@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <base href="../" target="_blank">
+  <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+
+  <script src="src/deps.js"></script>
+  <script src="test/script.js"></script>
+</head>
+<body ng-app="main">
+  <div ng-controller="MyController">
+    <visualization type="scatterplot"
+                   render="webgl"
+                   input-data="data"
+                   vis-resizable
+                   vis-rotatable
+                   vis-tooltip="on">
+      <vis-options vis-options-close vis-options-move>
+        <vis-option type="to-static-image"></vis-option>
+        <vis-option type="edit-code"></vis-option>
+        <vis-option type="toggle-tooltip"></vis-option>
+        <vis-option type="rotate">
+          <vis-option type="rotate-90"></vis-option>
+          <vis-option type="rotate-180"></vis-option>
+          <vis-option type="rotate-270"></vis-option>
+        </vis-option>
+        <vis-option type="colors"></vis-option>
+      </vis-options>
+    </visualization>
+    <visualization type="heatmap" input-data="data"></visualization>
+  </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "vis",
+  "version": "0.0.0",
+  "authors": [
+    "Florin Chelaru <florinc@mit.edu>",
+    "Manolis Kellis <manoli@mit.edu>"
+  ],
+  "description": "Data visualization library for Genomic and Epigenetic data",
+  "main": "js/vis.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "visualization",
+    "epigenomic",
+    "epigenomic"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "google-closure-library": "*",
+    "angular": "~1.4.4"
+  }
+}
