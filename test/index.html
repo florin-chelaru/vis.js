@@ -6,31 +6,65 @@
   <base href="../" target="_blank">
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
   <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/d3/d3.js"></script>
 
   <script src="src/deps.js"></script>
   <script src="test/script.js"></script>
 </head>
 <body ng-app="main">
   <div ng-controller="MyController">
-    <visualization type="scatterplot"
+    <!--<visualization type="scatterplot"
                    render="webgl"
-                   input-data="data"
+                   scale-coordinates="off"
+                   rows-order-by="age"
+                   cols-order-by="chr,start,end"
+                   color-by="row-sex"
+                   aggregate-by="row-sex"
                    vis-resizable
                    vis-rotatable
                    vis-tooltip="on">
-      <vis-options vis-options-close vis-options-move>
+      <vis-options close-button="on" move="on">
         <vis-option type="to-static-image"></vis-option>
         <vis-option type="edit-code"></vis-option>
         <vis-option type="toggle-tooltip"></vis-option>
+        <vis-option type="boundaries"></vis-option>
         <vis-option type="rotate">
           <vis-option type="rotate-90"></vis-option>
           <vis-option type="rotate-180"></vis-option>
           <vis-option type="rotate-270"></vis-option>
         </vis-option>
         <vis-option type="colors"></vis-option>
+        <vis-option type="axis-options">
+          <vis-option type="color-by"></vis-option>
+          <vis-option type="order-by"></vis-option>
+          <vis-option type="aggregate-by"></vis-option>
+        </vis-option>
       </vis-options>
-    </visualization>
-    <visualization type="heatmap" input-data="data"></visualization>
+      <vis-input-data>
+        <vis-rows>
+          <vis-array label="name" d="'florin','suze','wouter','apos'" />
+          <vis-array label="id" d="1,2,3,4" />
+          <vis-array label="age" d="30,24,35,22" />
+          <vis-array label="sex" d="'m','f','m','m'" />
+        </vis-rows>
+        <vis-cols>
+          <vis-array label="name" d="'gene1','gene2','gene3'" />
+          <vis-array label="id" d="1,2,3" />
+          <vis-array label="start" d="10,12,21" />
+          <vis-array label="end" d="15,16,25" />
+          <vis-array label="chr" d="1,1,1" />
+        </vis-cols>
+        <vis-values>
+          <vis-array label="gene expression" d="0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06, 0.865, 0.52, 0.915, 0.498" />
+        </vis-values>
+      </vis-input-data>
+    </visualization>-->
+    <visualization type="scatterplot"
+                   render="svg"
+                   width="400"
+                   height="400"
+                   input-data="data"
+                   options="options"></visualization>
   </div>
 </body>
 </html>

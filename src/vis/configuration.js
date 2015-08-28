@@ -15,14 +15,14 @@ vis.Configuration = function() {
    * @type {Object.<string, *>}
    * @private
    */
-  this._options = {
-  };
-
-  var self = this;
-  Object.defineProperty(this, 'options', {
-    get: function () { return self._options; }
-  });
+  this._options = {};
 };
+
+Object.defineProperties(vis.Configuration.prototype, {
+  options: {
+    get: function () { return this._options; }
+  }
+});
 
 /**
  * @param {Object.<string, *>} options

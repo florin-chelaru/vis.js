@@ -6,6 +6,8 @@
 
 goog.provide('vis.ui.Visualization');
 
+goog.require('vis.models.DataSource');
+
 /**
  * @param scope
  * @param element
@@ -13,22 +15,38 @@ goog.provide('vis.ui.Visualization');
  * @constructor
  */
 vis.ui.Visualization = function(scope, element, attrs) {
-  Object.defineProperties(this, {
-    scope: {
-      get: function() { return scope; }
-    },
-    element: {
-      get: function() { return element; }
-    },
-    attrs: {
-      get: function() { return attrs; }
-    }
-  });
+  /**
+   * @private
+   */
+  this._scope = scope;
+
+  /**
+   * @private
+   */
+  this._element = element;
+
+  /**
+   * @private
+   */
+  this._attrs = attrs;
 };
+
+Object.defineProperties(vis.ui.Visualization.prototype, {
+  scope: {
+    get: function() { return this._scope; }
+  },
+  element: {
+    get: function() { return this._element; }
+  },
+  attrs: {
+    get: function() { return this._attrs; }
+  },
+  data: {
+    /** @returns {vis.models.DataSource} */
+    get: function() { return this._scope.data; }
+  }
+});
 
 /**
  */
-vis.ui.Visualization.prototype.draw = function() {
-  var data = this.scope.data;
-  console.log(data);
-};
+vis.ui.Visualization.prototype.draw = function() {};

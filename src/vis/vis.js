@@ -12,48 +12,72 @@ goog.require('vis.ui.Visualization');
 
 vis.main = angular.module('vis', []);
 
-vis.main
-  .provider('configuration', function() {
-    var self = this;
-    self.__proto__ = new vis.Configuration();
-    self.$get = function() { return self; };
-  });
+vis.main.provider('configuration', function() {
+  var self = this;
+  self.__proto__ = new vis.Configuration();
+  self.$get = function() { return self; };
+});
 
-vis.main
-  .factory('visualizationFactory', ['configuration', function(configuration) {
-    return new vis.ui.VisualizationFactory(configuration);
-  }]);
+vis.main.factory('visualizationFactory', ['configuration', function(configuration) {
+  return new vis.ui.VisualizationFactory(configuration);
+}]);
 
-vis.main
-  .directive('visualization', ['visualizationFactory', function(visualizationFactory) {
-    return {
-      restrict: 'E',
-      templateUrl: 'res/templates/visualization.html',
-      scope: {
-        data: '=inputData'
-      },
-      link: function(scope, element, attrs) {
-        scope.handler = visualizationFactory.createNew(scope, element, attrs);
+vis.main.directive('visualization', ['visualizationFactory', function(visualizationFactory) {
+  return {
+    restrict: 'E',
+    templateUrl: 'res/templates/visualization.html',
+    scope: {
+      data: '=inputData'
+    },
+    controller: function($scope) {
 
-        scope.$watch(function(){return scope.data.dirty;}, function(newValue, oldValue) {
-          if (newValue) {
-            scope.handler.draw(scope.data);
-            scope.data.dirty = false;
-          }
-        });
-        /*scope.$watch(function(){return scope.data;}, function(newValue, oldValue) {
-          // SO basically, here we update the visualization
-          console.log(JSON.stringify(oldValue));
-        });*/
-        /*
-        Same thing:
-         scope.$watch('data', function(newValue, oldValue) {
-         console.log(JSON.stringify(newValue));
-         });
-         */
-      }
-    };
-  }]);
+    },
+    link: function(scope, element, attrs) {
+      scope.handler = visualizationFactory.createNew(scope, element, attrs);
+
+      scope.$watch(function(){return scope.data.dirty;}, function(newValue, oldValue) {
+        if (newValue) {
+          scope.handler.draw(scope.data);
+          scope.data.dirty = false;
+        }
+      });
+      /*
+      Same thing:
+       scope.$watch('data', function(newValue, oldValue) {
+       console.log(JSON.stringify(newValue));
+       });
+       */
+    }
+  };
+}]);
+
+// TODO: Later
+vis.main.directive('vis-input-data', function() {
+  return {
+    require: '^visualization',
+    restrict: 'E',
+    transclude: true,
+    scope: {
+    },
+    link: function(scope, element, attrs, visualizationCtrl) {
+      //visualizationCtrl.addPane(scope);
+    }
+  };
+});
+
+// TODO: Later
+vis.main.directive('vis-options', function() {
+  return {
+    require: '^visualization',
+    restrict: 'E',
+    transclude: true,
+    scope: {
+    },
+    link: function(scope, element, attrs, visualizationCtrl) {
+      //visualizationCtrl.addPane(scope);
+    }
+  };
+});
 
 vis.main
   .factory('$exceptionHandler', function() {
@@ -63,18 +87,4 @@ vis.main
   };
 });
 
-vis.main
-  .controller('MyController', ['$scope', '$interval', function($scope, $interval) {
-    $scope.data = {
-      dirty: false,
-      name: 'Naomi',
-      address: '1600 Amphitheatre'
-    };
-    $interval(function() {
-      $scope.data = {
-        dirty: ($scope.data.name + ' other').length >= 100,
-        name: $scope.data.name + ' other',
-        address: $scope.data.address + ' other'
-      }
-    }, 1000);
-  }]);
+

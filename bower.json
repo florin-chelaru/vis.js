@@ -25,6 +25,7 @@
   ],
   "dependencies": {
     "google-closure-library": "*",
-    "angular": "~1.4.4"
+    "angular": "~1.4.4",
+    "d3": "~3.5.6"
   }
 }
