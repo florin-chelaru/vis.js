@@ -8,6 +8,7 @@ goog.require('vis');
 
 goog.require('vis.ui.webgl.ScatterPlot');
 goog.require('vis.ui.svg.ScatterPlot');
+goog.require('vis.ui.svg.ScatterPlotOptions');
 goog.require('vis.ui.canvas.ScatterPlot');
 goog.require('vis.ui.svg.Heatmap');
 
@@ -42,7 +43,7 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
       { label: 'sex', d: ['m','f','m','m'] }
     ],
     cols: [
-      { label: 'name', d: ['gene1','gene2','gene3'] },
+      { label: 'name', d: ['gene1','gene2'] },
       { label: 'id', d: [1,2] },
       { label: 'start', d: [10,12] },
       { label: 'end', d: [15,16] },
@@ -50,10 +51,13 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
     ],
     vals: {
       label: 'gene expression',
-      d: [0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06]//, 0.865, 0.52, 0.915, 0.498]
+      d: [0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06],
+      boundaries: { min: 0, max: 1 }
     }
   };
   $scope.options = {
+    boundaries: {
+    }
   };
   /*$interval(function() {
    $scope.data = {

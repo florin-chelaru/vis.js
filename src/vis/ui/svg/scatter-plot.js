@@ -9,7 +9,10 @@ goog.provide('vis.ui.svg.ScatterPlot');
 goog.require('vis.ui.Visualization');
 goog.require('vis.utils');
 
+goog.require('vis.models.DataSource');
 goog.require('vis.models.RowDataItemWrapper');
+goog.require('vis.models.Boundaries');
+goog.require('vis.models.Margins');
 
 /**
  * @param scope
@@ -30,26 +33,35 @@ goog.inherits(vis.ui.svg.ScatterPlot, vis.ui.Visualization);
 vis.ui.svg.ScatterPlot.prototype.draw = function() {
   vis.ui.Visualization.prototype.draw.apply(this, arguments);
 
-  var data = this.data;
+  var data = this.scope.data;
   if (data.ncols != 2) {
     throw new vis.ui.UiException('Scatter plot can only draw exactly two columns.')
   }
 
-  // TODO
-  var xScale = d3.scale.linear()
-    .domain([0, 1])
-    .range([0, this.attrs.width]);
-  var yScale = d3.scale.linear()
-    .domain([0, 1])
-    .range([this.attrs.height, 0]);
+  // Nothing to draw
+  if (!data.nrows) { return; }
+
+  var options = this.options;
+
+  var margins = options.margins;
+  var xScale = options.scales.x;
+  var yScale = options.scales.y;
 
   var svg = d3.select(this.element[0]).select('svg');
   if (svg.empty()) {
     svg = d3.select(this.element[0])
       .append('svg')
-      .attr('width', this.attrs.width)
-      .attr('height', this.attrs.height);
+      .attr('width', options.width)
+      .attr('height', options.height);
   }
+
+  var viewport = svg.select('.viewport');
+  if (viewport.empty()) {
+    viewport = svg.append('g')
+      .attr('class', 'viewport');
+  }
+  viewport
+    .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
 
   var items = vis.utils.range(data.nrows).map(function(i) { return new vis.models.RowDataItemWrapper(data, i); });
   var selection = svg.selectAll('circle').data(items);

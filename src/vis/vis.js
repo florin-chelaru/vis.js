@@ -10,6 +10,9 @@ goog.require('vis.Configuration');
 goog.require('vis.ui.VisualizationFactory');
 goog.require('vis.ui.Visualization');
 
+goog.require('vis.directives.Visualization');
+goog.require('vis.directives.Axis');
+
 vis.main = angular.module('vis', []);
 
 vis.main.provider('configuration', function() {
@@ -23,33 +26,12 @@ vis.main.factory('visualizationFactory', ['configuration', function(configuratio
 }]);
 
 vis.main.directive('visualization', ['visualizationFactory', function(visualizationFactory) {
-  return {
-    restrict: 'E',
-    templateUrl: 'res/templates/visualization.html',
-    scope: {
-      data: '=inputData'
-    },
-    controller: function($scope) {
-
-    },
-    link: function(scope, element, attrs) {
-      scope.handler = visualizationFactory.createNew(scope, element, attrs);
-
-      scope.$watch(function(){return scope.data.dirty;}, function(newValue, oldValue) {
-        if (newValue) {
-          scope.handler.draw(scope.data);
-          scope.data.dirty = false;
-        }
-      });
-      /*
-      Same thing:
-       scope.$watch('data', function(newValue, oldValue) {
-       console.log(JSON.stringify(newValue));
-       });
-       */
-    }
-  };
+  return new vis.directives.Visualization(visualizationFactory);
 }]);
+
+vis.main.directive('visAxis', function() {
+  return new vis.directives.Axis();
+});
 
 // TODO: Later
 vis.main.directive('vis-input-data', function() {

@@ -7,6 +7,7 @@
 goog.provide('vis.ui.Visualization');
 
 goog.require('vis.models.DataSource');
+goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @param scope
@@ -41,8 +42,22 @@ Object.defineProperties(vis.ui.Visualization.prototype, {
   attrs: {
     get: function() { return this._attrs; }
   },
+
+  /**
+   * @type {vis.models.VisualizationOptions}
+   * @instance
+   * @memberof vis.ui.Visualization
+   */
+  options: {
+    get: function() { return this._scope.options; }
+  },
+
+  /**
+   * @type {vis.models.DataSource}
+   * @instance
+   * @memberof vis.ui.Visualization
+   */
   data: {
-    /** @returns {vis.models.DataSource} */
     get: function() { return this._scope.data; }
   }
 });

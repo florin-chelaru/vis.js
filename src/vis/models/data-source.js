@@ -15,28 +15,58 @@ goog.require('vis.models.DataArray');
 vis.models.DataSource = function() {};
 
 Object.defineProperties(vis.models.DataSource.prototype, {
+  /**
+   * @type {boolean}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   dirty: {
-    /** @returns {boolean} */
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new vis.AbstractMethodException(); },
+    set: function(value) { throw new vis.AbstractMethodException(); }
   },
+
+  /**
+   * @type {number}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   nrows: {
-    /** @returns {number} */
     get: function() { throw new vis.AbstractMethodException(); }
   },
+
+  /**
+   * @type {number}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   ncols: {
-    /** @returns {number} */
     get: function() { throw new vis.AbstractMethodException(); }
   },
+
+  /**
+   * @type {Array.<vis.models.DataArray>}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   rows: {
-    /** @returns {Array.<vis.models.DataArray>} */
     get: function() { throw new vis.AbstractMethodException(); }
   },
+
+  /**
+   * @type {Array.<vis.models.DataArray>}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   cols: {
-    /** @returns {Array.<vis.models.DataArray>} */
     get: function() { throw new vis.AbstractMethodException(); }
   },
+
+  /**
+   * @type {vis.models.DataArray}
+   * @instance
+   * @memberof vis.models.DataSource
+   */
   vals: {
-    /** @returns {Array.<vis.models.DataArray>} */
     get: function() { throw new vis.AbstractMethodException(); }
   }
 });
