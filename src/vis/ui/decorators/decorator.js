@@ -67,5 +67,17 @@ Object.defineProperties(vis.ui.decorators.Decorator.prototype, {
    */
   targetElement: {
     get: function() { return this._targetElement; }
+  },
+
+  data: {
+    get: function () { return this._scope.data; }
+  },
+
+  targetOptions: {
+    get: function () { return this._scope.targetOptions; }
   }
 });
+
+vis.ui.decorators.Decorator.prototype.draw = function() {
+
+};

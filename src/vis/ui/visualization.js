@@ -64,4 +64,8 @@ Object.defineProperties(vis.ui.Visualization.prototype, {
 
 /**
  */
+vis.ui.Visualization.prototype.preDraw = function() {};
+
+/**
+ */
 vis.ui.Visualization.prototype.draw = function() {};

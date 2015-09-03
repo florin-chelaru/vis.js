@@ -47,6 +47,8 @@ vis.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs) {
     $scope.options = $scope.visualizationFactory.generateOptions($scope, $element, $attrs);
     $scope.handler = $scope.visualizationFactory.createNew($scope, $element, $attrs);
+
+    $scope.handler.preDraw();
   },
   post: function($scope, $element, $attrs) {
     $scope.$watch(function(){ return $scope.options.dirty; }, function(newValue, oldValue) {

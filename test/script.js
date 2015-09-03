@@ -57,7 +57,9 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
   };
   $scope.options = {
     boundaries: {
-    }
+    },
+    width: 500,
+    height: 500
   };
   /*$interval(function() {
    $scope.data = {

@@ -27,6 +27,18 @@ vis.ui.svg.ScatterPlot = function(scope, element, attrs) {
 
 goog.inherits(vis.ui.svg.ScatterPlot, vis.ui.Visualization);
 
+vis.ui.svg.ScatterPlot.prototype.preDraw = function() {
+  vis.ui.Visualization.prototype.preDraw.apply(this, arguments);
+
+  var svg = d3.select(this.element[0]).select('svg');
+  if (svg.empty()) {
+    svg = d3.select(this.element[0])
+      .append('svg')
+      .attr('width', this.options.width)
+      .attr('height', this.options.height);
+  }
+};
+
 /**
  * @override
  */
@@ -48,12 +60,6 @@ vis.ui.svg.ScatterPlot.prototype.draw = function() {
   var yScale = options.scales.y;
 
   var svg = d3.select(this.element[0]).select('svg');
-  if (svg.empty()) {
-    svg = d3.select(this.element[0])
-      .append('svg')
-      .attr('width', options.width)
-      .attr('height', options.height);
-  }
 
   var viewport = svg.select('.viewport');
   if (viewport.empty()) {
@@ -63,11 +69,15 @@ vis.ui.svg.ScatterPlot.prototype.draw = function() {
   viewport
     .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
 
-  var items = vis.utils.range(data.nrows).map(function(i) { return new vis.models.RowDataItemWrapper(data, i); });
-  var selection = svg.selectAll('circle').data(items);
+  var items = vis.utils.range(data.nrows).map(function(i) {
+    return new vis.models.RowDataItemWrapper(data, i);
+  });
+  var selection = viewport.selectAll('circle').data(items);
 
   selection.enter()
-    .append('circle')
+    .append('circle');
+
+  selection
     .attr('r', 10)
     .attr('cx', function(d) { return xScale(d.vals[0]); })
     .attr('cy', function(d) { return yScale(d.vals[1]); })

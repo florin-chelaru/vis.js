@@ -12,6 +12,7 @@ goog.require('vis.ui.Visualization');
 
 goog.require('vis.directives.Visualization');
 goog.require('vis.directives.Axis');
+goog.require('vis.directives.Grid');
 
 vis.main = angular.module('vis', []);
 
@@ -31,6 +32,10 @@ vis.main.directive('visualization', ['visualizationFactory', function(visualizat
 
 vis.main.directive('visAxis', function() {
   return new vis.directives.Axis();
+});
+
+vis.main.directive('visGrid', function() {
+  return new vis.directives.Grid();
 });
 
 // TODO: Later

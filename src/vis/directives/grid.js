@@ -4,22 +4,22 @@
  * Time: 2:01 PM
  */
 
-goog.provide('vis.directives.Axis');
+goog.provide('vis.directives.Grid');
 
 goog.require('vis.directives.Visualization');
 goog.require('vis.directives.Decorator');
 
-goog.require('vis.ui.decorators.Axis');
+goog.require('vis.ui.decorators.Grid');
 
 /**
  * @constructor
  * @extends {vis.directives.Decorator}
  */
-vis.directives.Axis = function() {
+vis.directives.Grid = function() {
   vis.directives.Decorator.call(this, { type: '@', ticks: '@' });
 };
 
-goog.inherits(vis.directives.Axis, vis.directives.Decorator);
+goog.inherits(vis.directives.Grid, vis.directives.Decorator);
 
 /**
  * @param $scope
@@ -29,7 +29,7 @@ goog.inherits(vis.directives.Axis, vis.directives.Decorator);
  * @returns {vis.ui.decorators.Decorator}
  * @override
  */
-vis.directives.Axis.prototype.createHandler = function($scope, $element, $attrs, $targetElement) {
-  return new vis.ui.decorators.Axis($scope, $element, $attrs, $targetElement);
+vis.directives.Grid.prototype.createHandler = function($scope, $element, $attrs, $targetElement) {
+  return new vis.ui.decorators.Grid($scope, $element, $attrs, $targetElement);
 };
 

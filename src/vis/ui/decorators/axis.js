@@ -30,14 +30,6 @@ vis.ui.decorators.Axis.orientation = {
 };
 
 Object.defineProperties(vis.ui.decorators.Axis.prototype, {
-  data: {
-    get: function () { return this.scope.data; }
-  },
-
-  targetOptions: {
-    get: function () { return this.scope.targetOptions; }
-  },
-
   type: {
     get: function() { return this.scope.type; }
   },
@@ -52,12 +44,6 @@ vis.ui.decorators.Axis.prototype.draw = function() {
   if (!opts) { return; }
 
   var svg = d3.select(this.targetElement[0]).select('svg');
-  if (svg.empty()) {
-    svg = d3.select(this.element[0])
-      .append('svg')
-      .attr('width', this.attrs.width)
-      .attr('height', this.attrs.height);
-  }
 
   var type = this.type;
   var className = 'axis-' + type;
@@ -67,7 +53,6 @@ vis.ui.decorators.Axis.prototype.draw = function() {
       .attr('class', 'axis ' + className);
   }
 
-  var boundaries = opts.boundaries[type];
   var scale = opts.scales[type];
 
   var axisFn = d3.svg.axis()
@@ -79,8 +64,7 @@ vis.ui.decorators.Axis.prototype.draw = function() {
 
   var axisBox = axis[0][0].getBBox();
   var axisLocation = type == 'x' ? opts.origins : {x: opts.margins.left, y: opts.margins.top};
-  axisBox.x += axisLocation.x;
-  axisBox.y += axisLocation.y;
+  axisBox = { x: axisBox.x + axisLocation.x, y: axisBox.y + axisLocation.y, width: axisBox.width, height: axisBox.height};
 
   var offset = {top:0, bottom:0, left:0, right:0};
 
