@@ -7,19 +7,19 @@
 goog.provide('vis.directives.Axis');
 
 goog.require('vis.directives.Visualization');
-goog.require('vis.directives.Decorator');
+goog.require('vis.directives.GraphicDecorator');
 
 goog.require('vis.ui.decorators.Axis');
 
 /**
  * @constructor
- * @extends {vis.directives.Decorator}
+ * @extends {vis.directives.GraphicDecorator}
  */
 vis.directives.Axis = function() {
-  vis.directives.Decorator.call(this, { type: '@', ticks: '@' });
+  vis.directives.GraphicDecorator.call(this, { type: '@', ticks: '@' });
 };
 
-goog.inherits(vis.directives.Axis, vis.directives.Decorator);
+goog.inherits(vis.directives.Axis, vis.directives.GraphicDecorator);
 
 /**
  * @param $scope

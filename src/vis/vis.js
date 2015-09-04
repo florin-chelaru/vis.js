@@ -14,6 +14,8 @@ goog.require('vis.directives.Visualization');
 goog.require('vis.directives.Axis');
 goog.require('vis.directives.Grid');
 
+goog.require('vis.directives.Resizable');
+
 vis.main = angular.module('vis', []);
 
 vis.main.provider('configuration', function() {
@@ -36,6 +38,10 @@ vis.main.directive('visAxis', function() {
 
 vis.main.directive('visGrid', function() {
   return new vis.directives.Grid();
+});
+
+vis.main.directive('visResizable', function() {
+  return new vis.directives.Resizable();
 });
 
 // TODO: Later

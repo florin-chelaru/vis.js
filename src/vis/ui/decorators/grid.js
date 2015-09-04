@@ -56,11 +56,12 @@ vis.ui.decorators.Grid.prototype.draw = function() {
   var scale = opts.scales[type];
 
   var gridLines = grid
-    .selectAll('grid-line')
+    .selectAll('.grid-line')
     .data(scale.ticks(this.ticks));
 
   gridLines
-    .enter().append('line');
+    .enter().append('line')
+    .attr('class', 'grid-line');
 
   var x1 = type == 'x' ? scale : 0;
   var x2 = type == 'x' ? scale : opts.width - opts.margins.left - opts.margins.right;

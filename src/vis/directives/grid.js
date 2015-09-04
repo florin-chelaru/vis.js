@@ -7,19 +7,19 @@
 goog.provide('vis.directives.Grid');
 
 goog.require('vis.directives.Visualization');
-goog.require('vis.directives.Decorator');
+goog.require('vis.directives.GraphicDecorator');
 
 goog.require('vis.ui.decorators.Grid');
 
 /**
  * @constructor
- * @extends {vis.directives.Decorator}
+ * @extends {vis.directives.GraphicDecorator}
  */
 vis.directives.Grid = function() {
-  vis.directives.Decorator.call(this, { type: '@', ticks: '@' });
+  vis.directives.GraphicDecorator.call(this, { type: '@', ticks: '@' });
 };
 
-goog.inherits(vis.directives.Grid, vis.directives.Decorator);
+goog.inherits(vis.directives.Grid, vis.directives.GraphicDecorator);
 
 /**
  * @param $scope

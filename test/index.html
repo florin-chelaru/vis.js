@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title></title>
   <base href="../" target="_blank">
+
+  <link href="res/css/axis.css" rel="stylesheet" />
+  <link href="res/css/resizable.css" rel="stylesheet" />
+
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/d3/d3.js"></script>
@@ -66,11 +70,13 @@
                    width="400"
                    height="400"
                    input-data="data"
-                   options="options">
-      <vis-axis type="x"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-grid type="x"></vis-grid>
+                   options="options"
+
+                   vis-resizable>
+      <vis-grid type="x" ticks="10"></vis-grid>
       <vis-grid type="y"></vis-grid>
+      <vis-axis type="x" ticks="10"></vis-axis>
+      <vis-axis type="y"></vis-axis>
     </visualization>
   </div>
 </body>

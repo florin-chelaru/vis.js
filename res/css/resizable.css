@@ -1,0 +1,27 @@
+.resize-grab {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+  background-color: white;
+}
+
+.resize-grab.grab-top-left {
+  top: -15px;
+  left: -15px;
+}
+
+.resize-grab.grab-top-right {
+  top: -15px;
+  right: -15px;
+}
+
+.resize-grab.grab-bottom-left {
+  left: -15px;
+  bottom: -15px;
+}
+
+.resize-grab.grab-bottom-right {
+  right: -15px;
+  bottom: -15px;
+}
