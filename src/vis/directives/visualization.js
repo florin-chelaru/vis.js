@@ -16,7 +16,7 @@ goog.require('vis.ui.VisualizationFactory');
  */
 vis.directives.Visualization = function(visualizationFactory) {
   vis.directives.Directive.call(this, {
-    restrict: 'E',
+    restrict: 'A',
     scope: {
       _options: '=options',
 
@@ -52,6 +52,19 @@ vis.directives.Visualization.prototype.link = {
   },
   post: function($scope, $element, $attrs) {
     $scope.$watch(function(){ return $scope.options.dirty; }, function(newValue, oldValue) {
+      $scope.handler.draw();
+    });
+
+    var boundingBox = $element[0].getBoundingClientRect();
+
+    $element.resize(function(event) {
+      /*var newBoundingBox = event.target.getBoundingClientRect();
+      $scope.options.width -= newBoundingBox.width - boundingBox.width;
+      $scope.options.height -= newBoundingBox.height - boundingBox.height;
+      boundingBox = newBoundingBox;
+      $scope.handler.draw();*/
+      $scope.options.width -= event.dx;
+      $scope.options.height -= event.dy;
       $scope.handler.draw();
     });
 

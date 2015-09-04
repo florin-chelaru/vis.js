@@ -58,3 +58,11 @@ vis.models.Margins.prototype.add = function(offset) {
     this._bottom + offset.bottom,
     this._right + offset.right);
 };
+
+/**
+ * @param {*} other
+ * @returns {boolean}
+ */
+vis.models.Margins.prototype.equals = function(other) {
+  return (!!other && this._top == other._top && this._left == other._left && this._bottom == other._bottom && this._right == other._right);
+};

@@ -9,6 +9,7 @@
   <link href="res/css/resizable.css" rel="stylesheet" />
 
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/d3/d3.js"></script>
 
@@ -65,19 +66,28 @@
         </vis-values>
       </vis-input-data>
     </visualization>-->
-    <visualization type="scatterplot"
-                   render="svg"
-                   width="400"
-                   height="400"
-                   input-data="data"
-                   options="options"
-
-                   vis-resizable>
+    <div visualization
+         type="scatterplot"
+         render="svg"
+         input-data="data"
+         options="options">
+      <vis-resizable></vis-resizable>
       <vis-grid type="x" ticks="10"></vis-grid>
       <vis-grid type="y"></vis-grid>
       <vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
-    </visualization>
+    </div>
+    <div visualization
+         type="scatterplot"
+         render="svg"
+         input-data="data"
+         options="options">
+      <vis-resizable></vis-resizable>
+      <vis-grid type="x" ticks="10"></vis-grid>
+      <vis-grid type="y"></vis-grid>
+      <vis-axis type="x" ticks="10"></vis-axis>
+      <vis-axis type="y"></vis-axis>
+    </div>
   </div>
 </body>
 </html>

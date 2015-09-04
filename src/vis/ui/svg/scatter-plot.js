@@ -6,7 +6,7 @@
 
 goog.provide('vis.ui.svg.ScatterPlot');
 
-goog.require('vis.ui.Visualization');
+goog.require('vis.ui.svg.SvgVisualization');
 goog.require('vis.utils');
 
 goog.require('vis.models.DataSource');
@@ -19,31 +19,23 @@ goog.require('vis.models.Margins');
  * @param element
  * @param attrs
  * @constructor
- * @extends vis.ui.Visualization
+ * @extends vis.ui.svg.SvgVisualization
  */
 vis.ui.svg.ScatterPlot = function(scope, element, attrs) {
-  vis.ui.Visualization.call(this, scope, element, attrs);
+  vis.ui.svg.SvgVisualization.call(this, scope, element, attrs);
 };
 
-goog.inherits(vis.ui.svg.ScatterPlot, vis.ui.Visualization);
+goog.inherits(vis.ui.svg.ScatterPlot, vis.ui.svg.SvgVisualization);
 
 vis.ui.svg.ScatterPlot.prototype.preDraw = function() {
-  vis.ui.Visualization.prototype.preDraw.apply(this, arguments);
-
-  var svg = d3.select(this.element[0]).select('svg');
-  if (svg.empty()) {
-    svg = d3.select(this.element[0])
-      .append('svg')
-      .attr('width', this.options.width)
-      .attr('height', this.options.height);
-  }
+  vis.ui.svg.SvgVisualization.prototype.preDraw.apply(this, arguments);
 };
 
 /**
  * @override
  */
 vis.ui.svg.ScatterPlot.prototype.draw = function() {
-  vis.ui.Visualization.prototype.draw.apply(this, arguments);
+  vis.ui.svg.SvgVisualization.prototype.draw.apply(this, arguments);
 
   var data = this.scope.data;
   if (data.ncols != 2) {

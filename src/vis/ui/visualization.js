@@ -10,26 +10,26 @@ goog.require('vis.models.DataSource');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
- * @param scope
- * @param element
- * @param attrs
+ * @param $scope
+ * @param $element
+ * @param $attrs
  * @constructor
  */
-vis.ui.Visualization = function(scope, element, attrs) {
+vis.ui.Visualization = function($scope, $element, $attrs) {
   /**
    * @private
    */
-  this._scope = scope;
+  this._scope = $scope;
 
   /**
    * @private
    */
-  this._element = element;
+  this._element = $element;
 
   /**
    * @private
    */
-  this._attrs = attrs;
+  this._attrs = $attrs;
 };
 
 Object.defineProperties(vis.ui.Visualization.prototype, {

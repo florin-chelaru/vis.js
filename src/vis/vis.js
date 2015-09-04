@@ -40,9 +40,9 @@ vis.main.directive('visGrid', function() {
   return new vis.directives.Grid();
 });
 
-vis.main.directive('visResizable', function() {
-  return new vis.directives.Resizable();
-});
+vis.main.directive('visResizable', ['$document', function($document) {
+  return new vis.directives.Resizable($document);
+}]);
 
 // TODO: Later
 vis.main.directive('vis-input-data', function() {

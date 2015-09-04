@@ -19,10 +19,10 @@ vis.directives.Directive = function(options) {
   this.restrict = options.restrict;
   this._scope = options.scope;
   this._controller = options.controller;
-  this._template = options.template;
-  this._templateUrl = options.templateUrl;
+  this.template = options.template;
+  this.templateUrl = options.templateUrl;
   this.priority = options.priority;
-  this._transclude = options.transclude;
+  this.transclude = options.transclude;
   this._templateNamespace = options.templateNamespace;
   this._controllerAs = options.controllerAs;
   this._bindToController = options.bindToController;
@@ -45,18 +45,6 @@ Object.defineProperties(vis.directives.Directive.prototype, {
   controller: {
     /** @returns {function} */
     get: function() { return this._controller; }
-  },
-  template: {
-    /** @returns {string} */
-    get: function() { return this._template; }
-  },
-  templateUrl: {
-    /** @returns {string} */
-    get: function() { return this._templateUrl; }
-  },
-  transclude: {
-    /** @returns {boolean} */
-    get: function() { return this._transclude; }
   },
   templateNamespace: {
     /** @returns {string} */

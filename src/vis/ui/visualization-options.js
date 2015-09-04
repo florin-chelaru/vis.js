@@ -87,19 +87,34 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
         y: yBoundaries
       };
     },
-    set: function(value) { this._boundaries = value; this._dirty = true; }
+    set: function(value) { this._boundaries = value; this.redrawRequired(); }
   },
   margins: {
     get: function() { return this._margins; },
-    set: function(value) { this._margins = value; this._dirty = true; }
+    set: function(value) {
+      if (!this._margins.equals(value)) {
+        this._margins = value;
+        this.redrawRequired();
+      }
+    }
   },
   width: {
     get: function() { return this._width; },
-    set: function(value) { this._width = value; this._dirty = true; }
+    set: function(value) {
+      if (value != this._width) {
+        this._width = value;
+        this.redrawRequired();
+      }
+    }
   },
   height: {
     get: function() { return this._height; },
-    set: function(value) { this._height = value; this._dirty = true; }
+    set: function(value) {
+      if (value != this._height) {
+        this._height = value;
+        this.redrawRequired();
+      }
+    }
   },
   dimensions: {
     get: function() {
