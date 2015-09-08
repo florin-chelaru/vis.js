@@ -16,10 +16,9 @@ goog.require('vis.ui.decorators.Decorator');
 vis.directives.Resizable = function($document) {
   var self = this;
   vis.directives.Directive.call(this, {
-    restrict: 'E',// TODO: Change back to A and move in the elemen
-    templateUrl: 'res/templates/_resizable.html',
-    // replace: false,
-    transclude: true,
+    restrict: 'A',
+    replace: false,
+    transclude: false,
     controller: function($scope) {
       $scope.self = self;
       $scope.$document = $document;
@@ -39,33 +38,25 @@ goog.inherits(vis.directives.Resizable, vis.directives.Directive);
  * @override
  */
 vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
-  $element.parent()
-    .css('position', 'absolute');// TODO: Revert to this again
-    //.append('<div class="resize-grab grab-top-left" ng-click="doSomething()"></div>')
-    //.append('<div class="resize-grab grab-top-right"></div>')
-    //.append('<div class="resize-grab grab-bottom-left"></div>')
-    //.append('<div class="resize-grab grab-bottom-right"></div>');
+  $element
+    .css('position', 'absolute')
+    .append('<div class="resize-grab grab-top-left"></div>')
+    .append('<div class="resize-grab grab-top-right"></div>')
+    .append('<div class="resize-grab grab-bottom-left"></div>')
+    .append('<div class="resize-grab grab-bottom-right"></div>');
 
-  $topLeft = $element.find('.grab-top-left');
-  $topRight = $element.find('.grab-top-right');
-  $bottomLeft = $element.find('.grab-bottom-left');
-  $bottomRight = $element.find('.grab-bottom-right');
+  // TODO: Move the margin (5) in a configuration file;
+  // TODO: Caution: this is correlated to resizable.css: 5 = .resize-grab[width] - .resize-grab.grab-top-left[left]
+  var box = new vis.directives.Resizable.BoundingBox($element, 5);
 
-  var boundingBox = $element.parent()[0].getBoundingClientRect();
-
-  //var startX, startY, x, y, $target;
-  var startX = 0, startY = 0, x = 0, y = 0;
-  var $target;
+  var startX, startY, target;
 
   $element.find('.resize-grab').on('mousedown', function(event) {
     // Prevent default dragging of selected content
     event.preventDefault();
-    $target = $(this);
-    var offset = $target.position();
-    x = offset.left;
-    y = offset.top;
-    startX = event.pageX - x;
-    startY = event.pageY - y;
+    target = box.getHandler($(this));
+    startX = event.pageX - target.left;
+    startY = event.pageY - target.top;
     $scope.$document.on('mousemove', mousemove);
     $scope.$document.on('mouseup', mouseup);
   });
@@ -73,66 +64,19 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
   function mousemove(event) {
     var newY = event.pageY - startY;
     var newX = event.pageX - startX;
-    var delta;
 
-    //switch ($target[0]) {
-    //  case $topLeft[0]:
-    //    newX = Math.min(newX, boundingBox.right - 25);
-    //    newY = Math.min(newY, boundingBox.bottom - 25);
-    //    /*delta = {
-    //      dx: newX + 25 - boundingBox.left,
-    //      dy: newY + 25 - boundingBox.top
-    //    };
-    //    $element.parent().css({
-    //      top: (y + 25) + 'px',
-    //      left: (x + 25) + 'px'
-    //    });*/
-    //    break;
-    //  case $topRight[0]:
-    //    newX = Math.max(newX, boundingBox.left + 10);
-    //    newY = Math.min(newY, boundingBox.bottom - 25);
-    //    /*delta = {
-    //      dx: newX - 10 - boundingBox.right,
-    //      dy: newY + 25 - boundingBox.top
-    //    };
-    //    $element.parent().css({
-    //      top: (y + 25) + 'px'
-    //    });*/
-    //    break;
-    //  case $bottomLeft[0]:
-    //    newX = Math.min(newX, boundingBox.right - 25);
-    //    newY = Math.max(newY, boundingBox.top + 10);
-    //    /*delta = {
-    //      dx: newX + 25 - boundingBox.left,
-    //      dy: newY - 10 - boundingBox.bottom
-    //    };
-    //    $element.parent().css({
-    //      left: (x + 25) + 'px'
-    //    });*/
-    //    break;
-    //  case $bottomRight[0]:
-    //    newX = Math.max(newX, boundingBox.left + 10);
-    //    newY = Math.max(newY, boundingBox.top + 10);
-    //    /*delta = {
-    //      dx: newX - 10 - boundingBox.right,
-    //      dy: newY - 10 - boundingBox.bottom
-    //    };*/
-    //    break;
-    //}
+    target.top = newY;
+    target.left = newX;
 
-    y = newY;
-    x = newX;
-    $target.css({
-      top: y + 'px',
-      left:  x + 'px'
+    box.update(target);
+
+    $element.css({
+      top: box.top + 'px',
+      left: box.left + 'px',
+      width: box.width + 'px',
+      height: box.height + 'px'
     });
-
-    /*$element.parent().css({
-      width: boundingBox.width - delta.dx,
-      height: boundingBox.height - delta.dy
-    });*/
-    //boundingBox = $element.parent()[0].getBoundingClientRect();
-    //$element.parent().trigger($.Event('resize', delta));
+    $element.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
   }
 
   function mouseup() {
@@ -140,3 +84,134 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
     $scope.$document.off('mouseup', mouseup);
   }
 };
+
+/**
+ * @param {jQuery} $elem
+ * @constructor
+ */
+vis.directives.Resizable.ResizeHandler = function($elem) {
+  /**
+   * @type {jQuery}
+   */
+  this.$elem = $elem;
+  var rect = $elem[0].getBoundingClientRect();
+  this.top = rect.top;
+  this.left = rect.left;
+  this.width = rect.width;
+  this.height = rect.height;
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vis.directives.Resizable.ResizeHandler}
+ */
+vis.directives.Resizable.ResizeHandler.topLeft = function($elem) {
+  return new vis.directives.Resizable.ResizeHandler($elem.find('.grab-top-left'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vis.directives.Resizable.ResizeHandler}
+ */
+vis.directives.Resizable.ResizeHandler.topRight = function($elem) {
+  return new vis.directives.Resizable.ResizeHandler($elem.find('.grab-top-right'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vis.directives.Resizable.ResizeHandler}
+ */
+vis.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {
+  return new vis.directives.Resizable.ResizeHandler($elem.find('.grab-bottom-left'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vis.directives.Resizable.ResizeHandler}
+ */
+vis.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
+  return new vis.directives.Resizable.ResizeHandler($elem.find('.grab-bottom-right'));
+};
+
+/**
+ * @param {jQuery} $element
+ * @param {number} margin
+ * @constructor
+ */
+vis.directives.Resizable.BoundingBox = function($element, margin) {
+  this.topLeft = vis.directives.Resizable.ResizeHandler.topLeft($element);
+  this.topRight = vis.directives.Resizable.ResizeHandler.topRight($element);
+  this.bottomLeft = vis.directives.Resizable.ResizeHandler.bottomLeft($element);
+  this.bottomRight = vis.directives.Resizable.ResizeHandler.bottomRight($element);
+  this._margin = margin;
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vis.directives.Resizable.ResizeHandler}
+ */
+vis.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {
+  switch ($elem[0]) {
+    case this.topLeft.$elem[0]:
+      return this.topLeft;
+    case this.bottomLeft.$elem[0]:
+      return this.bottomLeft;
+    case this.topRight.$elem[0]:
+      return this.topRight;
+    case this.bottomRight.$elem[0]:
+      return this.bottomRight;
+    default:
+      return null;
+  }
+};
+
+/**
+ * @param {vis.directives.Resizable.ResizeHandler} handler
+ */
+vis.directives.Resizable.BoundingBox.prototype.update = function(handler) {
+  switch (handler) {
+    case this.topLeft:
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin);
+      this.bottomLeft.left = handler.left;
+      this.topRight.top = handler.top;
+      break;
+    case this.bottomLeft:
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin);
+      this.topLeft.left = handler.left;
+      this.bottomRight.top = handler.top;
+      break;
+    case this.topRight:
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin);
+      this.topLeft.top = handler.top;
+      this.bottomRight.left = handler.left;
+      break;
+    case this.bottomRight:
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin);
+      this.topRight.left = handler.left;
+      this.bottomLeft.top = handler.top;
+      break;
+  }
+};
+
+Object.defineProperties(vis.directives.Resizable.BoundingBox.prototype, {
+  left: {
+    get: function() { return this.topLeft.left + this.topLeft.width + this._margin; }
+  },
+  top: {
+    get: function() { return this.topLeft.top + this.topLeft.height + this._margin; }
+  },
+  width: {
+    get: function() {
+      return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin;
+    }
+  },
+  height: {
+    get: function() {
+      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - 2 * this._margin;
+    }
+  }
+});

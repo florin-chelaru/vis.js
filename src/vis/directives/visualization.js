@@ -55,16 +55,9 @@ vis.directives.Visualization.prototype.link = {
       $scope.handler.draw();
     });
 
-    var boundingBox = $element[0].getBoundingClientRect();
-
     $element.resize(function(event) {
-      /*var newBoundingBox = event.target.getBoundingClientRect();
-      $scope.options.width -= newBoundingBox.width - boundingBox.width;
-      $scope.options.height -= newBoundingBox.height - boundingBox.height;
-      boundingBox = newBoundingBox;
-      $scope.handler.draw();*/
-      $scope.options.width -= event.dx;
-      $scope.options.height -= event.dy;
+      $scope.options.width = event.width;
+      $scope.options.height = event.height;
       $scope.handler.draw();
     });
 

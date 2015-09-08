@@ -34,7 +34,11 @@ vis.ui.svg.SvgVisualization.prototype.preDraw = function () {
     d3.select(this.element[0])
       .append('svg')
       .attr('width', this.options.width)
-      .attr('height', this.options.height);
+      .attr('height', this.options.height)
+      .append('rect')
+      .style('fill', '#ffffff')
+      .attr('width', '100%')
+      .attr('height', '100%');
   }
 };
 

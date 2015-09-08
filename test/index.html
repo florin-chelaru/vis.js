@@ -5,6 +5,7 @@
   <title></title>
   <base href="../" target="_blank">
 
+  <link href="test/style.css" rel="stylesheet" />
   <link href="res/css/axis.css" rel="stylesheet" />
   <link href="res/css/resizable.css" rel="stylesheet" />
 
@@ -70,19 +71,9 @@
          type="scatterplot"
          render="svg"
          input-data="data"
-         options="options">
-      <vis-resizable></vis-resizable>
-      <vis-grid type="x" ticks="10"></vis-grid>
-      <vis-grid type="y"></vis-grid>
-      <vis-axis type="x" ticks="10"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-    </div>
-    <div visualization
-         type="scatterplot"
-         render="svg"
-         input-data="data"
-         options="options">
-      <vis-resizable></vis-resizable>
+         options="options"
+         vis-resizable
+         style="top: 30px; left: 30px;">
       <vis-grid type="x" ticks="10"></vis-grid>
       <vis-grid type="y"></vis-grid>
       <vis-axis type="x" ticks="10"></vis-axis>

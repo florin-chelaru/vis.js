@@ -51,6 +51,10 @@ vis.directives.GraphicDecorator.prototype.link = function($scope, $element, $att
     $scope.handler.draw();
   });
 
+  $element.parent().resize(function(event) {
+    $scope.handler.draw();
+  });
+
   $scope.handler.draw();
 };
 
