@@ -33,24 +33,11 @@ vis.ui.svg.SvgVisualization.prototype.preDraw = function () {
   if (d3.select(this.element[0]).select('svg').empty()) {
     d3.select(this.element[0])
       .append('svg')
-      .attr('width', this.options.width)
-      .attr('height', this.options.height)
+      .attr('width', '100%')
+      .attr('height', '100%')
       .append('rect')
       .style('fill', '#ffffff')
       .attr('width', '100%')
       .attr('height', '100%');
   }
-};
-
-/**
- * @override
- */
-vis.ui.svg.SvgVisualization.prototype.draw = function () {
-  vis.ui.Visualization.prototype.draw.apply(this, arguments);
-
-  d3.select(this.element[0]).select('svg')
-    .attr('width', '100%')
-    .attr('height', '100%');
-      //.attr('width', this.options.width)
-      //.attr('height', this.options.height);
 };

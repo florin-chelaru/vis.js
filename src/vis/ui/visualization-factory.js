@@ -113,7 +113,13 @@ vis.ui.VisualizationFactory.prototype.generateOptions = function($scope, $elemen
   }
 
   typeStr += 'Options';
-  var ctor = vis.reflection.evaluateFullyQualifiedTypeName(typeStr);
+  var ctor;
+  try {
+    ctor = vis.reflection.evaluateFullyQualifiedTypeName(typeStr);
+  } catch (ex) {
+    // No customized options defined for this visualization. We will use the standard ones.
+    ctor = vis.ui.VisualizationOptions;
+  }
   var ret = vis.reflection.applyConstructor(ctor, [$scope._options, $scope.data]);
 
   if (!(ret instanceof vis.ui.VisualizationOptions)) {
