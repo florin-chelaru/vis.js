@@ -1,0 +1,59 @@
+@grab-size: 24px;
+@margin: @grab-size * 0.5;
+
+.resize-show-on-hover {
+  opacity: 0;
+}
+
+.resize-show-on-hover:hover {
+  opacity: 1;
+}
+
+.resize-box {
+  border: 1px dashed #aaaaaa;
+  position: absolute;
+  width: calc(~'100% + 2 * @{grab-size}');
+  height: calc(~'100% + 2 * @{grab-size}');
+  top: -@grab-size;
+  left: -@grab-size;
+}
+
+.resize-grab {
+  opacity: 0;
+  position: absolute;
+  width: @grab-size;
+  height: @grab-size;
+  border: 1px solid #aaaaaa;
+
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.resize-grab.grab-top-left {
+  top: -@margin;
+  left: -@margin;
+
+  cursor: nw-resize;
+}
+
+.resize-grab.grab-top-right {
+  top: -@margin;
+  right: -@margin;
+
+  cursor: ne-resize;
+}
+
+.resize-grab.grab-bottom-left {
+  bottom: -@margin;
+  left: -@margin;
+
+  cursor: sw-resize;
+}
+
+.resize-grab.grab-bottom-right {
+  bottom: -@margin;
+  right: -@margin;
+
+  cursor: se-resize;
+}

@@ -7,12 +7,14 @@
 
   <link href="test/style.css" rel="stylesheet" />
   <link href="res/css/axis.css" rel="stylesheet" />
+  <link href="res/css/window.css" rel="stylesheet" />
   <link href="res/css/resizable.css" rel="stylesheet" />
 
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/d3/d3.js"></script>
+  <script src="bower_components/less/dist/less.js"></script>
 
   <script src="src/deps.js"></script>
   <script src="test/script.js"></script>
@@ -33,7 +35,7 @@
         <vis-option type="to-static-image"></vis-option>
         <vis-option type="edit-code"></vis-option>
         <vis-option type="toggle-tooltip"></vis-option>
-        <vis-option type="boundaries"></vis-option>
+        <vis-option type="axisBoundaries"></vis-option>
         <vis-option type="rotate">
           <vis-option type="rotate-90"></vis-option>
           <vis-option type="rotate-180"></vis-option>
@@ -72,6 +74,7 @@
          render="svg"
          input-data="data"
          options="options"
+         vis-window
          vis-resizable
          style="top: 30px; left: 30px;">
       <vis-grid type="x" ticks="10"></vis-grid>

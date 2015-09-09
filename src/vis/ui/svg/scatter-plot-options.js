@@ -14,7 +14,7 @@ goog.require('vis.models.Margins');
 
 /**
  * @param {{
- *   boundaries: vis.models.Boundaries=, margins: vis.models.Margins=,
+ *   axisBoundaries: Object.<string, vis.models.Boundaries>=, margins: vis.models.Margins=,
  *   width: number=, height: number= }} options
  * @param {vis.models.DataSource} data
  * @constructor

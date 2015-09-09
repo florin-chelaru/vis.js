@@ -16,14 +16,13 @@ goog.require('vis.ui.decorators.Decorator');
 vis.directives.Resizable = function($document) {
   var self = this;
   vis.directives.Directive.call(this, {
+    require: '^vis-window',
     restrict: 'A',
     replace: false,
     transclude: false,
     controller: function($scope) {
       $scope.self = self;
       $scope.$document = $document;
-      $scope.doSomething = function() {
-      }
     }
   });
 };
@@ -39,27 +38,40 @@ goog.inherits(vis.directives.Resizable, vis.directives.Directive);
  */
 vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
   $element
-    .css('position', 'absolute')
+    .css({
+      position: 'absolute'
+    })
+    //.append('<div class="resize-box resize-show-on-hover"></div>')
+    //.append('<div class="resize-grab grab-top-left resize-show-on-hover"></div>')
+    //.append('<div class="resize-grab grab-top-right resize-show-on-hover"></div>')
+    //.append('<div class="resize-grab grab-bottom-left resize-show-on-hover"></div>')
+    //.append('<div class="resize-grab grab-bottom-right resize-show-on-hover"></div>');
     .append('<div class="resize-grab grab-top-left"></div>')
     .append('<div class="resize-grab grab-top-right"></div>')
     .append('<div class="resize-grab grab-bottom-left"></div>')
     .append('<div class="resize-grab grab-bottom-right"></div>');
 
-  // TODO: Move the margin (5) in a configuration file;
-  // TODO: Caution: this is correlated to resizable.css: 5 = .resize-grab[width] - .resize-grab.grab-top-left[left]
-  var box = new vis.directives.Resizable.BoundingBox($element, 5);
+  var resizing = false;
 
+  //function hover() { $element.find('.resize-show-on-hover').css({ opacity: 1 }); }
+  //function unhover() { $element.find('.resize-show-on-hover').css({ opacity: 0 }); }
+
+  //$element.hover(hover, unhover);
+
+  var box = new vis.directives.Resizable.BoundingBox($element);
   var startX, startY, target;
 
-  $element.find('.resize-grab').on('mousedown', function(event) {
+  function mousedown(event) {
     // Prevent default dragging of selected content
     event.preventDefault();
+    resizing = true;
     target = box.getHandler($(this));
     startX = event.pageX - target.left;
     startY = event.pageY - target.top;
     $scope.$document.on('mousemove', mousemove);
     $scope.$document.on('mouseup', mouseup);
-  });
+    //$element.off('mouseenter mouseleave');
+  }
 
   function mousemove(event) {
     var newY = event.pageY - startY;
@@ -82,7 +94,10 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
   function mouseup() {
     $scope.$document.off('mousemove', mousemove);
     $scope.$document.off('mouseup', mouseup);
+    //$element.hover(hover, unhover);
   }
+
+  $element.find('.resize-grab').on('mousedown', mousedown);
 };
 
 /**
@@ -135,15 +150,14 @@ vis.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
 
 /**
  * @param {jQuery} $element
- * @param {number} margin
  * @constructor
  */
-vis.directives.Resizable.BoundingBox = function($element, margin) {
+vis.directives.Resizable.BoundingBox = function($element) {
   this.topLeft = vis.directives.Resizable.ResizeHandler.topLeft($element);
   this.topRight = vis.directives.Resizable.ResizeHandler.topRight($element);
   this.bottomLeft = vis.directives.Resizable.ResizeHandler.bottomLeft($element);
   this.bottomRight = vis.directives.Resizable.ResizeHandler.bottomRight($element);
-  this._margin = margin;
+  this._margin = -this.topLeft.width * 0.5; // This assumes that all handlers are square and of the same size
 };
 
 /**

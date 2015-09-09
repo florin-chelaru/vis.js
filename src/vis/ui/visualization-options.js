@@ -12,17 +12,17 @@ goog.require('vis.models.DataSource');
 
 /**
  * @param {{
- *   boundaries: vis.models.Boundaries=, margins: vis.models.Margins=,
+ *   axisBoundaries: Object.<string, vis.models.Boundaries>=, margins: vis.models.Margins=,
  *   width: number=, height: number= }} options
  * @param {vis.models.DataSource} [data]
  * @constructor
  */
 vis.ui.VisualizationOptions = function(options, data) {
   /**
-   * @type {vis.models.Boundaries}
+   * @type {Object.<string, vis.models.Boundaries>}
    * @protected
    */
-  this._boundaries = options.boundaries;
+  this._axisBoundaries = options.axisBoundaries;
 
   /**
    * @type {vis.models.Margins}
@@ -59,13 +59,13 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
   dirty: {
     get: function() { return this._dirty; }
   },
-  boundaries: {
+  axisBoundaries: {
     get: function() {
       var xBoundaries, yBoundaries;
 
-      if (this._boundaries) {
-        xBoundaries = this._boundaries.x;
-        yBoundaries = this._boundaries.y;
+      if (this._axisBoundaries) {
+        xBoundaries = this._axisBoundaries.x;
+        yBoundaries = this._axisBoundaries.y;
       }
 
       if (!xBoundaries) { xBoundaries = this._data.vals.boundaries; }
@@ -87,12 +87,14 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
         y: yBoundaries
       };
     },
-    set: function(value) { this._boundaries = value; this.redrawRequired(); }
+    set: function(value) { this._axisBoundaries = value; this.redrawRequired(); }
   },
   margins: {
     get: function() { return this._margins; },
     set: function(value) {
-      if (!this._margins.equals(value)) {
+      if (!this._margins.equals(value) &&
+          value.left + value.right <= this._width &&
+          value.top + value.bottom <= this._height) {
         this._margins = value;
         this.redrawRequired();
       }
@@ -101,7 +103,7 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
   width: {
     get: function() { return this._width; },
     set: function(value) {
-      if (value != this._width) {
+      if (value != this._width && value >= this._margins.left + this._margins.right) {
         this._width = value;
         this.redrawRequired();
       }
@@ -110,7 +112,7 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
   height: {
     get: function() { return this._height; },
     set: function(value) {
-      if (value != this._height) {
+      if (value != this._height && value >= this._margins.top + this._margins.bottom) {
         this._height = value;
         this.redrawRequired();
       }
@@ -126,7 +128,7 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
   },
   scales: {
     get: function() {
-      var boundaries = this.boundaries;
+      var boundaries = this.axisBoundaries;
       return {
         x: d3.scale.linear()
           .domain([boundaries.x.min, boundaries.x.max])

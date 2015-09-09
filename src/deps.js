@@ -7,8 +7,10 @@ goog.addDependency('../../../../src/vis/directives/control-decorator.js', ['vis.
 goog.addDependency('../../../../src/vis/directives/directive.js', ['vis.directives.Directive'], [], false);
 goog.addDependency('../../../../src/vis/directives/graphic-decorator.js', ['vis.directives.GraphicDecorator'], ['vis.directives.Visualization', 'vis.ui.decorators.Decorator'], false);
 goog.addDependency('../../../../src/vis/directives/grid.js', ['vis.directives.Grid'], ['vis.directives.GraphicDecorator', 'vis.directives.Visualization', 'vis.ui.decorators.Grid'], false);
+goog.addDependency('../../../../src/vis/directives/movable.js', ['vis.directives.Movable'], ['vis.ui.decorators.Decorator'], false);
 goog.addDependency('../../../../src/vis/directives/resizable.js', ['vis.directives.Resizable'], ['vis.ui.decorators.Decorator'], false);
 goog.addDependency('../../../../src/vis/directives/visualization.js', ['vis.directives.Visualization'], ['vis.directives.Directive', 'vis.ui.VisualizationFactory'], false);
+goog.addDependency('../../../../src/vis/directives/window.js', ['vis.directives.Window'], ['vis.ui.decorators.Decorator'], false);
 goog.addDependency('../../../../src/vis/exception.js', ['vis.Exception'], [], false);
 goog.addDependency('../../../../src/vis/models/boundaries.js', ['vis.models.Boundaries'], [], false);
 goog.addDependency('../../../../src/vis/models/data-array.js', ['vis.models.DataArray'], ['vis.AbstractMethodException', 'vis.models.Boundaries'], false);
@@ -33,4 +35,4 @@ goog.addDependency('../../../../src/vis/ui/visualization-options.js', ['vis.ui.V
 goog.addDependency('../../../../src/vis/ui/visualization.js', ['vis.ui.Visualization'], ['vis.models.DataSource', 'vis.ui.VisualizationOptions'], false);
 goog.addDependency('../../../../src/vis/ui/webgl/scatter-plot.js', ['vis.ui.webgl.ScatterPlot'], ['vis.ui.Visualization'], false);
 goog.addDependency('../../../../src/vis/utils/utils.js', ['vis.utils'], [], false);
-goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory'], false);
+goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.directives.Window', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory'], false);

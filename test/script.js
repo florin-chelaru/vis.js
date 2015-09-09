@@ -56,8 +56,7 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
     }
   };
   $scope.options = {
-    boundaries: {
-    },
+    axisBoundaries: {},
     width: 500,
     height: 500
   };

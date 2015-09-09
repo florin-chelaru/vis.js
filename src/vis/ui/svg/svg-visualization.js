@@ -49,6 +49,8 @@ vis.ui.svg.SvgVisualization.prototype.draw = function () {
   vis.ui.Visualization.prototype.draw.apply(this, arguments);
 
   d3.select(this.element[0]).select('svg')
-      .attr('width', this.options.width)
-      .attr('height', this.options.height);
+    .attr('width', '100%')
+    .attr('height', '100%');
+      //.attr('width', this.options.width)
+      //.attr('height', this.options.height);
 };
