@@ -1,9 +1,3 @@
-.resize-show-on-hover {
-  opacity: 0;
-}
-.resize-show-on-hover:hover {
-  opacity: 1;
-}
 .resize-box {
   border: 1px dashed #aaaaaa;
   position: absolute;
@@ -15,12 +9,14 @@
 .resize-grab {
   opacity: 0;
   position: absolute;
-  width: 24px;
-  height: 24px;
   border: 1px solid #aaaaaa;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+}
+.resize-grab.grab-diagonal {
+  width: 24px;
+  height: 24px;
 }
 .resize-grab.grab-top-left {
   top: -12px;
@@ -41,4 +37,28 @@
   bottom: -12px;
   right: -12px;
   cursor: se-resize;
+}
+.resize-grab.grab-vertical {
+  top: 12px;
+  width: 24px;
+  height: calc(100% - (24px - 12px) * 2);
+  cursor: ew-resize;
+}
+.resize-grab.grab-vertical.grab-left {
+  left: -12px;
+}
+.resize-grab.grab-vertical.grab-right {
+  right: -12px;
+}
+.resize-grab.grab-horizontal {
+  left: 12px;
+  height: 24px;
+  width: calc(100% - (24px - 12px) * 2);
+  cursor: ns-resize;
+}
+.resize-grab.grab-horizontal.grab-top {
+  top: -12px;
+}
+.resize-grab.grab-horizontal.grab-bottom {
+  bottom: -12px;
 }

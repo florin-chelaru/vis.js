@@ -16,6 +16,7 @@ goog.require('vis.directives.Grid');
 
 goog.require('vis.directives.Window');
 goog.require('vis.directives.Resizable');
+goog.require('vis.directives.Movable');
 
 vis.main = angular.module('vis', []);
 
@@ -47,6 +48,10 @@ vis.main.directive('visWindow', function($document) {
 
 vis.main.directive('visResizable', ['$document', function($document) {
   return new vis.directives.Resizable($document);
+}]);
+
+vis.main.directive('visMovable', ['$document', function($document) {
+  return new vis.directives.Movable($document);
 }]);
 
 // TODO: Later

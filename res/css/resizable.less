@@ -1,14 +1,6 @@
 @grab-size: 24px;
 @margin: @grab-size * 0.5;
 
-.resize-show-on-hover {
-  opacity: 0;
-}
-
-.resize-show-on-hover:hover {
-  opacity: 1;
-}
-
 .resize-box {
   border: 1px dashed #aaaaaa;
   position: absolute;
@@ -21,13 +13,16 @@
 .resize-grab {
   opacity: 0;
   position: absolute;
-  width: @grab-size;
-  height: @grab-size;
   border: 1px solid #aaaaaa;
 
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+.resize-grab.grab-diagonal {
+  width: @grab-size;
+  height: @grab-size;
 }
 
 .resize-grab.grab-top-left {
@@ -56,4 +51,34 @@
   right: -@margin;
 
   cursor: se-resize;
+}
+
+.resize-grab.grab-vertical {
+  top: @margin;
+  width: @grab-size;
+  height: calc(~'100% - (@{grab-size} - @{margin}) * 2');
+  cursor: ew-resize;
+}
+
+.resize-grab.grab-vertical.grab-left {
+  left: -@margin;
+}
+
+.resize-grab.grab-vertical.grab-right {
+  right: -@margin;
+}
+
+.resize-grab.grab-horizontal {
+  left: @margin;
+  height: @grab-size;
+  width: calc(~'100% - (@{grab-size} - @{margin}) * 2');
+  cursor: ns-resize;
+}
+
+.resize-grab.grab-horizontal.grab-top {
+  top: -@margin;
+}
+
+.resize-grab.grab-horizontal.grab-bottom {
+  bottom: -@margin;
 }
