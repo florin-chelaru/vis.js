@@ -19,8 +19,8 @@ vis.directives.ControlDecorator = function() {
     restrict: 'A',
     scope: {
     },
-    controller: function($scope) {
-    }
+    controller: ['$scope', function($scope) {
+    }]
   });
 };
 

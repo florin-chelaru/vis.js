@@ -52,8 +52,7 @@ vis.reflection.applyConstructor = function(ctor, params) {
   var fakeCtor = function() {};
   fakeCtor.prototype = ctor.prototype;
 
-  /** @type {T} */
-  obj = new fakeCtor();
+  obj = /** @type {T} */ (new fakeCtor());
 
   // Set the object's `constructor`
   obj.constructor = ctor;

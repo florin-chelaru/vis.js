@@ -22,7 +22,7 @@ vis.directives.Visualization = function(visualizationFactory) {
 
       data: '=inputData'
     },
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.visualizationFactory = visualizationFactory;
       $scope.options = null;
       $scope.handler = null;
@@ -31,7 +31,7 @@ vis.directives.Visualization = function(visualizationFactory) {
         options: { get: function() { return $scope.options; } },
         data: { get: function() { return $scope.data; } }
       });
-    }
+    }]
   });
 };
 

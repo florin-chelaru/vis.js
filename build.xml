@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project>
+  <target name="concatenate" description="Concatenate css files">
+	<echo message="Generate concatenated stylesheet: vis.css" />
+    <concat destfile="vis.css">
+      <fileset dir="res/css" includes="*.css" excludes="*.min.css" />
+    </concat>
+  </target>
+  
+  <target name="compress" depends="concatenate" description="Compress vis.css to vis.min.css">
+	<echo message="Minify vis.css -> vis.min.css" />
+	<java jar="node_modules/yuicompressor/build/yuicompressor-2.4.8.jar" fork="true">
+        <arg value="vis.css" /> <!-- input path for CSS files -->
+        <!--<arg value="-v" />--> <!-- Turn on verbose -->
+        <arg value="-o" />
+        <arg value="vis.min.css" /> <!-- output path for CSS files -->
+    </java>
+	<delete file="vis.css"/>
+</target>
+</project>

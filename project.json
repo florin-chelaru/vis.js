@@ -1,0 +1,12 @@
+{
+  "name": "vis",
+  "version": "0.0.0",
+  "authors": [
+    "Florin Chelaru <florinc@mit.edu>",
+    "Manolis Kellis <manoli@mit.edu>"
+  ],
+  "description": "Data visualization library for Genomic and Epigenetic data",
+  "dependencies": {
+    "yuicompressor": "2.4.8"
+  }
+}

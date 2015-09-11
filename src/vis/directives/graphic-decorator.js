@@ -22,11 +22,11 @@ vis.directives.GraphicDecorator = function($scope, controller) {
     restrict: 'E',
     transclude: true,
     scope: $scope,
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.self = self;
 
       if (controller) { controller($scope); }
-    }
+    }]
   });
 };
 

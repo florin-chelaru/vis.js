@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <base href="../" target="_blank">
+
+  <link href="vis.min.css" rel="stylesheet" />
+  <link href="test/style.css" rel="stylesheet" />
+
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/d3/d3.js"></script>
+
+  <script src="vis.min.js"></script>
+  <script src="test/script.js"></script>
+</head>
+<body ng-app="main">
+  <div ng-controller="MyController">
+    <div visualization
+         type="scatterplot"
+         render="svg"
+         input-data="data"
+         options="options"
+         vis-window
+         vis-resizable
+         vis-movable
+         style="top: 50px; left: 50px;">
+      <vis-grid type="x" ticks="10"></vis-grid>
+      <vis-grid type="y"></vis-grid>
+      <vis-axis type="x" ticks="10"></vis-axis>
+      <vis-axis type="y"></vis-axis>
+    </div>
+    <div visualization
+         type="scatterplot"
+         render="canvas"
+         input-data="data"
+         options="options"
+         vis-window
+         vis-resizable
+         vis-movable
+         style="top: 50px; left: 560px;">
+    </div>
+  </div>
+</body>
+</html>

@@ -6,20 +6,19 @@
 
 goog.provide('vis.directives.Window');
 
-goog.require('vis.ui.decorators.Decorator');
+goog.require('vis.directives.Directive');
 
 /**
- * @param $document
  * @constructor
  * @extends {vis.directives.Directive}
  */
-vis.directives.Window = function($document) {
+vis.directives.Window = function() {
   var self = this;
   vis.directives.Directive.call(this, {
     restrict: 'A',
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.self = self;
-    }
+    }]
   });
 };
 

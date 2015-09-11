@@ -6,7 +6,7 @@
 
 goog.provide('vis.directives.Movable');
 
-goog.require('vis.ui.decorators.Decorator');
+goog.require('vis.directives.Directive');
 
 /**
  * @param $document
@@ -19,10 +19,10 @@ vis.directives.Movable = function($document) {
     restrict: 'A',
     replace: false,
     transclude: false,
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.self = self;
       $scope.$document = $document;
-    }
+    }]
   });
 };
 

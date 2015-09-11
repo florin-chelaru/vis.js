@@ -6,9 +6,9 @@
 
 goog.provide('vis.ui.svg.ScatterPlot');
 
+goog.require('vis.ui.svg.ScatterPlotOptions');
 goog.require('vis.ui.svg.SvgVisualization');
 goog.require('vis.utils');
-
 goog.require('vis.models.DataSource');
 goog.require('vis.models.RowDataItemWrapper');
 goog.require('vis.models.Boundaries');

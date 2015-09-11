@@ -4,13 +4,11 @@
  * Time: 10:11 AM
  */
 
-goog.require('vis');
-
-goog.require('vis.ui.webgl.ScatterPlot');
-goog.require('vis.ui.svg.ScatterPlot');
-goog.require('vis.ui.svg.ScatterPlotOptions');
-goog.require('vis.ui.canvas.ScatterPlot');
-goog.require('vis.ui.svg.Heatmap');
+//goog.require('vis');
+//
+//goog.require('vis.ui.svg.ScatterPlot');
+//goog.require('vis.ui.svg.ScatterPlotOptions');
+//goog.require('vis.ui.canvas.ScatterPlot');
 
 var main = angular.module('main', ['vis']);
 
@@ -18,13 +16,8 @@ main.config(['configurationProvider', function(configuration) {
   configuration.customize({
     visualizations: {
       scatterplot: {
-        webgl: 'vis.ui.webgl.ScatterPlot',
         canvas: 'vis.ui.canvas.ScatterPlot',
         svg: 'vis.ui.svg.ScatterPlot',
-        default: 'svg'
-      },
-      heatmap: {
-        svg: 'vis.ui.svg.Heatmap',
         default: 'svg'
       }
     }
