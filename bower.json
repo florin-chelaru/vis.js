@@ -25,10 +25,10 @@
   ],
   "dependencies": {
     "google-closure-library": "*",
-    "angular": "~1.4.4",
-    "d3": "~3.5.6",
-    "jquery": "~2.1.4",
-    "less": "~2.5.1",
-    "closure-compiler": "~0.2.7"
+    "angular": "1.4.4",
+    "d3": "3.5.6",
+    "jquery": "2.1.4",
+    "less": "2.5.1",
+    "closure-compiler": "0.2.7"
   }
 }
