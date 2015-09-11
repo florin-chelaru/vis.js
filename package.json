@@ -5,6 +5,11 @@
     "Florin Chelaru <florinc@mit.edu>",
     "Manolis Kellis <manoli@mit.edu>"
   ],
+  "license": "MIT",
+  "repository":{
+    "type" : "git",
+    "url" : "https://github.com/florin-chelaru/visualization-lib.git"
+  },
   "description": "Data visualization library for Genomic and Epigenetic data",
   "dependencies": {
     "yuicompressor": "2.4.8"
