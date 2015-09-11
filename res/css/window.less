@@ -4,16 +4,13 @@
 
 .window {
   position: absolute;
-  left: -1px;
-  top: -@window-top-margin - 1px;
-  width: 100%;
-  height: calc(~'100% + @{window-top-margin}');
   background-color: @window-bg;
-  z-index: -1;
 
   -webkit-box-shadow:0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   -moz-box-shadow:0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   box-shadow:0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 
   border: 1px solid @window-border;
+
+  padding-top: @window-top-margin;
 }

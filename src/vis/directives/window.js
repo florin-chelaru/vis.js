@@ -17,8 +17,6 @@ vis.directives.Window = function($document) {
   var self = this;
   vis.directives.Directive.call(this, {
     restrict: 'A',
-    replace: false,
-    transclude: false,
     controller: function($scope) {
       $scope.self = self;
     }
@@ -34,58 +32,28 @@ goog.inherits(vis.directives.Window, vis.directives.Directive);
  * @param controller
  * @override
  */
-vis.directives.Window.prototype.link = function($scope, $element, $attrs, controller) {
-  $element
-    .css({
-      position: 'absolute'
-    })
-    .prepend('<div class="window"></div>');
+vis.directives.Window.prototype.link = {
+  pre: function($scope, $element, $attrs, controller) {
+    var $window = $('<div class="window"></div>').appendTo($element.parent());
 
-  /*var resizing = false;
-
-  function hover() { $element.find('.resize-show-on-hover').css({ visibility: 'visible' }); }
-  function unhover() { $element.find('.resize-show-on-hover').css({ visibility: 'hidden' }); }
-
-  $element.hover(hover, unhover);
-
-  var box = new vis.directives.Window.BoundingBox($element);
-  var startX, startY, target;
-
-  function mousedown(event) {
-    // Prevent default dragging of selected content
-    event.preventDefault();
-    resizing = true;
-    target = box.getHandler($(this));
-    startX = event.pageX - target.left;
-    startY = event.pageY - target.top;
-    $scope.$document.on('mousemove', mousemove);
-    $scope.$document.on('mouseup', mouseup);
-    $element.off('mouseenter mouseleave');
-  }
-
-  function mousemove(event) {
-    var newY = event.pageY - startY;
-    var newX = event.pageX - startX;
-
-    target.top = newY;
-    target.left = newX;
-
-    box.update(target);
+    $window.css({
+      top: $element.css('top'),
+      left: $element.css('left'),
+      bottom: $element.css('bottom'),
+      right: $element.css('right')
+    });
 
     $element.css({
-      top: box.top + 'px',
-      left: box.left + 'px',
-      width: box.width + 'px',
-      height: box.height + 'px'
+      top: '',
+      left: '',
+      bottom: '',
+      right: ''
     });
-    $element.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
-  }
 
-  function mouseup() {
-    $scope.$document.off('mousemove', mousemove);
-    $scope.$document.off('mouseup', mouseup);
-    $element.hover(hover, unhover);
-  }
+    $window.append($element);
 
-  $element.find('.resize-grab').on('mousedown', mousedown);*/
-};
+    // Bring to front when selected
+    $window.on('mousedown', function() {
+      $window.parent().append($window);
+    });
+}};

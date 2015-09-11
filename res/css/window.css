@@ -1,13 +1,9 @@
 .window {
   position: absolute;
-  left: -1px;
-  top: -13px;
-  width: 100%;
-  height: calc(100% + 12px);
   background-color: #b2b2b2;
-  z-index: -1;
   -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   border: 1px solid #757575;
+  padding-top: 12px;
 }

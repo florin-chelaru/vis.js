@@ -37,7 +37,8 @@ goog.inherits(vis.directives.Resizable, vis.directives.Directive);
  * @override
  */
 vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
-  $element
+  var $window = $element.parent();
+  $window
     .append('<div class="resize-grab grab-diagonal grab-top-left"></div>')
     .append('<div class="resize-grab grab-diagonal grab-top-right"></div>')
     .append('<div class="resize-grab grab-diagonal grab-bottom-left"></div>')
@@ -52,7 +53,7 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
   function mousedown(event) {
     // Prevent default dragging of selected content
     event.preventDefault();
-    box = new vis.directives.Resizable.BoundingBox($element);
+    box = new vis.directives.Resizable.BoundingBox($window);
     target = box.getHandler($(this));
     startX = event.pageX - target.left;
     startY = event.pageY - target.top;
@@ -69,12 +70,21 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
 
     box.update(target);
 
+    $window.css({
+      top: box.top + 'px',
+      left: box.left + 'px',
+      width: box.width + 'px',
+      height: box.height + 'px'
+    });
+
     $element.css({
       top: box.top + 'px',
       left: box.left + 'px',
       width: box.width + 'px',
       height: box.height + 'px'
     });
+
+    $window.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
     $element.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
   }
 
@@ -83,7 +93,7 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
     $scope.$document.off('mouseup', mouseup);
   }
 
-  $element.find('.resize-grab').on('mousedown', mousedown);
+  $window.find('.resize-grab').on('mousedown', mousedown);
 };
 
 /**
@@ -273,7 +283,7 @@ Object.defineProperties(vis.directives.Resizable.BoundingBox.prototype, {
   },
   height: {
     get: function() {
-      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - 2 * this._margin;
+      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin;
     }
   }
 });

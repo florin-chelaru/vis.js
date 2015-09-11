@@ -54,6 +54,15 @@ vis.main.directive('visMovable', ['$document', function($document) {
   return new vis.directives.Movable($document);
 }]);
 
+vis.main.directive('visTest', ['$document', function($document) {
+  return {
+    template: '<div class="test" ng-transclude></div>',
+    transclude: true,
+    replace: false
+  };
+}]);
+
+
 // TODO: Later
 vis.main.directive('vis-input-data', function() {
   return {

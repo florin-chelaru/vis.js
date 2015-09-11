@@ -48,6 +48,7 @@ vis.directives.Visualization.prototype.link = {
     $scope.options = $scope.visualizationFactory.generateOptions($scope, $element, $attrs);
     $scope.handler = $scope.visualizationFactory.createNew($scope, $element, $attrs);
 
+    $element.addClass('visualization');
     $element.css({
       width: $scope.options.width + 'px',
       height: $scope.options.height + 'px'

@@ -36,13 +36,15 @@ goog.inherits(vis.directives.Movable, vis.directives.Directive);
  * @override
  */
 vis.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  $window = $element.find('.window');
+  var $window = $element.parent();
   $window.css({ cursor: 'move' });
 
   var startX = 0, startY = 0, x, y;
-  var windowMargin = -parseInt($window.css('top'));
+  var windowMargin = 0;//-parseInt($window.css('top'));
 
   function mousedown(event) {
+    if (event.target != $window[0]) { return; }
+
     // Prevent default dragging of selected content
     event.preventDefault();
     var windowRect = $window[0].getBoundingClientRect();
@@ -57,7 +59,7 @@ vis.directives.Movable.prototype.link = function($scope, $element, $attrs, contr
   function mousemove(event) {
     y = event.pageY - startY;
     x = event.pageX - startX;
-    $element.css({
+    $window.css({
       top: (y + windowMargin) + 'px',
       left:  x + 'px'
     });
@@ -68,5 +70,5 @@ vis.directives.Movable.prototype.link = function($scope, $element, $attrs, contr
     $scope.$document.off('mouseup', mouseup);
   }
 
-  $element.find('.window').on('mousedown', mousedown);
+  $window.on('mousedown', mousedown);
 };
