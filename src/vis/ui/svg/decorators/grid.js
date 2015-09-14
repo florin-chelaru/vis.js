@@ -4,32 +4,31 @@
  * Time: 8:59 AM
  */
 
-goog.provide('vis.ui.decorators.Grid');
+goog.provide('vis.ui.svg.decorators.Grid');
 
-goog.require('vis.ui.decorators.Decorator');
-
+goog.require('vis.ui.Decorator');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.decorators.Decorator
+ * @extends vis.ui.Decorator
  */
-vis.ui.decorators.Grid = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.decorators.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
+vis.ui.svg.decorators.Grid = function($scope, $element, $attrs, $targetElement) {
+  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
 
 };
 
-goog.inherits(vis.ui.decorators.Grid, vis.ui.decorators.Decorator);
+goog.inherits(vis.ui.svg.decorators.Grid, vis.ui.Decorator);
 
 /**
  * @type {{x: string, y: string}}
  */
-vis.ui.decorators.Grid.orientation = {
+vis.ui.svg.decorators.Grid.orientation = {
   x: 'bottom',
   y: 'left'
 };
 
-Object.defineProperties(vis.ui.decorators.Grid.prototype, {
+Object.defineProperties(vis.ui.svg.decorators.Grid.prototype, {
   type: {
     get: function() { return this.scope.type; }
   },
@@ -39,7 +38,7 @@ Object.defineProperties(vis.ui.decorators.Grid.prototype, {
   }
 });
 
-vis.ui.decorators.Grid.prototype.draw = function() {
+vis.ui.svg.decorators.Grid.prototype.draw = function() {
   var opts = this.targetOptions;
   if (!opts) { return; }
 

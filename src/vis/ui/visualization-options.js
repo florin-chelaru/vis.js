@@ -59,6 +59,12 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
   dirty: {
     get: function() { return this._dirty; }
   },
+
+  /**
+   * @type {{x: vis.models.Boundaries, y: vis.models.Boundaries}}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   axisBoundaries: {
     get: function() {
       var xBoundaries, yBoundaries;
@@ -89,6 +95,12 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
     },
     set: function(value) { this._axisBoundaries = value; this.redrawRequired(); }
   },
+
+  /**
+   * @type {vis.models.Margins}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   margins: {
     get: function() { return this._margins; },
     set: function(value) {
@@ -118,14 +130,32 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
       }
     }
   },
+
+  /**
+   * @type {{x: number, y: number}}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   dimensions: {
     get: function() {
       return { x: this.width, y: this.height };
     }
   },
+
+  /**
+   * @type {{x: number, y: number}}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   origins: {
     get: function() { return { x: this.margins.left, y: this.height - this.margins.bottom }; }
   },
+
+  /**
+   * @type {{x: function(number): number, y: function(number): number}}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   scales: {
     get: function() {
       var boundaries = this.axisBoundaries;

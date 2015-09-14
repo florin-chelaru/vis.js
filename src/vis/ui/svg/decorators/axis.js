@@ -4,32 +4,31 @@
  * Time: 2:35 PM
  */
 
-goog.provide('vis.ui.decorators.Axis');
+goog.provide('vis.ui.svg.decorators.Axis');
 
-goog.require('vis.ui.decorators.Decorator');
-
+goog.require('vis.ui.Decorator');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.decorators.Decorator
+ * @extends vis.ui.Decorator
  */
-vis.ui.decorators.Axis = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.decorators.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
+vis.ui.svg.decorators.Axis = function($scope, $element, $attrs, $targetElement) {
+  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
 
 };
 
-goog.inherits(vis.ui.decorators.Axis, vis.ui.decorators.Decorator);
+goog.inherits(vis.ui.svg.decorators.Axis, vis.ui.Decorator);
 
 /**
  * @type {{x: string, y: string}}
  */
-vis.ui.decorators.Axis.orientation = {
+vis.ui.svg.decorators.Axis.orientation = {
   x: 'bottom',
   y: 'left'
 };
 
-Object.defineProperties(vis.ui.decorators.Axis.prototype, {
+Object.defineProperties(vis.ui.svg.decorators.Axis.prototype, {
   type: {
     get: function() { return this.scope.type; }
   },
@@ -39,7 +38,7 @@ Object.defineProperties(vis.ui.decorators.Axis.prototype, {
   }
 });
 
-vis.ui.decorators.Axis.prototype.draw = function() {
+vis.ui.svg.decorators.Axis.prototype.draw = function() {
   var opts = this.targetOptions;
   if (!opts) { return; }
 
@@ -57,7 +56,7 @@ vis.ui.decorators.Axis.prototype.draw = function() {
 
   var axisFn = d3.svg.axis()
       .scale(scale)
-      .orient(vis.ui.decorators.Axis.orientation[type])
+      .orient(vis.ui.svg.decorators.Axis.orientation[type])
       .ticks(this.ticks);
 
   axis.call(axisFn);

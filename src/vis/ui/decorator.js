@@ -1,23 +1,23 @@
 /**
  * Created by Florin Chelaru ( florin [dot] chelaru [at] gmail [dot] com )
- * Date: 8/27/2015
- * Time: 10:08 AM
+ * Date: 9/2/2015
+ * Time: 2:39 PM
  */
 
-goog.provide('vis.ui.Visualization');
-
-goog.require('vis.models.DataSource');
-goog.require('vis.ui.VisualizationOptions');
+goog.provide('vis.ui.Decorator');
 
 goog.require('vis.async.Task');
+goog.require('vis.async.TaskService');
 
 /**
  * @param $scope
  * @param $element
  * @param $attrs
+ * @param $targetElement
  * @constructor
+ * @abstract
  */
-vis.ui.Visualization = function($scope, $element, $attrs) {
+vis.ui.Decorator = function($scope, $element, $attrs, $targetElement) {
   /**
    * @private
    */
@@ -32,6 +32,11 @@ vis.ui.Visualization = function($scope, $element, $attrs) {
    * @private
    */
   this._attrs = $attrs;
+
+  /**
+   * @private
+   */
+  this._targetElement = $targetElement;
 
   var self = this;
 
@@ -48,39 +53,55 @@ vis.ui.Visualization = function($scope, $element, $attrs) {
   this._drawTask = $scope.taskService.createTask(function() { self.draw(); });
 };
 
-Object.defineProperties(vis.ui.Visualization.prototype, {
+Object.defineProperties(vis.ui.Decorator.prototype, {
+  /**
+   * @instance
+   * @memberof vis.ui.Decorator
+   */
   scope: {
     get: function() { return this._scope; }
   },
+
+  /**
+   * @instance
+   * @memberof vis.ui.Decorator
+   */
   element: {
     get: function() { return this._element; }
   },
+
+  /**
+   * @instance
+   * @memberof vis.ui.Decorator
+   */
   attrs: {
     get: function() { return this._attrs; }
   },
 
   /**
-   * @type {vis.models.VisualizationOptions}
    * @instance
-   * @memberof vis.ui.Visualization
+   * @memberof vis.ui.Decorator
    */
-  options: {
-    get: function() { return this._scope.options; }
+  targetElement: {
+    get: function() { return this._targetElement; }
   },
 
-  /**
-   * @type {vis.models.DataSource}
-   * @instance
-   * @memberof vis.ui.Visualization
-   */
   data: {
-    get: function() { return this._scope.data; }
+    get: function () { return this._scope.data; }
+  },
+
+  targetOptions: {
+    get: function () { return this._scope.targetOptions; }
+  },
+
+  visualization: {
+    get: function () { return this._scope.visualizationHandler; }
   },
 
   /**
    * @type {vis.async.Task}
    * @instance
-   * @memberof vis.ui.Visualization
+   * @memberof vis.ui.Decorator
    */
   preDrawTask: {
     get: function() { return this._preDrawTask; }
@@ -89,26 +110,13 @@ Object.defineProperties(vis.ui.Visualization.prototype, {
   /**
    * @type {vis.async.Task}
    * @instance
-   * @memberof vis.ui.Visualization
+   * @memberof vis.ui.Decorator
    */
   drawTask: {
     get: function() { return this._drawTask; }
   }
 });
 
-/**
- */
-vis.ui.Visualization.prototype.preDraw = function() {};
+vis.ui.Decorator.prototype.preDraw = function() {};
 
-/**
- */
-vis.ui.Visualization.prototype.draw = function() {};
-
-/**
- */
-vis.ui.Visualization.prototype.doDraw = function() {
-  var self = this;
-  var taskService = this._scope.taskService;
-  taskService.runChain(self.preDrawTask, true)
-    .then(function() { taskService.runChain(self.drawTask, true); });
-};
+vis.ui.Decorator.prototype.draw = function() {};

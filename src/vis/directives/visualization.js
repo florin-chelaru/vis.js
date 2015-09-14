@@ -8,13 +8,15 @@ goog.provide('vis.directives.Visualization');
 
 goog.require('vis.directives.Directive');
 goog.require('vis.ui.VisualizationFactory');
+goog.require('vis.async.TaskService');
 
 /**
  * @param {vis.ui.VisualizationFactory} visualizationFactory
+ * @param {vis.async.TaskService} taskService
  * @constructor
  * @extends {vis.directives.Directive}
  */
-vis.directives.Visualization = function(visualizationFactory) {
+vis.directives.Visualization = function(visualizationFactory, taskService) {
   vis.directives.Directive.call(this, {
     restrict: 'A',
     scope: {
@@ -23,13 +25,16 @@ vis.directives.Visualization = function(visualizationFactory) {
       data: '=inputData'
     },
     controller: ['$scope', function($scope) {
+      $scope.taskService = taskService;
       $scope.visualizationFactory = visualizationFactory;
       $scope.options = null;
       $scope.handler = null;
 
       Object.defineProperties(this, {
         options: { get: function() { return $scope.options; } },
-        data: { get: function() { return $scope.data; } }
+        data: { get: function() { return $scope.data; } },
+        handler: { get: function() { return $scope.handler; } },
+        taskService: { get: function() { return $scope.taskService; } }
       });
     }]
   });
@@ -53,20 +58,18 @@ vis.directives.Visualization.prototype.link = {
       width: $scope.options.width + 'px',
       height: $scope.options.height + 'px'
     });
-
-    $scope.handler.preDraw();
   },
   post: function($scope, $element, $attrs) {
     $scope.$watch(function(){ return $scope.options.dirty; }, function(newValue, oldValue) {
-      $scope.handler.draw();
+      $scope.handler.doDraw();
     });
 
     $element.resize(function(event) {
       $scope.options.width = event.width;
       $scope.options.height = event.height;
-      $scope.handler.draw();
+      $scope.handler.doDraw();
     });
 
-    $scope.handler.draw();
+    $scope.handler.doDraw();
   }
 };

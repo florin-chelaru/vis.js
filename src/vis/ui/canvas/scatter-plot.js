@@ -58,8 +58,8 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
   var canvas = this.element.find('canvas')[0].getContext('2d');
 
   var transform =
-    vis.models.Transformer.translate({x: margins.left, y: margins.top})
-      .combine(vis.models.Transformer.scale(xScale, yScale));
+    vis.models.Transformer.scale(xScale, yScale)
+      .combine(vis.models.Transformer.translate({x: margins.left, y: margins.top}));
   var items = vis.utils.range(data.nrows).map(function(i) {
     return new vis.models.RowDataItemWrapper(data, i);
   });
@@ -68,31 +68,4 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
     var point = transform.calc({x: d.vals[0], y: d.vals[1]});
     vis.ui.canvas.circle(canvas, point.x, point.y, 10, '#ff6520')
   });
-
-  /*var svg = d3.select(this.element[0]).select('svg');
-
-  var viewport = svg.select('.viewport');
-  if (viewport.empty()) {
-    viewport = svg.append('g')
-      .attr('class', 'viewport');
-  }
-  viewport
-    .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
-
-  var items = vis.utils.range(data.nrows).map(function(i) {
-    return new vis.models.RowDataItemWrapper(data, i);
-  });
-  var selection = viewport.selectAll('circle').data(items);
-
-  selection.enter()
-    .append('circle');
-
-  selection
-    .attr('r', 10)
-    .attr('cx', function(d) { return xScale(d.vals[0]); })
-    .attr('cy', function(d) { return yScale(d.vals[1]); })
-    .attr('fill', '#ff6520');
-
-  selection.exit()
-    .remove();*/
 };

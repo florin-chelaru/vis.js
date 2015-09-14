@@ -7,7 +7,7 @@
 goog.provide('vis.directives.GraphicDecorator');
 
 goog.require('vis.directives.Visualization');
-goog.require('vis.ui.decorators.Decorator');
+goog.require('vis.ui.Decorator');
 
 /**
  * @param [$scope]
@@ -43,19 +43,14 @@ vis.directives.GraphicDecorator.prototype.link = function($scope, $element, $att
   var self = $scope.self;
   Object.defineProperties($scope, {
     data: { get: function() { return controller.data; } },
-    targetOptions: { get: function() { return controller.options; } }
+    targetOptions: { get: function() { return controller.options; } },
+    visualizationHandler: { get: function() { return controller.handler; } },
+    taskService: { get: function() { return controller.taskService; } }
   });
   $scope.handler = self.createHandler($scope, $element, $attrs, $element.parent());
 
-  $scope.$watch(function(){ return $scope.targetOptions.dirty; }, function(newValue, oldValue) {
-    $scope.handler.draw();
-  });
-
-  $element.parent().resize(function(event) {
-    $scope.handler.draw();
-  });
-
-  $scope.handler.draw();
+  controller.taskService.chain($scope.handler.drawTask, $scope.visualizationHandler.drawTask);
+  controller.taskService.chain($scope.visualizationHandler.preDrawTask, $scope.handler.preDrawTask);
 };
 
 /**
@@ -63,6 +58,6 @@ vis.directives.GraphicDecorator.prototype.link = function($scope, $element, $att
  * @param $element
  * @param $attrs
  * @param $targetElement
- * @returns {vis.ui.decorators.Decorator}
+ * @returns {vis.ui.Decorator}
  */
 vis.directives.GraphicDecorator.prototype.createHandler = function($scope, $element, $attrs, $targetElement) { throw new vis.AbstractMethodException(); };

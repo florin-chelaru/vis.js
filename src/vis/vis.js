@@ -7,6 +7,7 @@
 goog.provide('vis');
 
 goog.require('vis.Configuration');
+goog.require('vis.async.TaskService');
 goog.require('vis.ui.VisualizationFactory');
 goog.require('vis.ui.Visualization');
 goog.require('vis.ui.svg.ScatterPlot');
@@ -32,16 +33,20 @@ vis.main.factory('visualizationFactory', ['configuration', function(configuratio
   return new vis.ui.VisualizationFactory(configuration);
 }]);
 
-vis.main.directive('visualization', ['visualizationFactory', function(visualizationFactory) {
-  return new vis.directives.Visualization(visualizationFactory);
+vis.main.factory('taskService', ['$timeout', '$q', function($timeout, $q) {
+  return new vis.async.TaskService($timeout, $q);
 }]);
 
-vis.main.directive('visAxis', function() {
-  return new vis.directives.Axis();
-});
+vis.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
+  return new vis.directives.Visualization(visualizationFactory, taskService);
+}]);
 
 vis.main.directive('visGrid', function() {
   return new vis.directives.Grid();
+});
+
+vis.main.directive('visAxis', function() {
+  return new vis.directives.Axis();
 });
 
 vis.main.directive('visWindow', function() {

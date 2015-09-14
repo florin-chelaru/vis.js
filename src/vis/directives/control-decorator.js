@@ -6,7 +6,7 @@
 
 goog.provide('vis.directives.ControlDecorator');
 
-goog.require('vis.ui.decorators.Decorator');
+goog.require('vis.ui.Decorator');
 
 /**
  * TODO: Adapt
