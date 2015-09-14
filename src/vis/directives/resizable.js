@@ -180,7 +180,10 @@ vis.directives.Resizable.BoundingBox = function($element) {
   this.leftHandler = vis.directives.Resizable.ResizeHandler.left($element);
   this.rightHandler = vis.directives.Resizable.ResizeHandler.right($element);
   this.bottomHandler = vis.directives.Resizable.ResizeHandler.bottom($element);
-  this._margin = -this.topLeft.width * 0.5; // This assumes that all handlers are square and of the same size
+
+  // This assumes that all handlers are square and of the same size
+  // The 1 corresponds to the border
+  this._margin = -this.topLeft.width * 0.5 - 1;
 };
 
 /**
