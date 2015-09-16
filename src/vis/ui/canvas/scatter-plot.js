@@ -17,6 +17,7 @@ goog.require('vis.models.Margins');
 goog.require('vis.ui.canvas');
 goog.require('vis.models.Point');
 goog.require('vis.models.Transformer');
+goog.require('goog.async.Deferred');
 
 /**
  * @param scope
@@ -55,7 +56,7 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
   var xScale = options.scales.x;
   var yScale = options.scales.y;
 
-  var canvas = this.element.find('canvas')[0].getContext('2d');
+  var context = this.pendingCanvas[0].getContext('2d');//this.element.find('canvas')[0].getContext('2d');
 
   var transform =
     vis.models.Transformer.scale(xScale, yScale)
@@ -66,6 +67,6 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
 
   items.forEach(function(d) {
     var point = transform.calc({x: d.vals[0], y: d.vals[1]});
-    vis.ui.canvas.circle(canvas, point.x, point.y, 10, '#ff6520')
+    vis.ui.canvas.circle(context, point.x, point.y, 10, '#ff6520')
   });
 };

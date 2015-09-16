@@ -14,6 +14,8 @@ goog.require('vis.models.RowDataItemWrapper');
 goog.require('vis.models.Boundaries');
 goog.require('vis.models.Margins');
 
+goog.require('goog.string.format');
+
 /**
  * @param scope
  * @param element
@@ -27,19 +29,40 @@ vis.ui.canvas.CanvasVisualization = function (scope, element, attrs) {
 
 goog.inherits(vis.ui.canvas.CanvasVisualization, vis.ui.Visualization);
 
+Object.defineProperties(vis.ui.canvas.CanvasVisualization.prototype, {
+  /**
+   * @type {jQuery}
+   * @instance
+   * @memberof vis.ui.canvas.CanvasVisualization
+   */
+  pendingCanvas: { get: function() { return this.element.find('canvas').filter(':hidden'); } },
+
+  /**
+   * @type {jQuery}
+   * @instance
+   * @memberof vis.ui.canvas.CanvasVisualization
+   */
+  activeCanvas: { get: function() { return this.element.find('canvas').filter(':visible'); } }
+});
+
+/**
+ * @override
+ */
 vis.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
   vis.ui.Visualization.prototype.preDraw.apply(this, arguments);
 
-  var canvas = this.element.find('canvas');
-  if (canvas.length == 0) {
-    canvas = $('<canvas width="' + this.options.width + '" height="' + this.options.height + '"></canvas>').appendTo(this.element);
+  var pendingCanvas = this.pendingCanvas;
+  if (this.pendingCanvas.length == 0) {
+    var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', this.options.width, this.options.height);
+    $(goog.string.format(format, 'block') + goog.string.format(format, 'none')).appendTo(this.element);
+    pendingCanvas = this.pendingCanvas;
   }
 
-  canvas
+  pendingCanvas
     .attr('width', this.options.width)
     .attr('height', this.options.height);
 
-  var context = canvas[0].getContext('2d');
+  var context = pendingCanvas[0].getContext('2d');
   context.translate(0.5,0.5);
   context.rect(0, 0, this.options.width, this.options.height);
   context.fillStyle = '#ffffff';
@@ -51,4 +74,22 @@ vis.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
  */
 vis.ui.canvas.CanvasVisualization.prototype.draw = function () {
   vis.ui.Visualization.prototype.draw.apply(this, arguments);
+};
+
+/**
+ */
+vis.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
+  var activeCanvas = this.activeCanvas;
+  var pendingCanvas = this.pendingCanvas;
+  activeCanvas.css({ display: 'none' });
+  pendingCanvas.css({ display: 'block' });
+};
+
+/**
+ * @override
+ */
+vis.ui.canvas.CanvasVisualization.prototype.doDraw = function() {
+  var self = this;
+  vis.ui.Visualization.prototype.doDraw.call(this)
+    .then(function() { self.finalizeDraw(); });
 };

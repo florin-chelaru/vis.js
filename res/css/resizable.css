@@ -41,7 +41,7 @@
 .resize-grab.grab-vertical {
   top: 12px;
   width: 24px;
-  height: calc(100% - (24px - 12px) * 2);
+  height: calc(100% - 24px);
   cursor: ew-resize;
 }
 .resize-grab.grab-vertical.grab-left {
@@ -53,7 +53,7 @@
 .resize-grab.grab-horizontal {
   left: 12px;
   height: 24px;
-  width: calc(100% - (24px - 12px) * 2);
+  width: calc(100% - 24px);
   cursor: ns-resize;
 }
 .resize-grab.grab-horizontal.grab-top {

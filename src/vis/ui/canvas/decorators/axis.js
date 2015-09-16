@@ -54,8 +54,7 @@ vis.ui.canvas.decorators.Axis.prototype.draw = function() {
     return;
   }
 
-  var context = this.targetElement.find('canvas')[0].getContext('2d');
-  //context.imageSmoothingEnabled= false;
+  var context = this.visualization.pendingCanvas[0].getContext('2d');
 
   /*
    http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/

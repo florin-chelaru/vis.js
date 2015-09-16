@@ -10,6 +10,7 @@ goog.require('vis.models.DataSource');
 goog.require('vis.ui.VisualizationOptions');
 
 goog.require('vis.async.Task');
+goog.require('goog.async.Deferred');
 
 /**
  * @param $scope
@@ -105,10 +106,15 @@ vis.ui.Visualization.prototype.preDraw = function() {};
 vis.ui.Visualization.prototype.draw = function() {};
 
 /**
+ * @returns {goog.async.Deferred}
  */
 vis.ui.Visualization.prototype.doDraw = function() {
   var self = this;
+  var deferred = new goog.async.Deferred();
   var taskService = this._scope.taskService;
   taskService.runChain(self.preDrawTask, true)
-    .then(function() { taskService.runChain(self.drawTask, true); });
+    .then(function() { return taskService.runChain(self.drawTask, true); })
+    .then(function() { deferred.callback(); });
+
+  return deferred;
 };

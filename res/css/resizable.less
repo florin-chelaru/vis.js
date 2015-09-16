@@ -1,5 +1,6 @@
 @grab-size: 24px;
 @margin: @grab-size * 0.5;
+@side-grab-margins: (@grab-size - @margin) * 2;
 
 .resize-box {
   border: 1px dashed #aaaaaa;
@@ -56,7 +57,7 @@
 .resize-grab.grab-vertical {
   top: @margin;
   width: @grab-size;
-  height: calc(~'100% - (@{grab-size} - @{margin}) * 2');
+  height: calc(~'100% - @{side-grab-margins}');
   cursor: ew-resize;
 }
 
@@ -71,7 +72,7 @@
 .resize-grab.grab-horizontal {
   left: @margin;
   height: @grab-size;
-  width: calc(~'100% - (@{grab-size} - @{margin}) * 2');
+  width: calc(~'100% - @{side-grab-margins}');
   cursor: ns-resize;
 }
 

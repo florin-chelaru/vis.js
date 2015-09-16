@@ -58,6 +58,8 @@ vis.directives.Visualization.prototype.link = {
       width: $scope.options.width + 'px',
       height: $scope.options.height + 'px'
     });
+
+    $scope.handler.doDraw();
   },
   post: function($scope, $element, $attrs) {
     $scope.$watch(function(){ return $scope.options.dirty; }, function(newValue, oldValue) {
