@@ -4,12 +4,6 @@
  * Time: 10:11 AM
  */
 
-//goog.require('vis');
-//
-//goog.require('vis.ui.svg.ScatterPlot');
-//goog.require('vis.ui.svg.ScatterPlotOptions');
-//goog.require('vis.ui.canvas.ScatterPlot');
-
 var main = angular.module('main', ['vis']);
 
 main.config(['configurationProvider', function(configuration) {
@@ -51,13 +45,12 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
   $scope.options = {
     axisBoundaries: {},
     width: 500,
-    height: 500
+    height: 500,
+    margins: {
+      left: 10,
+      right: 10,
+      bottom: 10,
+      top: 10
+    }
   };
-  /*$interval(function() {
-   $scope.data = {
-   dirty: ($scope.data.name + ' other').length >= 100,
-   name: $scope.data.name + ' other',
-   address: $scope.data.address + ' other'
-   }
-   }, 1000);*/
 }]);

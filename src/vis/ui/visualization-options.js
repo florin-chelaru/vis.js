@@ -28,7 +28,9 @@ vis.ui.VisualizationOptions = function(options, data) {
    * @type {vis.models.Margins}
    * @protected
    */
-  this._margins = options.margins || new vis.models.Margins(0, 0, 0, 0);
+  this._margins = options.margins ?
+    new vis.models.Margins(options.margins.top, options.margins.left, options.margins.bottom, options.margins.right) :
+    new vis.models.Margins(0, 0, 0, 0);
 
   /**
    * @type {number}

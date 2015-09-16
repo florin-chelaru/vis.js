@@ -48,7 +48,7 @@ vis.ui.svg.decorators.Grid.prototype.draw = function() {
   var className = 'grid-' + type;
   var grid = svg.select('.' + className);
   if (grid.empty()) {
-    grid = svg.append('g')
+    grid = svg.insert('g', '.viewport')
       .attr('class', 'grid ' + className);
   }
 

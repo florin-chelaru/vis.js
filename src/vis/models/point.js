@@ -15,10 +15,10 @@ vis.models.Point = function(x, y) {
   /**
    * @type {number}
    */
-  this.x = x || 0;
+  this.x = x;
 
   /**
    * @type {number}
    */
-  this.y = y || 0;
+  this.y = y;
 };

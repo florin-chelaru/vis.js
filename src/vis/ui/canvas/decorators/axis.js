@@ -43,122 +43,77 @@ vis.ui.canvas.decorators.Axis.prototype.draw = function() {
   if (!opts) { return; }
 
   var type = this.type;
-  var minMargin = 25;
+  var minYMargin = 25;
   var offset = {top:0, bottom:0, left:0, right:0};
 
-  if (type == 'x' && opts.margins.left < minMargin) { offset.left = minMargin - opts.margins.left; }
-  else if (type == 'y' && opts.margins.bottom < minMargin) { offset.bottom = minMargin - opts.margins.bottom; }
+  if (type == 'x' && opts.margins.bottom < minYMargin) { offset.bottom = minYMargin - opts.margins.bottom; }
 
   if (offset.top + offset.bottom + offset.left + offset.right > 0) {
     opts.margins = opts.margins.add(offset);
     return;
   }
 
-  var context = this.visualization.pendingCanvas[0].getContext('2d');
+  var margins = opts.margins;
+  var intCoords = vis.models.Transformer.intCoords();
+  var translate = vis.models.Transformer.translate({x: margins.left, y: margins.top}).combine(intCoords);
 
-  /*
-   http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/
-   */
+  var context = this.visualization.pendingCanvas[0].getContext('2d');
+  var moveTo = context.__proto__.moveTo;
+  var lineTo = context.__proto__.lineTo;
 
   var scale = opts.scales[type];
 
-  context.save();
-  context.beginPath();
-  context.moveTo(opts.origins.x, opts.origins.y);
+  context.strokeStyle = '#000000';
+  context.lineWidth = 1;
+  context.font = '17px Times New Roman';
+  context.fillStyle = '#000000';
 
-  switch (type) {
-    case 'x':
-      context.lineTo(opts.width - opts.margins.right, opts.origins.y);
-      break;
-    case 'y':
-      context.lineTo(opts.origins.x, opts.margins.top);
-      break;
+  var ticks = scale.ticks(this.ticks);
+  var units = ticks.map(scale.tickFormat(this.ticks));
 
+  var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
+
+  var minXMargin = maxTextSize + 11;
+  if (type == 'y' && opts.margins.left < minXMargin) {
+    offset.left = minXMargin - opts.margins.left;
+    opts.margins = opts.margins.add(offset);
+    return;
   }
 
-  //context.strokeStyle = '#000000';
-  //context.lineWidth = 1;
+  // Draw main line
+  context.beginPath();
+  moveTo.apply(context, intCoords.calcArr({x: opts.origins.x, y: opts.origins.y}));
+  switch (type) {
+    case 'x': lineTo.apply(context, intCoords.calcArr({x: opts.width - opts.margins.right, y: opts.origins.y})); break;
+    case 'y': lineTo.apply(context, intCoords.calcArr({x: opts.origins.x, y: opts.margins.top})); break;
+  }
+
+  // Draw ticks
+  var x1 = type == 'x' ? scale : function() { return 0; };
+  var x2 = type == 'x' ? scale : function() { return -6; };
+  var y1 = type == 'y' ? scale : function() { return opts.height - opts.margins.top - opts.margins.bottom; };
+  var y2 = type == 'y' ? scale : function() { return opts.height - opts.margins.top - opts.margins.bottom + 6; };
+
+  ticks.forEach(function(tick) {
+    moveTo.apply(context, translate.calcArr({x: x1(tick), y: y1(tick)}));
+    lineTo.apply(context, translate.calcArr({x: x2(tick), y: y2(tick)}));
+  });
+
   context.stroke();
 
-  // draw tick marks
-  /*var xPosIncrement = this.unitsPerTick * this.unitX;
-  var xPos, unit;
-  context.font = this.font;
-  context.textAlign = 'center';
-  context.textBaseline = 'top';
-
-  // draw left tick marks
-  xPos = this.centerX - xPosIncrement;
-  unit = -1 * this.unitsPerTick;
-  while(xPos > 0) {
-    context.moveTo(xPos, this.centerY - this.tickSize / 2);
-    context.lineTo(xPos, this.centerY + this.tickSize / 2);
-    context.stroke();
-    context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
-    unit -= this.unitsPerTick;
-    xPos = Math.round(xPos - xPosIncrement);
+  // Draw units
+  if (type == 'x') {
+    context.textAlign = 'center';
+    context.textBaseline = 'top';
+  } else {
+    context.textAlign = 'right';
+    context.textBaseline = 'middle';
+    translate = translate.combine(vis.models.Transformer.translate({x: -5, y: 0}));
   }
 
-  // draw right tick marks
-  xPos = this.centerX + xPosIncrement;
-  unit = this.unitsPerTick;
-  while(xPos < this.canvas.width) {
-    context.moveTo(xPos, this.centerY - this.tickSize / 2);
-    context.lineTo(xPos, this.centerY + this.tickSize / 2);
-    context.stroke();
-    context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
-    unit += this.unitsPerTick;
-    xPos = Math.round(xPos + xPosIncrement);
-  }
-  context.restore();
-
-  */
-
-
-
-  /*var type = this.type;
-  var className = 'axis-' + type;
-  var axis = svg.select('.' + className);
-  if (axis.empty()) {
-    axis = svg.append('g')
-      .attr('class', 'axis ' + className);
-  }
-
-  var scale = opts.scales[type];
-
-  var axisFn = d3.svg.axis()
-    .scale(scale)
-    .orient(vis.ui.canvas.decorators.Axis.orientation[type])
-    .ticks(this.ticks);
-
-  axis.call(axisFn);
-
-  var axisBox = axis[0][0].getBBox();
-  var axisLocation = type == 'x' ? opts.origins : {x: opts.margins.left, y: opts.margins.top};
-  axisBox = { x: axisBox.x + axisLocation.x, y: axisBox.y + axisLocation.y, width: axisBox.width, height: axisBox.height};
-
-  var offset = {top:0, bottom:0, left:0, right:0};
-
-  var dif;
-  if (axisBox.height > opts.height) {
-    dif = (axisBox.height - opts.height);
-    offset.top += 0.5 * dif;
-    offset.bottom += 0.5 * dif;
-  }
-
-  if (axisBox.width > opts.width) {
-    dif = (axisBox.width - opts.width);
-    offset.left += 0.5 * dif;
-    offset.right += 0.5 * dif;
-  }
-
-  if (axisBox.x < 0) { offset.left += -axisBox.x; }
-  if (axisBox.y < 0) { offset.top += -axisBox.y; }
-  if (axisBox.x + axisBox.width > opts.width) { offset.right += axisBox.x + axisBox.width - opts.width; }
-  if (axisBox.y + axisBox.height > opts.height) { offset.bottom += axisBox.y + axisBox.height - opts.height; }
-
-  opts.margins = opts.margins.add(offset);
-
-  axis.attr('transform', 'translate(' + axisLocation.x + ', ' + axisLocation.y + ')');*/
+  units.forEach(function(unit) {
+    var p = translate.calc({x: x2(unit), y: y2(unit)});
+    context.fillText(unit, p.x, p.y);
+  });
 };
 

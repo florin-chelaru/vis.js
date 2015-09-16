@@ -25,6 +25,12 @@ goog.require('goog.string.format');
  */
 vis.ui.canvas.CanvasVisualization = function (scope, element, attrs) {
   vis.ui.Visualization.call(this, scope, element, attrs);
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._doubleBuffer = !attrs.singleBuffer;
 };
 
 goog.inherits(vis.ui.canvas.CanvasVisualization, vis.ui.Visualization);
@@ -35,14 +41,14 @@ Object.defineProperties(vis.ui.canvas.CanvasVisualization.prototype, {
    * @instance
    * @memberof vis.ui.canvas.CanvasVisualization
    */
-  pendingCanvas: { get: function() { return this.element.find('canvas').filter(':hidden'); } },
+  pendingCanvas: { get: function() { return this._doubleBuffer ? this.element.find('canvas').filter(':hidden') : this.element.find('canvas'); } },
 
   /**
    * @type {jQuery}
    * @instance
    * @memberof vis.ui.canvas.CanvasVisualization
    */
-  activeCanvas: { get: function() { return this.element.find('canvas').filter(':visible'); } }
+  activeCanvas: { get: function() { return this._doubleBuffer ? this.element.find('canvas').filter(':visible') : this.element.find('canvas'); } }
 });
 
 /**
@@ -54,7 +60,7 @@ vis.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
   var pendingCanvas = this.pendingCanvas;
   if (this.pendingCanvas.length == 0) {
     var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', this.options.width, this.options.height);
-    $(goog.string.format(format, 'block') + goog.string.format(format, 'none')).appendTo(this.element);
+    $(goog.string.format(format, 'block') + (this._doubleBuffer ? goog.string.format(format, 'none') : '')).appendTo(this.element);
     pendingCanvas = this.pendingCanvas;
   }
 
@@ -79,6 +85,7 @@ vis.ui.canvas.CanvasVisualization.prototype.draw = function () {
 /**
  */
 vis.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
+  if (!this._doubleBuffer) { return; }
   var activeCanvas = this.activeCanvas;
   var pendingCanvas = this.pendingCanvas;
   activeCanvas.css({ display: 'none' });

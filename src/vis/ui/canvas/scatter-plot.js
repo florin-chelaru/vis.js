@@ -56,7 +56,7 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
   var xScale = options.scales.x;
   var yScale = options.scales.y;
 
-  var context = this.pendingCanvas[0].getContext('2d');//this.element.find('canvas')[0].getContext('2d');
+  var context = this.pendingCanvas[0].getContext('2d');
 
   var transform =
     vis.models.Transformer.scale(xScale, yScale)

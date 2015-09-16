@@ -48,7 +48,7 @@ vis.ui.svg.decorators.Axis.prototype.draw = function() {
   var className = 'axis-' + type;
   var axis = svg.select('.' + className);
   if (axis.empty()) {
-    axis = svg.append('g')
+    axis = svg.insert('g', '.viewport')
       .attr('class', 'axis ' + className);
   }
 

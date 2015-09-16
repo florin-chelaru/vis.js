@@ -10,6 +10,7 @@ goog.require('vis.directives.Visualization');
 goog.require('vis.directives.GraphicDecorator');
 
 goog.require('vis.ui.svg.decorators.Grid');
+goog.require('vis.ui.canvas.decorators.Grid');
 
 /**
  * @constructor
@@ -33,6 +34,8 @@ vis.directives.Grid.prototype.createHandler = function($scope, $element, $attrs,
   switch ($targetElement.attr('render')) {
     case 'svg':
       return new vis.ui.svg.decorators.Grid($scope, $element, $attrs, $targetElement);
+    case 'canvas':
+      return new vis.ui.canvas.decorators.Grid($scope, $element, $attrs, $targetElement);
   }
 };
 

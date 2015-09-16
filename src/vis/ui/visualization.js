@@ -112,9 +112,17 @@ vis.ui.Visualization.prototype.doDraw = function() {
   var self = this;
   var deferred = new goog.async.Deferred();
   var taskService = this._scope.taskService;
-  taskService.runChain(self.preDrawTask, true)
+
+  // Since we chose to run draw tasks sequentially, there is no need to queue them using promises.
+  // The preDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
+  // TODO: Create an entirely new chain, containing both the preDraw and draw tasks and run that instead.
+  /*taskService.runChain(self.preDrawTask, true)
     .then(function() { return taskService.runChain(self.drawTask, true); })
-    .then(function() { deferred.callback(); });
+    .then(function() { deferred.callback(); });*/
+
+  taskService.runChain(self.preDrawTask, true);
+  taskService.runChain(self.drawTask, true);
+  deferred.callback();
 
   return deferred;
 };
