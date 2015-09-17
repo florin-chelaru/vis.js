@@ -15,7 +15,15 @@ vis.Configuration = function() {
    * @type {Object.<string, *>}
    * @private
    */
-  this._options = {};
+  this._options = {
+    visualizations: {
+      scatterplot: {
+        'canvas': 'vis.ui.canvas.ScatterPlot',
+        'svg': 'vis.ui.svg.ScatterPlot',
+        'default': 'svg'
+      }
+    }
+  };
 };
 
 Object.defineProperties(vis.Configuration.prototype, {

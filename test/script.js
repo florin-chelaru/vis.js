@@ -6,18 +6,6 @@
 
 var main = angular.module('main', ['vis']);
 
-main.config(['configurationProvider', function(configuration) {
-  configuration.customize({
-    visualizations: {
-      scatterplot: {
-        canvas: 'vis.ui.canvas.ScatterPlot',
-        svg: 'vis.ui.svg.ScatterPlot',
-        default: 'svg'
-      }
-    }
-  })
-}]);
-
 main.controller('MyController', ['$scope', '$interval', function($scope, $interval) {
   $scope.data = {
     dirty: true,
@@ -54,3 +42,20 @@ main.controller('MyController', ['$scope', '$interval', function($scope, $interv
     }
   };
 }]);
+
+/*
+
+To register your own visualization, configure the library like in the example below:
+
+main.config(['configurationProvider', function(configuration) {
+  configuration.customize({
+    visualizations: {
+      scatterplot: {
+        canvas: 'vis.ui.canvas.ScatterPlot',
+        svg: 'vis.ui.svg.ScatterPlot',
+        default: 'svg'
+      }
+    }
+  })
+}]);
+*/
