@@ -13,7 +13,8 @@ goog.require('vis.models.DataSource');
 /**
  * @param {{
  *   axisBoundaries: Object.<string, vis.models.Boundaries>=, margins: vis.models.Margins=,
- *   width: number=, height: number= }} options
+ *   width: number=, height: number=, visCtor: function(new: vis.ui.Visualization)=, render: string=,
+ *   visOptionsCtor: function(new: vis.ui.VisualizationOptions)= }} options
  * @param {vis.models.DataSource} [data]
  * @constructor
  */
@@ -45,6 +46,12 @@ vis.ui.VisualizationOptions = function(options, data) {
   this._height = options.height == undefined ? 150 : options.height;
 
   /**
+   * @type {string}
+   * @private
+   */
+  this._vals = options.vals == undefined ? data.vals[0].label : options.vals;
+
+  /**
    * @type {vis.models.DataSource}
    * @protected
    */
@@ -55,9 +62,39 @@ vis.ui.VisualizationOptions = function(options, data) {
    * @private
    */
   this._dirty = 0;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._render = options.render;
+
+  /**
+   * @type {function(new: vis.ui.Visualization)}
+   * @private
+   */
+  this._visCtor = options.visCtor;
+
+  /**
+   * @type {function(new: vis.ui.VisualizationOptions)}
+   * @private
+   */
+  this._visOptionsCtor = options.visOptionsCtor;
 };
 
 Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
+  /**
+   * @type {vis.models.DataSource}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
+  data: { get: function() { return this._data; } },
+
+  /**
+   * @type {boolean}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
   dirty: {
     get: function() { return this._dirty; }
   },
@@ -76,14 +113,15 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
         yBoundaries = this._axisBoundaries.y;
       }
 
-      if (!xBoundaries) { xBoundaries = this._data.vals.boundaries; }
-      if (!yBoundaries) { yBoundaries = this._data.vals.boundaries; }
+      var valsArr = this._data.getVals(this._vals);
+      if (!xBoundaries) { xBoundaries = valsArr.boundaries; }
+      if (!yBoundaries) { yBoundaries = valsArr.boundaries; }
 
       var dataBoundaries;
       if (!xBoundaries || !yBoundaries) {
         dataBoundaries = new vis.models.Boundaries(
-          Math.min.apply(undefined, this._data.vals.d),
-          Math.max.apply(undefined, this._data.vals.d)
+          Math.min.apply(undefined, valsArr.d),
+          Math.max.apply(undefined, valsArr.d)
         );
       }
 
@@ -132,6 +170,34 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
       }
     }
   },
+
+  /**
+   * @type {string}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
+  vals: { get: function() { return this._vals; } },
+
+  /**
+   * @type {string}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
+  render: { get: function() { return this._render; } },
+
+  /**
+   * @type {function(new: vis.ui.Visualization)}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
+  visCtor: { get: function() { return this._visCtor; } },
+
+  /**
+   * @type {function(new: vis.ui.VisualizationOptions)}
+   * @instance
+   * @memberof vis.ui.VisualizationOptions
+   */
+  visOptionsCtor: { get: function() { return this._visOptionsCtor; } },
 
   /**
    * @type {{x: number, y: number}}

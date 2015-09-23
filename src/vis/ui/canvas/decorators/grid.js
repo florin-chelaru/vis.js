@@ -6,40 +6,21 @@
 
 goog.provide('vis.ui.canvas.decorators.Grid');
 
-goog.require('vis.ui.Decorator');
+goog.require('vis.ui.decorators.Grid');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.Decorator
+ * @extends vis.ui.decorators.Grid
  */
-vis.ui.canvas.decorators.Grid = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
-
+vis.ui.canvas.decorators.Grid = function() {
+  vis.ui.decorators.Grid.apply(this, arguments);
 };
 
-goog.inherits(vis.ui.canvas.decorators.Grid, vis.ui.Decorator);
-
-/**
- * @type {{x: string, y: string}}
- */
-vis.ui.canvas.decorators.Grid.orientation = {
-  x: 'bottom',
-  y: 'left'
-};
-
-Object.defineProperties(vis.ui.canvas.decorators.Grid.prototype, {
-  type: {
-    get: function() { return this.scope.type; }
-  },
-
-  ticks: {
-    get: function () { return this.scope.ticks || 10; }
-  }
-});
+goog.inherits(vis.ui.canvas.decorators.Grid, vis.ui.decorators.Grid);
 
 vis.ui.canvas.decorators.Grid.prototype.draw = function() {
-  var opts = this.targetOptions;
+  var opts = this.visOptions;
   if (!opts) { return; }
 
   var type = this.type;
@@ -71,4 +52,3 @@ vis.ui.canvas.decorators.Grid.prototype.draw = function() {
 
   context.stroke();
 };
-

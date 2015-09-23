@@ -1,7 +1,7 @@
 /**
  * Created by Florin Chelaru ( florin [dot] chelaru [at] gmail [dot] com )
- * Date: 8/30/2015
- * Time: 9:14 AM
+ * Date: 9/22/2015
+ * Time: 7:37 PM
  */
 
 goog.provide('vis.directives.Visualization');
@@ -11,36 +11,40 @@ goog.require('vis.ui.VisualizationFactory');
 goog.require('vis.async.TaskService');
 
 /**
+ * @param $scope
  * @param {vis.ui.VisualizationFactory} visualizationFactory
  * @param {vis.async.TaskService} taskService
  * @constructor
  * @extends {vis.directives.Directive}
  */
-vis.directives.Visualization = function(visualizationFactory, taskService) {
-  vis.directives.Directive.call(this, {
-    restrict: 'A',
-    scope: {
-      _options: '=options',
+vis.directives.Visualization = function($scope, visualizationFactory, taskService) {
+  vis.directives.Directive.apply(this, arguments);
 
-      data: '=inputData'
-    },
-    controller: ['$scope', function($scope) {
-      $scope.taskService = taskService;
-      $scope.visualizationFactory = visualizationFactory;
-      $scope.options = null;
-      $scope.handler = null;
+  /**
+   * @type {vis.ui.Visualization}
+   * @private
+   */
+  this._vis = null;
 
-      Object.defineProperties(this, {
-        options: { get: function() { return $scope.options; } },
-        data: { get: function() { return $scope.data; } },
-        handler: { get: function() { return $scope.handler; } },
-        taskService: { get: function() { return $scope.taskService; } }
-      });
-    }]
-  });
+  /**
+   * @type {vis.async.TaskService}
+   * @private
+   */
+  this._taskService = taskService;
+
+  /**
+   * @type {vis.ui.VisualizationFactory}
+   * @private
+   */
+  this._visualizationFactory = visualizationFactory;
 };
 
 goog.inherits(vis.directives.Visualization, vis.directives.Directive);
+
+Object.defineProperties(vis.directives.Visualization.prototype, {
+  taskService: { get: function() { return this._taskService; } },
+  vis: { get: function() { return this._vis; } }
+});
 
 /**
  * @param $scope
@@ -49,29 +53,27 @@ goog.inherits(vis.directives.Visualization, vis.directives.Directive);
  * @override
  */
 vis.directives.Visualization.prototype.link = {
-  pre: function($scope, $element, $attrs) {
-    $scope.options = $scope.visualizationFactory.generateOptions($scope, $element, $attrs);
-    $scope.handler = $scope.visualizationFactory.createNew($scope, $element, $attrs);
-
+  pre: function($scope, $element, $attrs, controller) {
+    this._vis = this._visualizationFactory.createNew($scope, $element, $attrs, this._taskService);
     $element.addClass('visualization');
     $element.css({
-      width: $scope.options.width + 'px',
-      height: $scope.options.height + 'px'
+      width: this._vis.options.width + 'px',
+      height: this._vis.options.height + 'px'
     });
-
-    $scope.handler.doDraw();
+    this._vis.doDraw();
   },
-  post: function($scope, $element, $attrs) {
-    $scope.$watch(function(){ return $scope.options.dirty; }, function(newValue, oldValue) {
-      $scope.handler.doDraw();
+  post: function($scope, $element, $attrs, controller) {
+    var self = this;
+    $scope.$watch(function(){ return self._vis.options.dirty; }, function(newValue, oldValue) {
+      self._vis.doDraw();
     });
 
     $element.resize(function(event) {
-      $scope.options.width = event.width;
-      $scope.options.height = event.height;
-      $scope.handler.doDraw();
+      self._vis.options.width = event.width;
+      self._vis.options.height = event.height;
+      self._vis.doDraw();
     });
 
-    $scope.handler.doDraw();
+    self._vis.doDraw();
   }
 };

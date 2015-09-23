@@ -1,70 +1,62 @@
-﻿/**
+/**
  * Created by Florin Chelaru ( florin [dot] chelaru [at] gmail [dot] com )
- * Date: 8/30/2015
- * Time: 8:28 AM
+ * Date: 9/22/2015
+ * Time: 7:08 PM
  */
 
 goog.provide('vis.directives.Directive');
 
 /**
- * @param {{require: string=, restrict: string=, scope: boolean|Object=, controller: function=, template: string=, templateUrl: string=,
- *          priority: number=, transclude: boolean=, templateNamespace: string=, controllerAs: string=,
- *          bindToController: boolean=}} [options]
+ * @param $scope Angular scope
  * @constructor
- * @abstract
  */
-vis.directives.Directive = function(options) {
-  if (!options) { options = {}; }
-  this.require = options.require;
-  this.restrict = options.restrict;
-  this._scope = options.scope;
-  this._controller = options.controller;
-  this.template = options.template;
-  this.templateUrl = options.templateUrl;
-  this.priority = options.priority;
-  this.transclude = options.transclude;
-  this._templateNamespace = options.templateNamespace;
-  this._controllerAs = options.controllerAs;
-  this._bindToController = options.bindToController;
-};
-
-/**
- * @enum {string}
- */
-vis.directives.Directive.Restrict = {
-  Attribute: 'A',
-  Element: 'E',
-  Class: 'C'
+vis.directives.Directive = function($scope) {
+  /**
+   * @private
+   */
+  this._scope = $scope;
 };
 
 Object.defineProperties(vis.directives.Directive.prototype, {
-  scope: {
-    /** @returns {boolean|Object} */
-    get: function() { return this._scope; }
-  },
-  controller: {
-    /** @returns {function} */
-    get: function() { return this._controller; }
-  },
-  templateNamespace: {
-    /** @returns {string} */
-    get: function() { return this._templateNamespace; }
-  },
-  controllerAs: {
-    /** @returns {string} */
-    get: function() { return this._controllerAs; }
-  },
-  bindToController: {
-    /** @returns {boolean} */
-    get: function() { return this._bindToController; }
-  }
+  scope: { get: function() { return this._scope; } }
 });
 
+vis.directives.Directive.prototype.link = function($scope, $element, $attrs) {};
+
 /**
- * See angular documentation for directives for description of the arguments
- * @param $scope
- * @param $element
- * @param $attrs
- * @param controller
+ * @param {string} name
+ * @param {function(new: vis.directives.Directive)} controllerCtor
+ * @param {Array} [args]
+ * @param {Object.<string, *>} [options]
+ * @returns {{controller: *[], link: Function, restrict: string, transclude: boolean, replace: boolean}}
  */
-vis.directives.Directive.prototype.link = function($scope, $element, $attrs, controller) {};
+vis.directives.Directive.createNew = function(name, controllerCtor, args, options) {
+  var controller = ['$scope', function($scope) {
+    var params = [].concat(args || []);
+    params.unshift($scope);
+    this.handler = vis.reflection.applyConstructor(controllerCtor, params);
+  }];
+  var link;
+  if ($.isFunction(controllerCtor.prototype.link)) {
+    link = function ($scope, $element, $attrs) {
+      var ctrl = $scope[name];
+      return ctrl.handler.link($scope, $element, $attrs, ctrl);
+    };
+  } else {
+    link = {};
+    if (controllerCtor.prototype.link.pre) {
+      link.pre = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl.handler.link.pre.call(ctrl.handler, $scope, $element, $attrs, ctrl);
+      };
+    }
+    if (controllerCtor.prototype.link.post) {
+      link.post = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl.handler.link.post.call(ctrl.handler, $scope, $element, $attrs, ctrl);
+      };
+    }
+  }
+
+  return angular.extend({}, options, { link: link, controller: controller, controllerAs: name });
+};

@@ -9,22 +9,19 @@ goog.provide('vis.directives.Resizable');
 goog.require('vis.directives.Directive');
 
 /**
+ * @param $scope
  * @param $document
  * @constructor
  * @extends {vis.directives.Directive}
  */
-vis.directives.Resizable = function($document) {
-  var self = this;
-  vis.directives.Directive.call(this, {
-    require: '^vis-window',
-    restrict: 'A',
-    replace: false,
-    transclude: false,
-    controller: ['$scope', function($scope) {
-      $scope.self = self;
-      $scope.$document = $document;
-    }]
-  });
+vis.directives.Resizable = function($scope, $document) {
+  vis.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
 };
 
 goog.inherits(vis.directives.Resizable, vis.directives.Directive);
@@ -50,6 +47,7 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
   var box;
   var startX, startY, target;
 
+  var self = this;
   function mousedown(event) {
     // Prevent default dragging of selected content
     event.preventDefault();
@@ -57,8 +55,8 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
     target = box.getHandler($(this));
     startX = event.pageX - target.left;
     startY = event.pageY - target.top;
-    $scope.$document.on('mousemove', mousemove);
-    $scope.$document.on('mouseup', mouseup);
+    self._document.on('mousemove', mousemove);
+    self._document.on('mouseup', mouseup);
   }
 
   function mousemove(event) {
@@ -89,8 +87,8 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
   }
 
   function mouseup() {
-    $scope.$document.off('mousemove', mousemove);
-    $scope.$document.off('mouseup', mouseup);
+    self._document.off('mousemove', mousemove);
+    self._document.off('mouseup', mouseup);
   }
 
   $window.find('.resize-grab').on('mousedown', mousedown);
@@ -101,9 +99,7 @@ vis.directives.Resizable.prototype.link = function($scope, $element, $attrs, con
  * @constructor
  */
 vis.directives.Resizable.ResizeHandler = function($elem) {
-  /**
-   * @type {jQuery}
-   */
+  /** @type {jQuery} */
   this.$elem = $elem;
   var rect = $elem[0].getBoundingClientRect();
   this.top = rect.top;

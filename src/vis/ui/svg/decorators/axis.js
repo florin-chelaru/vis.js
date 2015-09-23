@@ -6,40 +6,21 @@
 
 goog.provide('vis.ui.svg.decorators.Axis');
 
-goog.require('vis.ui.Decorator');
+goog.require('vis.ui.decorators.Axis');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.Decorator
+ * @extends vis.ui.decorators.Axis
  */
-vis.ui.svg.decorators.Axis = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
-
+vis.ui.svg.decorators.Axis = function() {
+  vis.ui.decorators.Axis.apply(this, arguments);
 };
 
-goog.inherits(vis.ui.svg.decorators.Axis, vis.ui.Decorator);
-
-/**
- * @type {{x: string, y: string}}
- */
-vis.ui.svg.decorators.Axis.orientation = {
-  x: 'bottom',
-  y: 'left'
-};
-
-Object.defineProperties(vis.ui.svg.decorators.Axis.prototype, {
-  type: {
-    get: function() { return this.scope.type; }
-  },
-
-  ticks: {
-    get: function () { return this.scope.ticks || 10; }
-  }
-});
+goog.inherits(vis.ui.svg.decorators.Axis, vis.ui.decorators.Axis);
 
 vis.ui.svg.decorators.Axis.prototype.draw = function() {
-  var opts = this.targetOptions;
+  var opts = this.visOptions;
   if (!opts) { return; }
 
   var svg = d3.select(this.targetElement[0]).select('svg');
@@ -56,7 +37,7 @@ vis.ui.svg.decorators.Axis.prototype.draw = function() {
 
   var axisFn = d3.svg.axis()
       .scale(scale)
-      .orient(vis.ui.svg.decorators.Axis.orientation[type])
+      .orient(vis.ui.decorators.Axis.Orientation[type])
       .ticks(this.ticks);
 
   axis.call(axisFn);

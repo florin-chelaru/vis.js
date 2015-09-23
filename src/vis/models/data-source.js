@@ -10,9 +10,15 @@ goog.require('vis.AbstractMethodException');
 goog.require('vis.models.DataArray');
 
 /**
- * @interface
+ * @abstract
  */
-vis.models.DataSource = function() {};
+vis.models.DataSource = function() {
+  /**
+   * @type {Object.<string, vis.models.DataArray>}
+   * @private
+   */
+  this._valsMap = null;
+};
 
 Object.defineProperties(vis.models.DataSource.prototype, {
   /**
@@ -62,7 +68,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
   },
 
   /**
-   * @type {vis.models.DataArray}
+   * @type {Array.<vis.models.DataArray>}
    * @instance
    * @memberof vis.models.DataSource
    */
@@ -70,3 +76,19 @@ Object.defineProperties(vis.models.DataSource.prototype, {
     get: function() { throw new vis.AbstractMethodException(); }
   }
 });
+
+/**
+ * @param {string} label
+ * @returns {vis.models.DataArray}
+ */
+vis.models.DataSource.prototype.getVals = function(label) {
+  if (!this._valsMap) {
+    var valsMap = {};
+    this.vals.forEach(function(d) {
+      valsMap[d.label] = d;
+    });
+    this._valsMap = valsMap;
+  }
+
+  return this._valsMap[label];
+};

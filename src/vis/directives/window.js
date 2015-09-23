@@ -13,13 +13,7 @@ goog.require('vis.directives.Directive');
  * @extends {vis.directives.Directive}
  */
 vis.directives.Window = function() {
-  var self = this;
-  vis.directives.Directive.call(this, {
-    restrict: 'A',
-    controller: ['$scope', function($scope) {
-      $scope.self = self;
-    }]
-  });
+  vis.directives.Directive.apply(this, arguments);
 };
 
 goog.inherits(vis.directives.Window, vis.directives.Directive);

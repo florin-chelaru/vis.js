@@ -6,40 +6,21 @@
 
 goog.provide('vis.ui.canvas.decorators.Axis');
 
-goog.require('vis.ui.Decorator');
+goog.require('vis.ui.decorators.Axis');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.Decorator
+ * @extends vis.ui.decorators.Axis
  */
-vis.ui.canvas.decorators.Axis = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
-
+vis.ui.canvas.decorators.Axis = function() {
+  vis.ui.decorators.Axis.apply(this, arguments);
 };
 
-goog.inherits(vis.ui.canvas.decorators.Axis, vis.ui.Decorator);
-
-/**
- * @type {{x: string, y: string}}
- */
-vis.ui.canvas.decorators.Axis.orientation = {
-  x: 'bottom',
-  y: 'left'
-};
-
-Object.defineProperties(vis.ui.canvas.decorators.Axis.prototype, {
-  type: {
-    get: function() { return this.scope.type; }
-  },
-
-  ticks: {
-    get: function () { return this.scope.ticks || 10; }
-  }
-});
+goog.inherits(vis.ui.canvas.decorators.Axis, vis.ui.decorators.Axis);
 
 vis.ui.canvas.decorators.Axis.prototype.draw = function() {
-  var opts = this.targetOptions;
+  var opts = this.visOptions;
   if (!opts) { return; }
 
   var type = this.type;
@@ -116,4 +97,3 @@ vis.ui.canvas.decorators.Axis.prototype.draw = function() {
     context.fillText(unit, p.x, p.y);
   });
 };
-

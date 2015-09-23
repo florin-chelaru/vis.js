@@ -45,21 +45,6 @@ vis.reflection.evaluateFullyQualifiedTypeName = function(typeName) {
  * @template T
  */
 vis.reflection.applyConstructor = function(ctor, params) {
-  var obj;
-
-  // Use a fake constructor function with the target constructor's
-  // `prototype` property to create the object with the right prototype
-  var fakeCtor = function() {};
-  fakeCtor.prototype = ctor.prototype;
-
-  obj = /** @type {T} */ (new fakeCtor());
-
-  // Set the object's `constructor`
-  obj.constructor = ctor;
-
-  // Call the constructor function
-  ctor.apply(obj, params);
-
-  return obj;
+  return new (Function.prototype.bind.apply(ctor, [null].concat(params)));
 };
 

@@ -17,7 +17,7 @@ goog.require('vis.ui.canvas.decorators.Grid');
  * @extends {vis.directives.GraphicDecorator}
  */
 vis.directives.Grid = function() {
-  vis.directives.GraphicDecorator.call(this, { type: '@', ticks: '@' });
+  vis.directives.GraphicDecorator.call(this);
 };
 
 goog.inherits(vis.directives.Grid, vis.directives.GraphicDecorator);
@@ -26,16 +26,17 @@ goog.inherits(vis.directives.Grid, vis.directives.GraphicDecorator);
  * @param $scope
  * @param $element
  * @param $attrs
- * @param $targetElement
+ * @param {jQuery} $targetElement
+ * @param {vis.async.TaskService} taskService
+ * @param {vis.ui.Visualization} target
  * @returns {vis.ui.Decorator}
  * @override
  */
-vis.directives.Grid.prototype.createHandler = function($scope, $element, $attrs, $targetElement) {
-  switch ($targetElement.attr('render')) {
+vis.directives.Grid.prototype.createDecorator = function($scope, $element, $attrs, taskService, $targetElement, target) {
+  switch (target.options.render) {
     case 'svg':
-      return new vis.ui.svg.decorators.Grid($scope, $element, $attrs, $targetElement);
+      return new vis.ui.svg.decorators.Grid($scope, $element, $attrs, taskService, $targetElement, target);
     case 'canvas':
-      return new vis.ui.canvas.decorators.Grid($scope, $element, $attrs, $targetElement);
+      return new vis.ui.canvas.decorators.Grid($scope, $element, $attrs, taskService, $targetElement, target);
   }
 };
-

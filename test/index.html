@@ -18,10 +18,14 @@
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
   <script src="src/deps.js"></script>
   <script src="src/vis/vis.js"></script>
+  <script src="third-party/vis/plugins/canvas/scatter-plot-options.js"></script>
+  <script src="third-party/vis/plugins/canvas/scatter-plot.js"></script>
+  <script src="third-party/vis/plugins/svg/scatter-plot-options.js"></script>
+  <script src="third-party/vis/plugins/svg/scatter-plot.js"></script>
   <script src="test/script.js"></script>
 </head>
 <body ng-app="main">
-  <div ng-controller="MyController">
+  <div ng-controller="PeopleGeneExpression">
     <!--<visualization type="scatterplot"
                    render="webgl"
                    scale-coordinates="off"
@@ -73,11 +77,19 @@
     <div visualization
          type="scatterplot"
          render="svg"
-         input-data="data"
-         options="options"
+         input-data="d"
+         axis-boundaries="{x: {min: -1, max: 2}, y: {min: -0.5, max: 1.5}}"
+         width="500"
+         height="500"
+         margins="{left:10, right: 10, top: 10, bottom: 10}"
+         xCol="1"
+         yCol="0"
+         vals="gene expression"
+
          vis-window
          vis-resizable
          vis-movable
+
          style="top: 50px; left: 50px;">
       <vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
@@ -85,11 +97,7 @@
       <vis-grid type="y"></vis-grid>
     </div>
     <div visualization
-         type="scatterplot"
-         render="canvas"
-         single-buffer="true"
-         input-data="data"
-         options="options"
+         options="canvasOptions"
          vis-window
          vis-resizable
          vis-movable

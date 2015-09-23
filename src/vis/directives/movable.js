@@ -9,21 +9,19 @@ goog.provide('vis.directives.Movable');
 goog.require('vis.directives.Directive');
 
 /**
+ * @param $scope
  * @param $document
  * @constructor
  * @extends {vis.directives.Directive}
  */
-vis.directives.Movable = function($document) {
-  var self = this;
-  vis.directives.Directive.call(this, {
-    restrict: 'A',
-    replace: false,
-    transclude: false,
-    controller: ['$scope', function($scope) {
-      $scope.self = self;
-      $scope.$document = $document;
-    }]
-  });
+vis.directives.Movable = function($scope, $document) {
+  vis.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
 };
 
 goog.inherits(vis.directives.Movable, vis.directives.Directive);
@@ -42,6 +40,7 @@ vis.directives.Movable.prototype.link = function($scope, $element, $attrs, contr
   var startX = 0, startY = 0, x, y;
   var windowMargin = 0;//-parseInt($window.css('top'));
 
+  var $document = this._document;
   function mousedown(event) {
     if (event.target != $window[0]) { return; }
 
@@ -52,8 +51,8 @@ vis.directives.Movable.prototype.link = function($scope, $element, $attrs, contr
     y = windowRect.top;
     startX = event.pageX - x;
     startY = event.pageY - y;
-    $scope.$document.on('mousemove', mousemove);
-    $scope.$document.on('mouseup', mouseup);
+    $document.on('mousemove', mousemove);
+    $document.on('mouseup', mouseup);
   }
 
   function mousemove(event) {
@@ -66,8 +65,8 @@ vis.directives.Movable.prototype.link = function($scope, $element, $attrs, contr
   }
 
   function mouseup() {
-    $scope.$document.off('mousemove', mousemove);
-    $scope.$document.off('mouseup', mouseup);
+    $document.off('mousemove', mousemove);
+    $document.off('mouseup', mouseup);
   }
 
   $window.on('mousedown', mousedown);
