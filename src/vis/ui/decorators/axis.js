@@ -27,6 +27,12 @@ vis.ui.decorators.Axis = function($scope, $element, $attrs, taskService, $target
    * @private
    */
   this._ticks = ($attrs.ticks == undefined) ? 10 : parseInt($attrs.ticks);
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._format = $attrs.format;
 };
 
 goog.inherits(vis.ui.decorators.Axis, vis.ui.Decorator);
@@ -46,6 +52,10 @@ Object.defineProperties(vis.ui.decorators.Axis.prototype, {
 
   ticks: {
     get: function () { return this._ticks || 10; }
+  },
+
+  format: {
+    get: function() { return this._format; }
   }
 });
 

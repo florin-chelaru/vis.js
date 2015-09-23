@@ -22,6 +22,9 @@
   <script src="third-party/vis/plugins/canvas/scatter-plot.js"></script>
   <script src="third-party/vis/plugins/svg/scatter-plot-options.js"></script>
   <script src="third-party/vis/plugins/svg/scatter-plot.js"></script>
+
+  <script src="third-party/vis/plugins/svg/manhattan-plot-options.js"></script>
+  <script src="third-party/vis/plugins/svg/manhattan-plot.js"></script>
   <script src="test/script.js"></script>
 </head>
 <body ng-app="main">
@@ -82,8 +85,8 @@
          width="500"
          height="500"
          margins="{left:10, right: 10, top: 10, bottom: 10}"
-         xCol="1"
-         yCol="0"
+         x-col="0"
+         y-col="0"
          vals="gene expression"
 
          vis-window
@@ -105,6 +108,39 @@
       <vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
       <vis-grid type="x" ticks="10"></vis-grid>
+      <vis-grid type="y"></vis-grid>
+    </div>
+  </div>
+
+  <div ng-controller="GeneticVariants">
+    <div visualization
+         type="manhattan"
+         render="svg"
+         input-data="data"
+         axis-boundaries="{y: {min: 0, max: 1}}"
+         width="1200"
+         height="300"
+         margins="{left:10, right: 10, top: 10, bottom: 10}"
+
+         cols-filter="[0,1]"
+         cols-label="name"
+         cols-order-by="name"
+
+         rows-filter="[0,1,2]"
+         rows-label="pos"
+         rows-order-by="pos"
+         rows-scale="true"
+
+         vals="gwasPval"
+
+         vis-window
+         vis-resizable
+         vis-movable
+
+         style="top: 50px; left: 50px;">
+      <vis-axis type="x" format="s" ticks="3"></vis-axis>
+      <vis-axis type="y"></vis-axis>
+      <vis-grid type="x" ticks="3"></vis-grid>
       <vis-grid type="y"></vis-grid>
     </div>
   </div>

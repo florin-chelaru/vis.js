@@ -36,9 +36,13 @@ vis.ui.svg.decorators.Axis.prototype.draw = function() {
   var scale = opts.scales[type];
 
   var axisFn = d3.svg.axis()
-      .scale(scale)
-      .orient(vis.ui.decorators.Axis.Orientation[type])
-      .ticks(this.ticks);
+    .scale(scale)
+    .orient(vis.ui.decorators.Axis.Orientation[type])
+    .ticks(this.ticks);
+
+  if (this.format) {
+    axisFn = axisFn.tickFormat(d3.format('s'));
+  }
 
   axis.call(axisFn);
 

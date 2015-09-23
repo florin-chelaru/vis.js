@@ -18,6 +18,18 @@ vis.models.DataSource = function() {
    * @private
    */
   this._valsMap = null;
+
+  /**
+   * @type {Object.<string, vis.models.DataArray>}
+   * @private
+   */
+  this._rowsMap = null;
+
+  /**
+   * @type {Object.<string, vis.models.DataArray>}
+   * @private
+   */
+  this._colsMap = null;
 };
 
 Object.defineProperties(vis.models.DataSource.prototype, {
@@ -91,4 +103,36 @@ vis.models.DataSource.prototype.getVals = function(label) {
   }
 
   return this._valsMap[label];
+};
+
+/**
+ * @param {string} label
+ * @returns {vis.models.DataArray}
+ */
+vis.models.DataSource.prototype.getRows = function(label) {
+  if (!this._rowsMap) {
+    var rowsMap = {};
+    this.rows.forEach(function(d) {
+      rowsMap[d.label] = d;
+    });
+    this._rowsMap = rowsMap;
+  }
+
+  return this._rowsMap[label];
+};
+
+/**
+ * @param {string} label
+ * @returns {vis.models.DataArray}
+ */
+vis.models.DataSource.prototype.getCols = function(label) {
+  if (!this._colsMap) {
+    var colsMap = {};
+    this.cols.forEach(function(d) {
+      colsMap[d.label] = d;
+    });
+    this._colsMap = colsMap;
+  }
+
+  return this._colsMap[label];
 };

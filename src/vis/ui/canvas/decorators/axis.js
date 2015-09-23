@@ -50,7 +50,7 @@ vis.ui.canvas.decorators.Axis.prototype.draw = function() {
   context.fillStyle = '#000000';
 
   var ticks = scale.ticks(this.ticks);
-  var units = ticks.map(scale.tickFormat(this.ticks));
+  var units = ticks.map(scale.tickFormat(this.ticks, this.format));
 
   var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
 

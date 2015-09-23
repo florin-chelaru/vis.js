@@ -42,6 +42,12 @@ vis.models.RowDataItemWrapper = function(dataSource, i, options) {
   this._vals = null;
 
   /**
+   * @type {Array}
+   * @private
+   */
+  this._row = null;
+
+  /**
    * @type {vis.ui.VisualizationOptions}
    * @private
    */
@@ -74,6 +80,7 @@ Object.defineProperties(vis.models.RowDataItemWrapper.prototype, {
       if (!this._vals) {
         var valsSeries = this._dataSource.getVals(this._options.vals);
         var vals = [];
+        // TODO: Later introduce cols filter
         var j = this._i * this._dataSource.ncols;
         for (var i = 0; i < this._dataSource.ncols; ++i) {
           vals.push(valsSeries.d[j + i]);
@@ -84,3 +91,16 @@ Object.defineProperties(vis.models.RowDataItemWrapper.prototype, {
     }
   }
 });
+
+/**
+ * @param index
+ * @returns {*}
+ */
+vis.models.RowDataItemWrapper.prototype.row = function(index) {
+  if (typeof index == 'number') {
+    return this._dataSource.rows[index].d[this._i];
+  }
+
+  // else: string
+  return this._dataSource.getRows(index).d[this._i];
+};

@@ -38,9 +38,6 @@ vis.plugins.svg.ScatterPlot.prototype.draw = function() {
 
   /** @type {vis.models.DataSource} */
   var data = this.data;
-  if (data.ncols != 2) {
-    throw new vis.ui.UiException('Scatter plot can only draw exactly two columns.')
-  }
 
   // Nothing to draw
   if (!data.nrows) { return; }
@@ -50,6 +47,8 @@ vis.plugins.svg.ScatterPlot.prototype.draw = function() {
   var margins = options.margins;
   var xScale = options.scales.x;
   var yScale = options.scales.y;
+  var xCol = options.xCol;
+  var yCol = options.yCol;
 
   var svg = d3.select(this.element[0]).select('svg');
 
@@ -71,8 +70,8 @@ vis.plugins.svg.ScatterPlot.prototype.draw = function() {
 
   selection
     .attr('r', 10)
-    .attr('cx', function(d) { return xScale(d.vals[0]); })
-    .attr('cy', function(d) { return yScale(d.vals[1]); })
+    .attr('cx', function(d) { return xScale(d.vals[xCol]); })
+    .attr('cy', function(d) { return yScale(d.vals[yCol]); })
     .attr('fill', '#ff6520');
 
   selection.exit()

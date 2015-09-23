@@ -118,8 +118,37 @@ vis.ui.VisualizationFactory.prototype.generateOptions = function($scope, $elemen
     margins = $scope.$eval($attrs.margins);
   }
 
-  var x = opt.x || $attrs.x;
-  var y = opt.y || $attrs.y;
+  // TODO: Separate using dynamic options convention
+  var xCol = opt.xCol || $attrs.xCol;
+  var yCol = opt.yCol || $attrs.yCol;
+
+  var colsFilter;
+  if (opt.colsFilter) {
+    colsFilter = opt.colsFilter;
+  } else if ($attrs.colsFilter) {
+    colsFilter = $scope.$eval($attrs.colsFilter);
+  }
+
+  var colsLabel = opt.colsLabel || $attrs.colsLabel;
+  var colsOrderBy = opt.colsOrderBy || $attrs.colsOrderBy;
+
+  var rowsFilter;
+  if (opt.rowsFilter) {
+    rowsFilter = opt.rowsFilter;
+  } else if ($attrs.rowsFilter) {
+    rowsFilter = $scope.$eval($attrs.rowsFilter);
+  }
+
+  var rowsLabel = opt.rowsLabel || $attrs.rowsLabel;
+  var rowsOrderBy = opt.rowsOrderBy || $attrs.rowsOrderBy;
+
+  var rowsScale;
+  if (opt.rowsScale) {
+    rowsScale = opt.rowsScale;
+  } else if ($attrs.rowsScale) {
+    rowsScale = $scope.$eval($attrs.rowsScale);
+  }
+  //
 
   var vals = opt.vals || $attrs.vals;
 
@@ -130,9 +159,21 @@ vis.ui.VisualizationFactory.prototype.generateOptions = function($scope, $elemen
   opt.width = width;
   opt.height = height;
   opt.margins = margins;
-  opt.x = x;
-  opt.y = y;
   opt.vals = vals;
+
+  // TODO: Separate using a dynamic options convention
+  opt.xCol = xCol;
+  opt.yCol = yCol;
+
+  opt.colsFilter = colsFilter;
+  opt.colsLabel = colsLabel;
+  opt.colsOrderBy = colsOrderBy;
+  opt.rowsFilter = rowsFilter;
+  opt.rowsLabel = rowsLabel;
+  opt.rowsOrderBy = rowsOrderBy;
+  opt.rowsScale = rowsScale;
+  //
+
 
   opt.visCtor = vis.reflection.evaluateFullyQualifiedTypeName(typeStr);
 
