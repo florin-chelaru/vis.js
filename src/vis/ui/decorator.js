@@ -11,19 +11,22 @@ goog.require('vis.async.TaskService');
 
 /**
  * @param $scope
- * @param $element
+ * @param {jQuery} $element
  * @param $attrs
- * @param $targetElement
+ * @param {vis.async.TaskService} taskService
+ * @param {jQuery} $targetElement
+ * @param {vis.ui.Visualization} target
  * @constructor
  * @abstract
  */
-vis.ui.Decorator = function($scope, $element, $attrs, $targetElement) {
+vis.ui.Decorator = function($scope, $element, $attrs, taskService, $targetElement, target) {
   /**
    * @private
    */
   this._scope = $scope;
 
   /**
+   * @type {jQuery}
    * @private
    */
   this._element = $element;
@@ -34,9 +37,16 @@ vis.ui.Decorator = function($scope, $element, $attrs, $targetElement) {
   this._attrs = $attrs;
 
   /**
+   * @type {jQuery}
    * @private
    */
   this._targetElement = $targetElement;
+
+  /**
+   * @type {vis.ui.Visualization}
+   * @private
+   */
+  this._target = target;
 
   var self = this;
 
@@ -44,13 +54,13 @@ vis.ui.Decorator = function($scope, $element, $attrs, $targetElement) {
    * @type {vis.async.Task}
    * @private
    */
-  this._preDrawTask = $scope.taskService.createTask(function() { self.preDraw(); });
+  this._preDrawTask = taskService.createTask(function() { self.preDraw(); });
 
   /**
    * @type {vis.async.Task}
    * @private
    */
-  this._drawTask = $scope.taskService.createTask(function() { self.draw(); });
+  this._drawTask = taskService.createTask(function() { self.draw(); });
 };
 
 Object.defineProperties(vis.ui.Decorator.prototype, {
@@ -87,15 +97,15 @@ Object.defineProperties(vis.ui.Decorator.prototype, {
   },
 
   data: {
-    get: function () { return this._scope.data; }
+    get: function () { return this._target.data; }
   },
 
-  targetOptions: {
-    get: function () { return this._scope.targetOptions; }
+  visOptions: {
+    get: function () { return this._target.options; }
   },
 
   visualization: {
-    get: function () { return this._scope.visualizationHandler; }
+    get: function () { return this._target; }
   },
 
   /**

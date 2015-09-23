@@ -4,9 +4,9 @@
  * Time: 2:20 PM
  */
 
-goog.provide('vis.ui.svg.ScatterPlot');
+goog.provide('vis.plugins.svg.ScatterPlot');
 
-goog.require('vis.ui.svg.ScatterPlotOptions');
+goog.require('vis.plugins.svg.ScatterPlotOptions');
 goog.require('vis.ui.svg.SvgVisualization');
 goog.require('vis.utils');
 goog.require('vis.models.DataSource');
@@ -15,29 +15,27 @@ goog.require('vis.models.Boundaries');
 goog.require('vis.models.Margins');
 
 /**
- * @param scope
- * @param element
- * @param attrs
  * @constructor
  * @extends vis.ui.svg.SvgVisualization
  */
-vis.ui.svg.ScatterPlot = function(scope, element, attrs) {
-  vis.ui.svg.SvgVisualization.call(this, scope, element, attrs);
+vis.plugins.svg.ScatterPlot = function() {
+  vis.ui.svg.SvgVisualization.apply(this, arguments);
 };
 
-goog.inherits(vis.ui.svg.ScatterPlot, vis.ui.svg.SvgVisualization);
+goog.inherits(vis.plugins.svg.ScatterPlot, vis.ui.svg.SvgVisualization);
 
-vis.ui.svg.ScatterPlot.prototype.preDraw = function() {
+vis.plugins.svg.ScatterPlot.prototype.preDraw = function() {
   vis.ui.svg.SvgVisualization.prototype.preDraw.apply(this, arguments);
 };
 
 /**
  * @override
  */
-vis.ui.svg.ScatterPlot.prototype.draw = function() {
+vis.plugins.svg.ScatterPlot.prototype.draw = function() {
   vis.ui.svg.SvgVisualization.prototype.draw.apply(this, arguments);
 
-  var data = this.scope.data;
+  /** @type {vis.models.DataSource} */
+  var data = this.data;
   if (data.ncols != 2) {
     throw new vis.ui.UiException('Scatter plot can only draw exactly two columns.')
   }
@@ -62,7 +60,7 @@ vis.ui.svg.ScatterPlot.prototype.draw = function() {
     .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
 
   var items = vis.utils.range(data.nrows).map(function(i) {
-    return new vis.models.RowDataItemWrapper(data, i);
+    return new vis.models.RowDataItemWrapper(data, i, options);
   });
   var selection = viewport.selectAll('circle').data(items);
 

@@ -4,7 +4,7 @@
  * Time: 4:15 PM
  */
 
-goog.provide('vis.ui.svg.ScatterPlotOptions');
+goog.provide('vis.plugins.svg.ScatterPlotOptions');
 
 goog.require('vis.ui.VisualizationOptions');
 
@@ -20,8 +20,8 @@ goog.require('vis.models.Margins');
  * @constructor
  * @extends vis.ui.VisualizationOptions
  */
-vis.ui.svg.ScatterPlotOptions = function(options, data) {
+vis.plugins.svg.ScatterPlotOptions = function(options, data) {
   vis.ui.VisualizationOptions.apply(this, [options, data]);
 };
 
-goog.inherits(vis.ui.svg.ScatterPlotOptions, vis.ui.VisualizationOptions);
+goog.inherits(vis.plugins.svg.ScatterPlotOptions, vis.ui.VisualizationOptions);

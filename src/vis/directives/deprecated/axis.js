@@ -9,18 +9,15 @@ goog.provide('vis.directives.Axis');
 goog.require('vis.directives.Visualization');
 goog.require('vis.directives.GraphicDecorator');
 
-goog.require('vis.ui.Visualization');
 goog.require('vis.ui.svg.decorators.Axis');
 goog.require('vis.ui.canvas.decorators.Axis');
-
-goog.require('vis.async.TaskService');
 
 /**
  * @constructor
  * @extends {vis.directives.GraphicDecorator}
  */
 vis.directives.Axis = function() {
-  vis.directives.GraphicDecorator.apply(this, arguments);
+  vis.directives.GraphicDecorator.call(this);
 };
 
 goog.inherits(vis.directives.Axis, vis.directives.GraphicDecorator);
@@ -29,18 +26,16 @@ goog.inherits(vis.directives.Axis, vis.directives.GraphicDecorator);
  * @param $scope
  * @param $element
  * @param $attrs
- * @param {jQuery} $targetElement
- * @param {vis.async.TaskService} taskService
- * @param {vis.ui.Visualization} target
+ * @param $targetElement
  * @returns {vis.ui.Decorator}
  * @override
  */
-vis.directives.Axis.prototype.createDecorator = function($scope, $element, $attrs, $targetElement, taskService, target) {
-  switch (target.options.render) {
+vis.directives.Axis.prototype.createHandler = function($scope, $element, $attrs, $targetElement) {
+  switch ($targetElement.attr('render')) {
     case 'svg':
-      return new vis.ui.svg.decorators.Axis($scope, $element, $attrs, taskService, $targetElement, target);
+      return new vis.ui.svg.decorators.Axis($scope, $element, $attrs, $targetElement);
     case 'canvas':
-      return new vis.ui.canvas.decorators.Axis($scope, $element, $attrs, taskService, $targetElement, target);
+      return new vis.ui.canvas.decorators.Axis($scope, $element, $attrs, $targetElement);
   }
 };
 

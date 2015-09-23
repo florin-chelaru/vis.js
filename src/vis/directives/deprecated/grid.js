@@ -17,7 +17,19 @@ goog.require('vis.ui.canvas.decorators.Grid');
  * @extends {vis.directives.GraphicDecorator}
  */
 vis.directives.Grid = function() {
-  vis.directives.GraphicDecorator.call(this, { type: '@', ticks: '@' });
+  vis.directives.GraphicDecorator.call(this);
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._type = null;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._ticks = null;
 };
 
 goog.inherits(vis.directives.Grid, vis.directives.GraphicDecorator);

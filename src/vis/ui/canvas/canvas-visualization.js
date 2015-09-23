@@ -7,6 +7,7 @@
 goog.provide('vis.ui.canvas.CanvasVisualization');
 
 goog.require('vis.ui.Visualization');
+goog.require('vis.ui.VisualizationOptions');
 goog.require('vis.utils');
 
 goog.require('vis.models.DataSource');
@@ -14,23 +15,31 @@ goog.require('vis.models.RowDataItemWrapper');
 goog.require('vis.models.Boundaries');
 goog.require('vis.models.Margins');
 
+goog.require('vis.ui.canvas');
+
+goog.require('vis.async.TaskService');
+
 goog.require('goog.string.format');
 
 /**
  * @param scope
  * @param element
  * @param attrs
+ * @param {vis.async.TaskService} taskService
+ * @param {vis.ui.VisualizationOptions} options
  * @constructor
  * @extends vis.ui.Visualization
  */
-vis.ui.canvas.CanvasVisualization = function (scope, element, attrs) {
-  vis.ui.Visualization.call(this, scope, element, attrs);
+vis.ui.canvas.CanvasVisualization = function (scope, element, attrs, taskService, options) {
+  vis.ui.Visualization.apply(this, arguments);
 
   /**
+   * TODO: Change back
    * @type {boolean}
    * @private
    */
   this._doubleBuffer = !attrs.singleBuffer;
+  //this._doubleBuffer = false;
 };
 
 goog.inherits(vis.ui.canvas.CanvasVisualization, vis.ui.Visualization);
@@ -96,7 +105,10 @@ vis.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
  * @override
  */
 vis.ui.canvas.CanvasVisualization.prototype.doDraw = function() {
-  var self = this;
-  vis.ui.Visualization.prototype.doDraw.call(this)
-    .then(function() { self.finalizeDraw(); });
+  // TODO: Change back once we've figured out how to bind these actions together
+  // var self = this;
+  // vis.ui.Visualization.prototype.doDraw.call(this)
+  //   .then(function() { self.finalizeDraw(); });
+  vis.ui.Visualization.prototype.doDraw.call(this);
+  this.finalizeDraw();
 };

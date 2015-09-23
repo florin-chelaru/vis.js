@@ -15,14 +15,11 @@ goog.require('vis.models.Boundaries');
 goog.require('vis.models.Margins');
 
 /**
- * @param scope
- * @param element
- * @param attrs
  * @constructor
  * @extends vis.ui.Visualization
  */
-vis.ui.svg.SvgVisualization = function (scope, element, attrs) {
-  vis.ui.Visualization.call(this, scope, element, attrs);
+vis.ui.svg.SvgVisualization = function () {
+  vis.ui.Visualization.apply(this, arguments);
 };
 
 goog.inherits(vis.ui.svg.SvgVisualization, vis.ui.Visualization);

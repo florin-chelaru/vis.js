@@ -8,38 +8,32 @@ goog.provide('vis.directives.GraphicDecorator');
 
 goog.require('vis.directives.Visualization');
 goog.require('vis.ui.Decorator');
-goog.require('vis.ui.Visualization');
-
-goog.require('vis.async.TaskService');
 
 /**
  * @constructor
  * @extends {vis.directives.Directive}
  */
 vis.directives.GraphicDecorator = function() {
-  vis.directives.Directive.apply(this, arguments);/*{
+  var self = this;
+  vis.directives.Directive.call(this, {
     require: '^visualization',
     restrict: 'E',
     transclude: true,
     controller: ['$scope', function($scope) {
       Object.defineProperties(this, {
-        decoratorHandler: { get: function() { return this._decorator; }}
+        decoratorHandler: { get: function() { return this._decoratorHandler; }}
       });
     }]
-  });*/
+  });
 
   /**
    * @type {vis.ui.Decorator}
    * @private
    */
-  this._decorator = null;
+  this._decoratorHandler = null;
 };
 
 goog.inherits(vis.directives.GraphicDecorator, vis.directives.Directive);
-
-Object.defineProperties(vis.directives.GraphicDecorator.prototype, {
-  decorator: { get: function() { return this._decorator; }}
-});
 
 /**
  * @param $scope
@@ -55,22 +49,17 @@ vis.directives.GraphicDecorator.prototype.link = function($scope, $element, $att
     visHandler: { get: function() { return controller.handler; } },
     taskService: { get: function() { return controller.taskService; } }
   });*/
-  /** @type {vis.directives.Visualization} */
-  var visualization = $scope.visualization.handler;
+  this._decoratorHandler = this.createHandler($scope, $element, $attrs, $element.parent());
 
-  this._decorator = this.createDecorator($scope, $element, $attrs, $element.parent(), visualization.taskService, visualization.vis);
-
-  visualization.taskService.chain(this._decorator.drawTask, visualization.vis.drawTask);
-  visualization.taskService.chain(visualization.vis.preDrawTask, this._decorator.preDrawTask);
+  controller.taskService.chain(this._decoratorHandler.drawTask, controller.visHandler.drawTask);
+  controller.taskService.chain(controller.visHandler.preDrawTask, this._decoratorHandler.preDrawTask);
 };
 
 /**
  * @param $scope
  * @param $element
  * @param $attrs
- * @param {jQuery} $targetElement
- * @param {vis.async.TaskService} taskService
- * @param {vis.ui.Visualization} target
+ * @param $targetElement
  * @returns {vis.ui.Decorator}
  */
-vis.directives.GraphicDecorator.prototype.createDecorator = function($scope, $element, $attrs, $targetElement, taskService, target) { throw new vis.AbstractMethodException(); };
+vis.directives.GraphicDecorator.prototype.createHandler = function($scope, $element, $attrs, $targetElement) { throw new vis.AbstractMethodException(); };

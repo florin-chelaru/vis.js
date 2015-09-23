@@ -7,20 +7,26 @@
 goog.provide('vis');
 
 goog.require('vis.Configuration');
+
 goog.require('vis.async.TaskService');
+
+goog.require('vis.models.Transformer');
+
 goog.require('vis.ui.VisualizationFactory');
 goog.require('vis.ui.Visualization');
-goog.require('vis.ui.svg.ScatterPlot');
-goog.require('vis.ui.canvas.ScatterPlot');
+goog.require('vis.ui.svg.SvgVisualization');
+goog.require('vis.ui.canvas.CanvasVisualization');
+
 
 goog.require('vis.directives.Visualization');
-goog.require('vis.directives.Axis');
-goog.require('vis.directives.Grid');
-
 goog.require('vis.directives.Window');
+goog.require('vis.directives.Axis');
+/*goog.require('vis.directives.Grid');
+
+
 goog.require('vis.directives.Resizable');
 goog.require('vis.directives.Movable');
-
+*/
 vis.main = angular.module('vis', []);
 
 vis.main.provider('configuration', function() {
@@ -38,10 +44,22 @@ vis.main.factory('taskService', ['$timeout', '$q', function($timeout, $q) {
 }]);
 
 vis.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
-  return new vis.directives.Visualization(visualizationFactory, taskService);
+  return vis.directives.Directive.new('visualization', vis.directives.Visualization, [visualizationFactory, taskService], {restrict: 'A', transclude: true, replace: false});
 }]);
 
-vis.main.directive('visGrid', function() {
+vis.main.directive('visWindow', function() {
+  return vis.directives.Directive.new('visWindow', vis.directives.Window, null, {restrict: 'A'});
+});
+
+vis.main.directive('visAxis', function() {
+  return vis.directives.Directive.new('visAxis', vis.directives.Axis, null, {restrict: 'E', require: '^visualization', transclude: true});
+});
+
+/*vis.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
+ return new vis.directives.Visualization(visualizationFactory, taskService);
+ }]);*/
+
+/*vis.main.directive('visGrid', function() {
   return new vis.directives.Grid();
 });
 
@@ -59,7 +77,7 @@ vis.main.directive('visResizable', ['$document', function($document) {
 
 vis.main.directive('visMovable', ['$document', function($document) {
   return new vis.directives.Movable($document);
-}]);
+}]);*/
 
 /*
 // TODO: Later

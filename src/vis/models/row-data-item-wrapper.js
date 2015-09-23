@@ -12,10 +12,11 @@ goog.require('vis.models.RowDataItem');
 /**
  * @param {vis.models.DataSource} dataSource
  * @param {number} i
+ * @param {vis.ui.VisualizationOptions} options
  * @constructor
  * @implements vis.models.RowDataItem
  */
-vis.models.RowDataItemWrapper = function(dataSource, i) {
+vis.models.RowDataItemWrapper = function(dataSource, i, options) {
   /**
    * @type {vis.models.DataSource}
    * @private
@@ -39,6 +40,12 @@ vis.models.RowDataItemWrapper = function(dataSource, i) {
    * @private
    */
   this._vals = null;
+
+  /**
+   * @type {vis.ui.VisualizationOptions}
+   * @private
+   */
+  this._options = options;
 };
 
 goog.inherits(vis.models.RowDataItemWrapper, vis.models.RowDataItem);
@@ -65,10 +72,11 @@ Object.defineProperties(vis.models.RowDataItemWrapper.prototype, {
     /** @returns {Array.<number>} */
     get: function() {
       if (!this._vals) {
+        var valsSeries = this._dataSource.getVals(this._options.vals);
         var vals = [];
         var j = this._i * this._dataSource.ncols;
         for (var i = 0; i < this._dataSource.ncols; ++i) {
-          vals.push(this._dataSource.vals.d[j + i]);
+          vals.push(valsSeries.d[j + i]);
         }
         this._vals = vals;
       }

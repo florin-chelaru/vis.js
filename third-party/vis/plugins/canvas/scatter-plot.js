@@ -4,7 +4,7 @@
  * Time: 2:20 PM
  */
 
-goog.provide('vis.ui.canvas.ScatterPlot');
+goog.provide('vis.plugins.canvas.ScatterPlot');
 
 goog.require('vis.ui.canvas.CanvasVisualization');
 goog.require('vis.utils');
@@ -20,29 +20,26 @@ goog.require('vis.models.Transformer');
 goog.require('goog.async.Deferred');
 
 /**
- * @param scope
- * @param element
- * @param attrs
  * @constructor
  * @extends vis.ui.canvas.CanvasVisualization
  */
-vis.ui.canvas.ScatterPlot = function(scope, element, attrs) {
-  vis.ui.canvas.CanvasVisualization.call(this, scope, element, attrs);
+vis.plugins.canvas.ScatterPlot = function() {
+  vis.ui.canvas.CanvasVisualization.apply(this, arguments);
 };
 
-goog.inherits(vis.ui.canvas.ScatterPlot, vis.ui.canvas.CanvasVisualization);
+goog.inherits(vis.plugins.canvas.ScatterPlot, vis.ui.canvas.CanvasVisualization);
 
-vis.ui.canvas.ScatterPlot.prototype.preDraw = function() {
+vis.plugins.canvas.ScatterPlot.prototype.preDraw = function() {
   vis.ui.canvas.CanvasVisualization.prototype.preDraw.apply(this, arguments);
 };
 
 /**
  * @override
  */
-vis.ui.canvas.ScatterPlot.prototype.draw = function() {
+vis.plugins.canvas.ScatterPlot.prototype.draw = function() {
   vis.ui.canvas.CanvasVisualization.prototype.draw.apply(this, arguments);
 
-  var data = this.scope.data;
+  var data = this.data;
   if (data.ncols != 2) {
     throw new vis.ui.UiException('Scatter plot can only draw exactly two columns.')
   }
@@ -62,7 +59,7 @@ vis.ui.canvas.ScatterPlot.prototype.draw = function() {
     vis.models.Transformer.scale(xScale, yScale)
       .combine(vis.models.Transformer.translate({x: margins.left, y: margins.top}));
   var items = vis.utils.range(data.nrows).map(function(i) {
-    return new vis.models.RowDataItemWrapper(data, i);
+    return new vis.models.RowDataItemWrapper(data, i, options);
   });
 
   items.forEach(function(d) {

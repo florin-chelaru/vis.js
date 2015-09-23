@@ -6,40 +6,21 @@
 
 goog.provide('vis.ui.svg.decorators.Grid');
 
-goog.require('vis.ui.Decorator');
+goog.require('vis.ui.decorators.Grid');
 goog.require('vis.ui.VisualizationOptions');
 
 /**
  * @constructor
- * @extends vis.ui.Decorator
+ * @extends vis.ui.decorators.Grid
  */
 vis.ui.svg.decorators.Grid = function($scope, $element, $attrs, $targetElement) {
-  vis.ui.Decorator.apply(this, [$scope, $element, $attrs, $targetElement]);
-
+  vis.ui.decorators.Grid.apply(this, [$scope, $element, $attrs, $targetElement]);
 };
 
-goog.inherits(vis.ui.svg.decorators.Grid, vis.ui.Decorator);
-
-/**
- * @type {{x: string, y: string}}
- */
-vis.ui.svg.decorators.Grid.orientation = {
-  x: 'bottom',
-  y: 'left'
-};
-
-Object.defineProperties(vis.ui.svg.decorators.Grid.prototype, {
-  type: {
-    get: function() { return this.scope.type; }
-  },
-
-  ticks: {
-    get: function () { return this.scope.ticks || 10; }
-  }
-});
+goog.inherits(vis.ui.svg.decorators.Grid, vis.ui.decorators.Grid);
 
 vis.ui.svg.decorators.Grid.prototype.draw = function() {
-  var opts = this.targetOptions;
+  var opts = this.visOptions;
   if (!opts) { return; }
 
   var svg = d3.select(this.targetElement[0]).select('svg');
@@ -78,4 +59,3 @@ vis.ui.svg.decorators.Grid.prototype.draw = function() {
 
   gridLines.exit().remove();
 };
-

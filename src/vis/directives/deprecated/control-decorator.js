@@ -16,11 +16,7 @@ goog.require('vis.ui.Decorator');
 vis.directives.ControlDecorator = function() {
   var self = this;
   vis.directives.Directive.call(this, {
-    restrict: 'A',
-    scope: {
-    },
-    controller: ['$scope', function($scope) {
-    }]
+    restrict: 'A'
   });
 };
 
@@ -33,6 +29,4 @@ goog.inherits(vis.directives.ControlDecorator, vis.directives.Directive);
  * @param controller
  * @override
  */
-vis.directives.ControlDecorator.prototype.link = function($scope, $element, $attrs, controller) {
-
-};
+vis.directives.ControlDecorator.prototype.link = function($scope, $element, $attrs, controller) {};

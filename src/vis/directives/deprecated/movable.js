@@ -19,11 +19,14 @@ vis.directives.Movable = function($document) {
     restrict: 'A',
     replace: false,
     transclude: false,
-    controller: ['$scope', function($scope) {
-      $scope.self = self;
-      $scope.$document = $document;
-    }]
+    controller: ['$scope', function($scope) {}]
   });
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
 };
 
 goog.inherits(vis.directives.Movable, vis.directives.Directive);
