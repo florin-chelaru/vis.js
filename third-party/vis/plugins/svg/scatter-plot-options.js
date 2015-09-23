@@ -13,13 +13,15 @@ goog.require('vis.models.Boundaries');
 goog.require('vis.models.Margins');
 
 /**
- * @param {Object.<string, string>} options
+ * @param {{
+ *   axisBoundaries: Object.<string, vis.models.Boundaries>=, margins: vis.models.Margins=,
+ *   width: number=, height: number= }} options
  * @param {vis.models.DataSource} data
  * @constructor
  * @extends vis.ui.VisualizationOptions
  */
 vis.plugins.svg.ScatterPlotOptions = function(options, data) {
-  vis.ui.VisualizationOptions.apply(this, arguments);
+  vis.ui.VisualizationOptions.apply(this, [options, data]);
 };
 
 goog.inherits(vis.plugins.svg.ScatterPlotOptions, vis.ui.VisualizationOptions);
