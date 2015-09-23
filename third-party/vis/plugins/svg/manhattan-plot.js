@@ -47,7 +47,7 @@ vis.plugins.svg.ManhattanPlot.prototype.draw = function() {
   var margins = options.margins;
   var xScale = options.scales.x;
   var yScale = options.scales.y;
-  var cols = options.cols;
+  var cols = options.colsFilter;
 
   var svg = d3.select(this.element[0]).select('svg');
 
@@ -70,7 +70,7 @@ vis.plugins.svg.ManhattanPlot.prototype.draw = function() {
   selection
     .attr('r', 3)
     .attr('cx', function(d) { return xScale(d.row(options.rowsOrderBy)); })
-    .attr('cy', function(d) { return yScale(d.vals[options.colsFilter[0]]); })
+    .attr('cy', function(d) { return yScale(d.vals[cols[0]]); })
     .attr('fill', '#1e60d4');
 
   selection.exit()

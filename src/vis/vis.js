@@ -16,7 +16,7 @@ goog.require('vis.ui.VisualizationFactory');
 goog.require('vis.ui.Visualization');
 goog.require('vis.ui.svg.SvgVisualization');
 goog.require('vis.ui.canvas.CanvasVisualization');
-goog.require('vis.ui.canvas.CanvasVisualizationOptions');
+goog.require('vis.ui.TrackVisualizationOptions');
 
 
 goog.require('vis.directives.Visualization');

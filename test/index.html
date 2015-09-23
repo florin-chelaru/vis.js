@@ -18,13 +18,15 @@
   <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
   <script src="src/deps.js"></script>
   <script src="src/vis/vis.js"></script>
-  <script src="third-party/vis/plugins/canvas/scatter-plot-options.js"></script>
   <script src="third-party/vis/plugins/canvas/scatter-plot.js"></script>
-  <script src="third-party/vis/plugins/svg/scatter-plot-options.js"></script>
   <script src="third-party/vis/plugins/svg/scatter-plot.js"></script>
 
   <script src="third-party/vis/plugins/svg/manhattan-plot-options.js"></script>
   <script src="third-party/vis/plugins/svg/manhattan-plot.js"></script>
+
+  <script src="third-party/vis/plugins/canvas/manhattan-plot-options.js"></script>
+  <script src="third-party/vis/plugins/canvas/manhattan-plot.js"></script>
+
   <script src="test/script.js"></script>
 </head>
 <body ng-app="main">
@@ -82,18 +84,18 @@
          render="svg"
          input-data="d"
          axis-boundaries="{x: {min: -1, max: 2}, y: {min: -0.5, max: 1.5}}"
-         width="500"
-         height="500"
+         width="200"
+         height="200"
          margins="{left:10, right: 10, top: 10, bottom: 10}"
-         x-col="0"
-         y-col="0"
+
+         cols-filter="[0,1]"
          vals="gene expression"
 
          vis-window
          vis-resizable
          vis-movable
 
-         style="top: 50px; left: 50px;">
+         style="top: 15px; left: 15px;">
       <vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
       <vis-grid type="x" ticks="10"></vis-grid>
@@ -104,7 +106,7 @@
          vis-window
          vis-resizable
          vis-movable
-         style="top: 50px; left: 560px;">
+         style="top: 15px; left: 520px;">
       <vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
       <vis-grid type="x" ticks="10"></vis-grid>
@@ -119,7 +121,7 @@
          input-data="data"
          axis-boundaries="{y: {min: 0, max: 1}}"
          width="1200"
-         height="300"
+         height="200"
          margins="{left:10, right: 10, top: 10, bottom: 10}"
 
          cols-filter="[0,1]"
@@ -137,7 +139,37 @@
          vis-resizable
          vis-movable
 
-         style="top: 50px; left: 50px;">
+         style="top: 235px; left: 15px;">
+      <vis-axis type="x" format="s" ticks="3"></vis-axis>
+      <vis-axis type="y"></vis-axis>
+      <vis-grid type="x" ticks="3"></vis-grid>
+      <vis-grid type="y"></vis-grid>
+    </div>
+    <div visualization
+         type="manhattan"
+         render="canvas"
+         input-data="data"
+         axis-boundaries="{y: {min: 0, max: 1}}"
+         width="1200"
+         height="200"
+         margins="{left:10, right: 10, top: 10, bottom: 10}"
+
+         cols-filter="[0,1]"
+         cols-label="name"
+         cols-order-by="name"
+
+         rows-filter="[0,1,2]"
+         rows-label="pos"
+         rows-order-by="pos"
+         rows-scale="true"
+
+         vals="gwasPval"
+
+         vis-window
+         vis-resizable
+         vis-movable
+
+         style="top: 455px; left: 15px;">
       <vis-axis type="x" format="s" ticks="3"></vis-axis>
       <vis-axis type="y"></vis-axis>
       <vis-grid type="x" ticks="3"></vis-grid>

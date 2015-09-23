@@ -15,7 +15,9 @@ main.config(['configurationProvider', function(configuration) {
         default: 'svg'
       },
       manhattan: {
-        svg: 'vis.plugins.svg.ManhattanPlot'
+        svg: 'vis.plugins.svg.ManhattanPlot',
+        canvas: 'vis.plugins.canvas.ManhattanPlot',
+        default: 'svg'
       }
     }
   })
@@ -58,16 +60,15 @@ main.controller('PeopleGeneExpression', ['$scope', '$interval', function($scope,
     inputData: 'd',
     singleBuffer: false,
     axisBoundaries: {},
-    width: 500,
-    height: 500,
+    width: 200,
+    height: 200,
     margins: {
       left: 10,
       right: 10,
       bottom: 10,
       top: 10
     },
-    xCol: 1,
-    yCol: 0,
+    colsFilter: [0, 0],
     vals: 'dna methylation'
   };
 }]);
@@ -99,22 +100,5 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
         boundaries: { min: 0, max: 1 }
     }]
   };
-  $scope.options = {
-    type: 'scatterplot',
-    render: 'canvas',
-    inputData: 'd',
-    singleBuffer: false,
-    axisBoundaries: {},
-    width: 500,
-    height: 500,
-    margins: {
-      left: 10,
-      right: 10,
-      bottom: 10,
-      top: 10
-    },
-    xCol: 1,
-    yCol: 0,
-    vals: 'dna methylation'
-  };
+  $scope.options = {};
 }]);

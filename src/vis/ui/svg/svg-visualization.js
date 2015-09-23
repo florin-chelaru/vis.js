@@ -7,7 +7,6 @@
 goog.provide('vis.ui.svg.SvgVisualization');
 
 goog.require('vis.ui.Visualization');
-goog.require('vis.utils');
 
 goog.require('vis.models.DataSource');
 goog.require('vis.models.RowDataItemWrapper');

@@ -6,7 +6,6 @@
 
 goog.provide('vis.plugins.svg.ScatterPlot');
 
-goog.require('vis.plugins.svg.ScatterPlotOptions');
 goog.require('vis.ui.svg.SvgVisualization');
 goog.require('vis.utils');
 goog.require('vis.models.DataSource');
@@ -47,8 +46,8 @@ vis.plugins.svg.ScatterPlot.prototype.draw = function() {
   var margins = options.margins;
   var xScale = options.scales.x;
   var yScale = options.scales.y;
-  var xCol = options.xCol;
-  var yCol = options.yCol;
+  var xCol = options.colsFilter[0];
+  var yCol = options.colsFilter[1];
 
   var svg = d3.select(this.element[0]).select('svg');
 

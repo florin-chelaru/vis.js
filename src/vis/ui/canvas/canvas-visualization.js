@@ -8,7 +8,6 @@ goog.provide('vis.ui.canvas.CanvasVisualization');
 
 goog.require('vis.ui.Visualization');
 goog.require('vis.ui.VisualizationOptions');
-goog.require('vis.utils');
 
 goog.require('vis.models.DataSource');
 goog.require('vis.models.RowDataItemWrapper');

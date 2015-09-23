@@ -25,7 +25,6 @@ goog.addDependency('../../../../src/vis/models/transformer.js', ['vis.models.Tra
 goog.addDependency('../../../../src/vis/not-implemented-exception.js', ['vis.NotImplementedException'], ['vis.Exception'], false);
 goog.addDependency('../../../../src/vis/reflection/reflection-exception.js', ['vis.reflection.ReflectionException'], ['vis.Exception'], false);
 goog.addDependency('../../../../src/vis/reflection/reflection.js', ['vis.reflection'], ['vis.reflection.ReflectionException'], false);
-goog.addDependency('../../../../src/vis/ui/canvas/canvas-visualization-options.js', ['vis.ui.canvas.CanvasVisualizationOptions'], ['vis.ui.VisualizationOptions'], false);
 goog.addDependency('../../../../src/vis/ui/canvas/canvas-visualization.js', ['vis.ui.canvas.CanvasVisualization'], ['goog.string.format', 'vis.async.TaskService', 'vis.models.Boundaries', 'vis.models.DataSource', 'vis.models.Margins', 'vis.models.RowDataItemWrapper', 'vis.ui.Visualization', 'vis.ui.VisualizationOptions', 'vis.ui.canvas', 'vis.utils'], false);
 goog.addDependency('../../../../src/vis/ui/canvas/canvas.js', ['vis.ui.canvas'], [], false);
 goog.addDependency('../../../../src/vis/ui/canvas/decorators/axis.js', ['vis.ui.canvas.decorators.Axis'], ['vis.ui.VisualizationOptions', 'vis.ui.decorators.Axis'], false);
@@ -37,9 +36,10 @@ goog.addDependency('../../../../src/vis/ui/svg/decorators/axis.js', ['vis.ui.svg
 goog.addDependency('../../../../src/vis/ui/svg/decorators/grid.js', ['vis.ui.svg.decorators.Grid'], ['vis.ui.VisualizationOptions', 'vis.ui.decorators.Grid'], false);
 goog.addDependency('../../../../src/vis/ui/svg/heatmap.js', ['vis.ui.svg.Heatmap'], ['vis.ui.Visualization'], false);
 goog.addDependency('../../../../src/vis/ui/svg/svg-visualization.js', ['vis.ui.svg.SvgVisualization'], ['vis.models.Boundaries', 'vis.models.DataSource', 'vis.models.Margins', 'vis.models.RowDataItemWrapper', 'vis.ui.Visualization', 'vis.utils'], false);
+goog.addDependency('../../../../src/vis/ui/track-visualization-options.js', ['vis.ui.TrackVisualizationOptions'], ['vis.ui.VisualizationOptions'], false);
 goog.addDependency('../../../../src/vis/ui/ui-exception.js', ['vis.ui.UiException'], ['vis.Exception'], false);
 goog.addDependency('../../../../src/vis/ui/visualization-factory.js', ['vis.ui.VisualizationFactory'], ['vis.Configuration', 'vis.async.TaskService', 'vis.models.DataSource', 'vis.models.DataSourceWrapper', 'vis.reflection', 'vis.ui.UiException', 'vis.ui.Visualization'], false);
 goog.addDependency('../../../../src/vis/ui/visualization-options.js', ['vis.ui.VisualizationOptions'], ['vis.models.Boundaries', 'vis.models.DataSource', 'vis.models.Margins'], false);
 goog.addDependency('../../../../src/vis/ui/visualization.js', ['vis.ui.Visualization'], ['goog.async.Deferred', 'vis.async.Task', 'vis.async.TaskService', 'vis.models.DataSource', 'vis.ui.VisualizationOptions'], false);
 goog.addDependency('../../../../src/vis/utils/utils.js', ['vis.utils'], [], false);
-goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.async.TaskService', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Movable', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.directives.Window', 'vis.models.Transformer', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory', 'vis.ui.canvas.CanvasVisualization', 'vis.ui.canvas.CanvasVisualizationOptions', 'vis.ui.svg.SvgVisualization'], false);
+goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.async.TaskService', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Movable', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.directives.Window', 'vis.models.Transformer', 'vis.ui.TrackVisualizationOptions', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory', 'vis.ui.canvas.CanvasVisualization', 'vis.ui.svg.SvgVisualization'], false);

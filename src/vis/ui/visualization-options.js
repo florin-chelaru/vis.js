@@ -12,6 +12,9 @@ goog.require('vis.models.DataSource');
 
 /**
  * @param {{
+ *   singleBuffer: boolean=,
+ *   colsFilter: Array.<number>=, colsLabel: string=, colsOrderBy: string=,
+ *   rowsFilter: Array.<number>=, rowsLabel: string=, rowsOrderBy: string=, rowsScale: boolean=,
  *   axisBoundaries: Object.<string, vis.models.Boundaries>=, margins: vis.models.Margins=,
  *   width: number=, height: number=, visCtor: function(new: vis.ui.Visualization)=, render: string=,
  *   visOptionsCtor: function(new: vis.ui.VisualizationOptions)= }} options
@@ -70,6 +73,48 @@ vis.ui.VisualizationOptions = function(options, data) {
   this._render = options.render;
 
   /**
+   * @type {Array.<number>}
+   * @private
+   */
+  this._colsFilter = options.colsFilter || goog.array.range(data.ncols);
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._colsLabel = options.colsLabel || data.cols[0].label;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._colsOrderBy = options.colsOrderBy || data.cols[0].label;
+
+  /**
+   * @type {Array.<number>}
+   * @private
+   */
+  this._rowsFilter = options.rowsFilter || goog.array.range(data.nrows);
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._rowsLabel = options.rowsLabel || data.rows[0].label;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._rowsOrderBy = options.rowsOrderBy || data.rows[0].label;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._rowsScale = options.rowsScale == undefined ? true : options.rowsScale;
+
+  /**
    * @type {function(new: vis.ui.Visualization)}
    * @private
    */
@@ -80,6 +125,13 @@ vis.ui.VisualizationOptions = function(options, data) {
    * @private
    */
   this._visOptionsCtor = options.visOptionsCtor;
+
+  /**
+   * TODO: Later, separate this type of options into render options
+   * @type {boolean}
+   * @private
+   */
+  this._doubleBuffer = !options.singleBuffer;
 };
 
 Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
@@ -185,6 +237,14 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
    */
   render: { get: function() { return this._render; } },
 
+  colsFilter: { get: function() { return this._colsFilter; } },
+  colsLabel: { get: function() { return this._colsLabel; } },
+  colsOrderBy: { get: function() { return this._colsOrderBy; } },
+  rowsFilter: { get: function() { return this._rowsFilter; } },
+  rowsLabel: { get: function() { return this._rowsLabel; } },
+  rowsOrderBy: { get: function() { return this._rowsOrderBy; } },
+  rowsScale: { get: function() { return this._rowsScale; } },
+
   /**
    * @type {function(new: vis.ui.Visualization)}
    * @instance
@@ -236,7 +296,9 @@ Object.defineProperties(vis.ui.VisualizationOptions.prototype, {
           .range([this.height - this.margins.top - this.margins.bottom, 0])
       }
     }
-  }
+  },
+
+  doubleBuffer: { get: function() { return this._doubleBuffer; } }
 });
 
 /**

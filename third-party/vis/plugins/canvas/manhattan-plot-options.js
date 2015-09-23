@@ -4,7 +4,7 @@
  * Time: 2:02 PM
  */
 
-goog.provide('vis.plugins.svg.ManhattanPlotOptions');
+goog.provide('vis.plugins.canvas.ManhattanPlotOptions');
 
 goog.require('vis.ui.TrackVisualizationOptions');
 
@@ -14,8 +14,8 @@ goog.require('vis.ui.TrackVisualizationOptions');
  * @constructor
  * @extends vis.ui.TrackVisualizationOptions
  */
-vis.plugins.svg.ManhattanPlotOptions = function(options, data) {
+vis.plugins.canvas.ManhattanPlotOptions = function(options, data) {
   vis.ui.TrackVisualizationOptions.apply(this, arguments);
 };
 
-goog.inherits(vis.plugins.svg.ManhattanPlotOptions, vis.ui.TrackVisualizationOptions);
+goog.inherits(vis.plugins.canvas.ManhattanPlotOptions, vis.ui.TrackVisualizationOptions);

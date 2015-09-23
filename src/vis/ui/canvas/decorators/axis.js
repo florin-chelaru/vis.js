@@ -92,8 +92,8 @@ vis.ui.canvas.decorators.Axis.prototype.draw = function() {
     translate = translate.combine(vis.models.Transformer.translate({x: -5, y: 0}));
   }
 
-  units.forEach(function(unit) {
-    var p = translate.calc({x: x2(unit), y: y2(unit)});
+  units.forEach(function(unit, i) {
+    var p = translate.calc({x: x2(ticks[i]), y: y2(ticks[i])});
     context.fillText(unit, p.x, p.y);
   });
 };
