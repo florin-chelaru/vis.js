@@ -102,3 +102,27 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
   };
   $scope.options = {};
 }]);
+
+$(function() {
+  var long = new goog.math.Long(10, 0);
+  var bigwig = new vis.io.BigwigProxy('http://localhost/E120-H3K9ac.pval.signal.bigwig');
+
+  var header, zoomHeader, totalSummary, chrBTreeHeader;
+  bigwig.readHeader()
+    .then(function(d) {
+      header = d;
+      return bigwig.readZoomHeader(header, 9);
+    })
+    .then(function(d) {
+      zoomHeader = d;
+      return bigwig.readTotalSummary(header);
+    })
+    .then(function(d) {
+      totalSummary = d;
+      return bigwig.readChrTreeHeader(header);
+    })
+    .then(function(d) {
+      chrBTreeHeader = d;
+    });
+});
+

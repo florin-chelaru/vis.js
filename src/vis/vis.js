@@ -28,6 +28,8 @@ goog.require('vis.directives.Window');
 goog.require('vis.directives.Movable');
 goog.require('vis.directives.Resizable');
 
+goog.require('vis.io.BigwigProxy');
+
 
 vis.main = angular.module('vis', []);
 
@@ -69,29 +71,6 @@ vis.main.directive('visGrid', function() {
   return vis.directives.Directive.createNew('visGrid', vis.directives.Grid, null, {restrict: 'E', require: '^visualization'/*, transclude: true*/});
 });
 
-/*vis.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
- return new vis.directives.Visualization(visualizationFactory, taskService);
- }]);*/
-
-/*vis.main.directive('visGrid', function() {
-  return new vis.directives.Grid();
-});
-
-vis.main.directive('visAxis', function() {
-  return new vis.directives.Axis();
-});
-
-vis.main.directive('visWindow', function() {
-  return new vis.directives.Window();
-});
-
-vis.main.directive('visResizable', ['$document', function($document) {
-  return new vis.directives.Resizable($document);
-}]);
-
-vis.main.directive('visMovable', ['$document', function($document) {
-  return new vis.directives.Movable($document);
-}]);*/
 
 /*
 // TODO: Later
