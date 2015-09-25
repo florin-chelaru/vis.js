@@ -36,6 +36,6 @@ vis.models.bigwig.ChrTreeHeader.Fields = {
  * @returns {vis.models.bigwig.ChrTreeHeader}
  */
 vis.models.bigwig.ChrTreeHeader.fromArrayBuffer = function(data, littleEndian) {
-  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ChrTreeHeader, data, littleEndian);
+  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ChrTreeHeader, vis.models.bigwig.ChrTreeHeader.Fields, data, littleEndian);
 };
 

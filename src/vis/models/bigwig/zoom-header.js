@@ -34,5 +34,5 @@ vis.models.bigwig.ZoomHeader.Fields = {
  * @returns {vis.models.bigwig.ZoomHeader}
  */
 vis.models.bigwig.ZoomHeader.fromArrayBuffer = function(data, littleEndian) {
-  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ZoomHeader, data, littleEndian);
+  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ZoomHeader, vis.models.bigwig.ZoomHeader.Fields, data, littleEndian);
 };

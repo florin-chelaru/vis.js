@@ -9,24 +9,14 @@ goog.provide('vis.models.bigwig.BigwigBase');
 goog.require('goog.math.Long');
 
 /**
- * @param {Object.<string, *>} fields
+ * @param {Object.<string, *>} values
  * @constructor
  */
-vis.models.bigwig.BigwigBase = function(fields) {
+vis.models.bigwig.BigwigBase = function(values) {
   var self = this;
-  var args = arguments;
-  var fields = this.constructor.Fields;
-  if (args.length == 1) {
-    $.each(args[0], function(field, value) {
-      self[field] = value;
-    });
-  } else {
-    var i = 0;
-    $.each(fields, function(field) {
-      self[field] = args[i];
-      ++i;
-    });
-  }
+  $.each(values, function(field, value) {
+    self[field] = value;
+  });
 };
 
 /**
@@ -44,17 +34,29 @@ vis.models.bigwig.BigwigBase.prototype.toString = function() {
 
 /**
  * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {Object.<string, number>} fields
  * @param {ArrayBuffer} data
  * @param {boolean} [littleEndian]
  * @returns {vis.models.bigwig.BigwigBase}
  */
-vis.models.bigwig.BigwigBase.fromArrayBuffer = function(bigwigType, data, littleEndian) {
-  var bigEndian = !littleEndian;
-  var fields = bigwigType.Fields;
+vis.models.bigwig.BigwigBase.fromArrayBuffer = function(bigwigType, fields, data, littleEndian) {
   var view = new DataView(data);
+  return vis.models.bigwig.BigwigBase.fromDataView(bigwigType, fields, view, littleEndian);
+};
+
+/**
+ * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {Object.<string, number>} fields
+ * @param {DataView} view
+ * @param {boolean} [littleEndian]
+ * @returns {vis.models.bigwig.BigwigBase}
+ */
+vis.models.bigwig.BigwigBase.fromDataView = function(bigwigType, fields, view, littleEndian) {
+  var bigEndian = !littleEndian;
 
   var ret = {};
   var offset = 0;
+  var buf;
   $.each(fields, function(field, size) {
     var val;
     switch (size) {
@@ -78,6 +80,22 @@ vis.models.bigwig.BigwigBase.fromArrayBuffer = function(bigwigType, data, little
       case -4:
         val = view.getFloat32(offset, !bigEndian);
         break;
+      case 0:
+        // Zero-terminated string
+        buf = [];
+        for (; offset < view.byteLength && (buf.length == 0 || buf[buf.length-1] != 0); ++offset) {
+          buf.push(view.getUint8(offset));
+        }
+        val = String.fromCharCode.apply(null, buf);
+        break;
+      default:
+        buf = new Uint8Array(view.buffer, view.byteOffset + offset, size);
+        var zeroIndex = buf.indexOf(0);
+        if (zeroIndex >= 0) {
+          buf = buf.subarray(0, zeroIndex);
+        }
+        val = String.fromCharCode.apply(null, buf);
+        break;
     }
     offset += Math.abs(size);
     ret[field] = val;
@@ -88,11 +106,13 @@ vis.models.bigwig.BigwigBase.fromArrayBuffer = function(bigwigType, data, little
 
 /**
  * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {Object.<string, number>} [fields]
  * @returns {number}
  */
-vis.models.bigwig.BigwigBase.sizeOf = function(bigwigType) {
+vis.models.bigwig.BigwigBase.sizeOf = function(bigwigType, fields) {
   var ret = 0;
-  var fields = bigwigType.Fields;
+  fields = fields || bigwigType.Fields;
+  if (!fields) { throw new vis.models.ModelsException('Cannot compute size of type (fields not defined)'); }
   $.each(fields, function(field, size) {
     ret += Math.abs(size);
   });

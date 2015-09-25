@@ -33,7 +33,14 @@ vis.models.bigwig.ChrTreeNode.Fields = {
  * @returns {vis.models.bigwig.ChrTreeNode}
  */
 vis.models.bigwig.ChrTreeNode.fromArrayBuffer = function(data, littleEndian) {
-  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ChrTreeNode, data, littleEndian);
+  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.ChrTreeNode, vis.models.bigwig.ChrTreeNode.Fields, data, littleEndian);
 };
 
-
+/**
+ * @param {DataView} view
+ * @param {boolean} [littleEndian]
+ * @returns {vis.models.bigwig.ChrTreeNode}
+ */
+vis.models.bigwig.ChrTreeNode.fromDataView = function(view, littleEndian) {
+  return vis.models.bigwig.BigwigBase.fromDataView(vis.models.bigwig.ChrTreeNode, vis.models.bigwig.ChrTreeNode.Fields, view, littleEndian);
+};

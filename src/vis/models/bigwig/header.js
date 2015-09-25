@@ -52,7 +52,7 @@ vis.models.bigwig.Header.fromArrayBuffer = function(data) {
   var magic = view.getUint32(0);
   var bigEndian = magic == 0x888FFC26;
 
-  var header = vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.Header, data, !bigEndian);
+  var header = vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.Header, vis.models.bigwig.Header.Fields, data, !bigEndian);
   header.magic = magic;
 
   return header;

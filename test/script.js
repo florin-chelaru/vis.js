@@ -107,11 +107,11 @@ $(function() {
   var long = new goog.math.Long(10, 0);
   var bigwig = new vis.io.BigwigProxy('http://localhost/E120-H3K9ac.pval.signal.bigwig');
 
-  var header, zoomHeader, totalSummary, chrBTreeHeader;
+  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords;
   bigwig.readHeader()
     .then(function(d) {
       header = d;
-      return bigwig.readZoomHeader(header, 9);
+      return bigwig.readZoomHeader(header, 0);
     })
     .then(function(d) {
       zoomHeader = d;
@@ -122,7 +122,22 @@ $(function() {
       return bigwig.readChrTreeHeader(header);
     })
     .then(function(d) {
-      chrBTreeHeader = d;
-    });
+      chrTreeHeader = d;
+
+      var treeOffset = header.chromosomeTreeOffset;
+      var offset = treeOffset.add(goog.math.Long.fromNumber(vis.io.BigwigProxy.CHR_TREE_HEADER_SIZE));
+      return bigwig.readChrTreeBranch(header, chrTreeHeader, offset);
+    })
+    .then(function(d) {
+      branch = d;
+      return bigwig.readDataCount(header);
+    })
+    .then(function(d) {
+      dataCount = d;
+      return bigwig.readDataRecords(header);
+    })
+    .then(function(d){
+      dataRecords = d;
+    })
 });
 

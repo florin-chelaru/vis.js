@@ -35,5 +35,5 @@ vis.models.bigwig.TotalSummary.Fields = {
  * @returns {vis.models.bigwig.TotalSummary}
  */
 vis.models.bigwig.TotalSummary.fromArrayBuffer = function(data, littleEndian) {
-  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.TotalSummary, data, littleEndian);
+  return vis.models.bigwig.BigwigBase.fromArrayBuffer(vis.models.bigwig.TotalSummary, vis.models.bigwig.TotalSummary.Fields, data, littleEndian);
 };
