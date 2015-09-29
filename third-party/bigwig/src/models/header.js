@@ -4,22 +4,22 @@
  * Time: 10:36 AM
  */
 
-goog.provide('bigwig.Header');
+goog.provide('bigwig.models.Header');
 
-goog.require('bigwig.BigwigStruct');
+goog.require('bigwig.models.BigwigStruct');
 
 
 /**
  * @constructor
- * @extends {bigwig.BigwigStruct}
+ * @extends {bigwig.models.BigwigStruct}
  */
-bigwig.Header = function() {
-  bigwig.BigwigStruct.apply(this, arguments);
+bigwig.models.Header = function() {
+  bigwig.models.BigwigStruct.apply(this, arguments);
 };
 
-goog.inherits(bigwig.Header, bigwig.BigwigStruct);
+goog.inherits(bigwig.models.Header, bigwig.models.BigwigStruct);
 
-Object.defineProperties(bigwig.Header.prototype, {
+Object.defineProperties(bigwig.models.Header.prototype, {
   bigEndian: { get: function() { return this.magic == 0x888FFC26; } },
   littleEndian: { get: function() { return !this.bigEndian; } }
 });
@@ -27,7 +27,7 @@ Object.defineProperties(bigwig.Header.prototype, {
 /**
  * @type {Object.<string, number>}
  */
-bigwig.Header.Fields = {
+bigwig.models.Header.Fields = {
   magic: 4,
   version: 2,
   zoomLevels: 2,
@@ -44,15 +44,15 @@ bigwig.Header.Fields = {
 
 /**
  * @param {ArrayBuffer} data
- * @returns {bigwig.Header}
+ * @returns {bigwig.models.Header}
  */
-bigwig.Header.fromArrayBuffer = function(data) {
+bigwig.models.Header.fromArrayBuffer = function(data) {
   var view = new DataView(data);
 
   var magic = view.getUint32(0);
   var bigEndian = magic == 0x888FFC26;
 
-  var header = bigwig.BigwigStruct.fromArrayBuffer(bigwig.Header, bigwig.Header.Fields, data, !bigEndian);
+  var header = bigwig.models.BigwigStruct.fromArrayBuffer(bigwig.models.Header, bigwig.models.Header.Fields, data, !bigEndian);
   header.magic = magic;
 
   return header;

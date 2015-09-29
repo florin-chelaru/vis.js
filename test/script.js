@@ -4,6 +4,10 @@
  * Time: 10:11 AM
  */
 
+goog.require('goog.math.Long');
+goog.require('goog.async.Deferred');
+goog.require('bigwig.BigwigReader');
+
 var main = angular.module('main', ['vis']);
 
 main.config(['configurationProvider', function(configuration) {
@@ -107,11 +111,11 @@ $(function() {
   //var bigwig = new bigwig.BigwigReader('http://localhost/wigVarStepExample.bigwig');
   var reader = new bigwig.BigwigReader('http://localhost/E120-H3K9ac.pval.signal.bigwig');
 
-  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords, rTreeHeader, rNodeItems, rTree, rBranch, data;
+  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords, rTreeHeader, rNodeItems, rTree, rBranch, data, chrTree;
   reader.readHeader()
     .then(function(d) {
       header = d;
-      return reader.readZoomHeader(header, 0);
+      return reader.readZoomHeader(header, 9);
     })
     .then(function(d) {
       zoomHeader = d;
@@ -126,7 +130,7 @@ $(function() {
 
       var treeOffset = header.chromosomeTreeOffset;
       var offset = treeOffset.add(goog.math.Long.fromNumber(bigwig.BigwigReader.CHR_TREE_HEADER_SIZE));
-      return reader.readChrTreeBranch(header, chrTreeHeader, offset);
+      return reader.readChrTreeNodeItems(header, chrTreeHeader, offset);
     })
     .then(function(d) {
       branch = d;
@@ -153,6 +157,10 @@ $(function() {
     })
     .then(function(d) {
       data = d;
+      return reader.readChrTree(header);
+    })
+    .then(function(d) {
+      chrTree = d;
     });
 });
 

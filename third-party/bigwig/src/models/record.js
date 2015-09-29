@@ -4,18 +4,18 @@
  * Time: 4:54 PM
  */
 
-goog.provide('bigwig.Record');
+goog.provide('bigwig.models.Record');
 
 /**
  * @interface
  */
-bigwig.Record = function() {};
+bigwig.models.Record = function() {};
 
-Object.defineProperties(bigwig.Record.prototype, {
+Object.defineProperties(bigwig.models.Record.prototype, {
   /**
    * @type {number}
    * @instance
-   * @memberof bigwig.Record
+   * @memberof bigwig.models.Record
    */
   value: { get: function() { return null; } }
 });
