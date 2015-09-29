@@ -28,6 +28,7 @@
     "angular": "1.4.4",
     "d3": "3.5.6",
     "jquery": "2.1.4",
-    "closure-compiler": "0.2.7"
+    "closure-compiler": "0.2.7",
+    "zlib.js": "0.2.0"
   }
 }

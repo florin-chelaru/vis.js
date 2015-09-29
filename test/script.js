@@ -104,40 +104,55 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
 }]);
 
 $(function() {
-  var long = new goog.math.Long(10, 0);
-  var bigwig = new vis.io.BigwigProxy('http://localhost/E120-H3K9ac.pval.signal.bigwig');
+  //var bigwig = new bigwig.BigwigReader('http://localhost/wigVarStepExample.bigwig');
+  var reader = new bigwig.BigwigReader('http://localhost/E120-H3K9ac.pval.signal.bigwig');
 
-  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords;
-  bigwig.readHeader()
+  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords, rTreeHeader, rNodeItems, rTree, rBranch, data;
+  reader.readHeader()
     .then(function(d) {
       header = d;
-      return bigwig.readZoomHeader(header, 0);
+      return reader.readZoomHeader(header, 0);
     })
     .then(function(d) {
       zoomHeader = d;
-      return bigwig.readTotalSummary(header);
+      return reader.readTotalSummary(header);
     })
     .then(function(d) {
       totalSummary = d;
-      return bigwig.readChrTreeHeader(header);
+      return reader.readChrTreeHeader(header);
     })
     .then(function(d) {
       chrTreeHeader = d;
 
       var treeOffset = header.chromosomeTreeOffset;
-      var offset = treeOffset.add(goog.math.Long.fromNumber(vis.io.BigwigProxy.CHR_TREE_HEADER_SIZE));
-      return bigwig.readChrTreeBranch(header, chrTreeHeader, offset);
+      var offset = treeOffset.add(goog.math.Long.fromNumber(bigwig.BigwigReader.CHR_TREE_HEADER_SIZE));
+      return reader.readChrTreeBranch(header, chrTreeHeader, offset);
     })
     .then(function(d) {
       branch = d;
-      return bigwig.readDataCount(header);
+      return reader.readDataCount(header);
     })
     .then(function(d) {
       dataCount = d;
-      return bigwig.readDataRecords(header);
+      return reader.readRTreeHeader(header);
     })
     .then(function(d){
-      dataRecords = d;
+      rTreeHeader = d;
+
+      var rTreeOffset = header.fullIndexOffset;
+      var offset = rTreeOffset.add(goog.math.Long.fromNumber(bigwig.BigwigReader.R_TREE_HEADER_SIZE));
+      return reader.readRTreeNodeItems(header, undefined, offset);
     })
+    .then(function(d) {
+      rNodeItems = d;
+      return reader.readRTreeBranch(header);
+    })
+    .then(function(d) {
+      rBranch = d;
+      return reader.readData(header, rBranch.nodes[rBranch.nodes.length - 1].items[0]);
+    })
+    .then(function(d) {
+      data = d;
+    });
 });
 

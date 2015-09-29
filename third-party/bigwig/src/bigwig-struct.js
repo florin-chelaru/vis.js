@@ -4,15 +4,17 @@
  * Time: 2:34 PM
  */
 
-goog.provide('vis.models.bigwig.BigwigBase');
+goog.provide('bigwig.BigwigStruct');
 
-goog.require('goog.math.Long');
+//goog.require('goog.math.Long');
+goog.require('bigwig.Exception');
+goog.require('bigwig.reflection');
 
 /**
  * @param {Object.<string, *>} values
  * @constructor
  */
-vis.models.bigwig.BigwigBase = function(values) {
+bigwig.BigwigStruct = function(values) {
   var self = this;
   $.each(values, function(field, value) {
     self[field] = value;
@@ -22,7 +24,7 @@ vis.models.bigwig.BigwigBase = function(values) {
 /**
  * @returns {string}
  */
-vis.models.bigwig.BigwigBase.prototype.toString = function() {
+bigwig.BigwigStruct.prototype.toString = function() {
   return JSON.stringify(this, function(k, v) {
     if (v instanceof goog.math.Long) {
       if (v.getHighBits() == 0) { return v.getLowBitsUnsigned(); }
@@ -33,25 +35,25 @@ vis.models.bigwig.BigwigBase.prototype.toString = function() {
 };
 
 /**
- * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {function(new: bigwig.BigwigStruct)} bigwigType
  * @param {Object.<string, number>} fields
  * @param {ArrayBuffer} data
  * @param {boolean} [littleEndian]
- * @returns {vis.models.bigwig.BigwigBase}
+ * @returns {bigwig.BigwigStruct}
  */
-vis.models.bigwig.BigwigBase.fromArrayBuffer = function(bigwigType, fields, data, littleEndian) {
+bigwig.BigwigStruct.fromArrayBuffer = function(bigwigType, fields, data, littleEndian) {
   var view = new DataView(data);
-  return vis.models.bigwig.BigwigBase.fromDataView(bigwigType, fields, view, littleEndian);
+  return bigwig.BigwigStruct.fromDataView(bigwigType, fields, view, littleEndian);
 };
 
 /**
- * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {function(new: bigwig.BigwigStruct)} bigwigType
  * @param {Object.<string, number>} fields
  * @param {DataView} view
  * @param {boolean} [littleEndian]
- * @returns {vis.models.bigwig.BigwigBase}
+ * @returns {bigwig.BigwigStruct}
  */
-vis.models.bigwig.BigwigBase.fromDataView = function(bigwigType, fields, view, littleEndian) {
+bigwig.BigwigStruct.fromDataView = function(bigwigType, fields, view, littleEndian) {
   var bigEndian = !littleEndian;
 
   var ret = {};
@@ -101,18 +103,18 @@ vis.models.bigwig.BigwigBase.fromDataView = function(bigwigType, fields, view, l
     ret[field] = val;
   });
 
-  return vis.reflection.applyConstructor(bigwigType, [ret]);
+  return bigwig.reflection.applyConstructor(bigwigType, [ret]);
 };
 
 /**
- * @param {function(new: vis.models.bigwig.BigwigBase)} bigwigType
+ * @param {function(new: bigwig.BigwigStruct)} bigwigType
  * @param {Object.<string, number>} [fields]
  * @returns {number}
  */
-vis.models.bigwig.BigwigBase.sizeOf = function(bigwigType, fields) {
+bigwig.BigwigStruct.sizeOf = function(bigwigType, fields) {
   var ret = 0;
   fields = fields || bigwigType.Fields;
-  if (!fields) { throw new vis.models.ModelsException('Cannot compute size of type (fields not defined)'); }
+  if (!fields) { throw new bigwig.Exception('Cannot compute size of type (fields not defined)'); }
   $.each(fields, function(field, size) {
     ret += Math.abs(size);
   });

@@ -13,17 +13,6 @@ goog.addDependency('../../../../src/vis/directives/resizable.js', ['vis.directiv
 goog.addDependency('../../../../src/vis/directives/visualization.js', ['vis.directives.Visualization'], ['vis.async.TaskService', 'vis.directives.Directive', 'vis.ui.VisualizationFactory'], false);
 goog.addDependency('../../../../src/vis/directives/window.js', ['vis.directives.Window'], ['vis.directives.Directive'], false);
 goog.addDependency('../../../../src/vis/exception.js', ['vis.Exception'], [], false);
-goog.addDependency('../../../../src/vis/io/bigwig-proxy.js', ['vis.io.BigwigProxy'], ['goog.async.Deferred', 'vis.models.ModelsException', 'vis.models.bigwig.ChrTreeHeader', 'vis.models.bigwig.ChrTreeNode', 'vis.models.bigwig.ChrTreeNodeItem', 'vis.models.bigwig.ChrTreeNodeLeaf', 'vis.models.bigwig.DataRecord', 'vis.models.bigwig.Header', 'vis.models.bigwig.TotalSummary', 'vis.models.bigwig.ZoomHeader'], false);
-goog.addDependency('../../../../src/vis/io/random-access-file-reader.js', ['vis.io.RandomAccessFileReader'], [], false);
-goog.addDependency('../../../../src/vis/models/bigwig/bigwig-base.js', ['vis.models.bigwig.BigwigBase'], ['goog.math.Long'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/chr-tree-header.js', ['vis.models.bigwig.ChrTreeHeader'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/chr-tree-node-item.js', ['vis.models.bigwig.ChrTreeNodeItem'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/chr-tree-node-leaf.js', ['vis.models.bigwig.ChrTreeNodeLeaf'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/chr-tree-node.js', ['vis.models.bigwig.ChrTreeNode'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/data-record.js', ['vis.models.bigwig.DataRecord'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/header.js', ['vis.models.bigwig.Header'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/total-summary.js', ['vis.models.bigwig.TotalSummary'], ['vis.models.bigwig.BigwigBase'], false);
-goog.addDependency('../../../../src/vis/models/bigwig/zoom-header.js', ['vis.models.bigwig.ZoomHeader'], ['vis.models.bigwig.BigwigBase'], false);
 goog.addDependency('../../../../src/vis/models/boundaries.js', ['vis.models.Boundaries'], [], false);
 goog.addDependency('../../../../src/vis/models/data-array.js', ['vis.models.DataArray'], ['vis.AbstractMethodException', 'vis.models.Boundaries'], false);
 goog.addDependency('../../../../src/vis/models/data-source-wrapper.js', ['vis.models.DataSourceWrapper'], ['vis.models.DataArray', 'vis.models.DataSource'], false);
@@ -54,4 +43,4 @@ goog.addDependency('../../../../src/vis/ui/visualization-factory.js', ['vis.ui.V
 goog.addDependency('../../../../src/vis/ui/visualization-options.js', ['vis.ui.VisualizationOptions'], ['vis.models.Boundaries', 'vis.models.DataSource', 'vis.models.Margins'], false);
 goog.addDependency('../../../../src/vis/ui/visualization.js', ['vis.ui.Visualization'], ['goog.async.Deferred', 'vis.async.Task', 'vis.async.TaskService', 'vis.models.DataSource', 'vis.ui.VisualizationOptions'], false);
 goog.addDependency('../../../../src/vis/utils/utils.js', ['vis.utils'], [], false);
-goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.async.TaskService', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Movable', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.directives.Window', 'vis.io.BigwigProxy', 'vis.models.Transformer', 'vis.ui.TrackVisualizationOptions', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory', 'vis.ui.canvas.CanvasVisualization', 'vis.ui.svg.SvgVisualization'], false);
+goog.addDependency('../../../../src/vis/vis.js', ['vis'], ['vis.Configuration', 'vis.async.TaskService', 'vis.directives.Axis', 'vis.directives.Grid', 'vis.directives.Movable', 'vis.directives.Resizable', 'vis.directives.Visualization', 'vis.directives.Window', 'vis.models.Transformer', 'vis.ui.TrackVisualizationOptions', 'vis.ui.Visualization', 'vis.ui.VisualizationFactory', 'vis.ui.canvas.CanvasVisualization', 'vis.ui.svg.SvgVisualization'], false);

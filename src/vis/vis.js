@@ -28,8 +28,6 @@ goog.require('vis.directives.Window');
 goog.require('vis.directives.Movable');
 goog.require('vis.directives.Resizable');
 
-goog.require('vis.io.BigwigProxy');
-
 
 vis.main = angular.module('vis', []);
 
