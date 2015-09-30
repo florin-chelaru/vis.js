@@ -45,13 +45,17 @@ var extractWindowLocationArgs = function() {
   return args;
 };
 
+var file = null;
+
 $(function() {
   var args = extractWindowLocationArgs();
   if (!args.file || !args.chr || !args.start || !args.end) {
     $('#result').text('Please specify valid file, chr, start and end');
     return;
   }
-  var file = new bigwig.BigwigFile(args.file);
+  //var file = new bigwig.BigwigFile(args.file);
+  //file = new bigwig.BigwigFile('http://localhost/vis/test/partial.php?q=' + args.file);
+  file = new bigwig.BigwigFile('http://epiviz-dev.cbcb.umd.edu/bigwig/partial.php?q=' + args.file);
   file.query(args.chr, parseInt(args.start), parseInt(args.end))
     .then(function(d) {
       $('#result').text(JSON.stringify(d, function (k, v) {
