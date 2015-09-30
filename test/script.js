@@ -7,6 +7,7 @@
 goog.require('goog.math.Long');
 goog.require('goog.async.Deferred');
 goog.require('bigwig.BigwigReader');
+goog.require('bigwig.BigwigFile');
 
 var main = angular.module('main', ['vis']);
 
@@ -109,7 +110,7 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
 
 $(function() {
   //var bigwig = new bigwig.BigwigReader('http://localhost/wigVarStepExample.bigwig');
-  var reader = new bigwig.BigwigReader('http://localhost/E120-H3K9ac.pval.signal.bigwig');
+  /*var reader = new bigwig.BigwigReader('http://localhost/E120-H3K9ac.pval.signal.bigwig');
 
   var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords, rTreeHeader, rNodeItems, rTree, rBranch, data, chrTree;
   reader.readHeader()
@@ -161,6 +162,18 @@ $(function() {
     })
     .then(function(d) {
       chrTree = d;
+    });*/
+
+  var file = new bigwig.BigwigFile('http://localhost/E120-H3K9ac.pval.signal.bigwig');
+  file.query('chr1', 0, 10197)
+    .then(function(d) {
+      console.log(d);
+      console.log(JSON.stringify(d, function (k, v) {
+        if (v instanceof bigwig.DataRecord) {
+          return v.toJSON();
+        }
+        return v;
+      }));
     });
 });
 

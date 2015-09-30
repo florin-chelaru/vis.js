@@ -7,7 +7,11 @@
 goog.provide('bigwig.BigwigFile');
 
 goog.require('bigwig.BigwigReader');
-goog.require('bigwig.Header');
+goog.require('bigwig.models.Header');
+
+goog.require('bigwig.ChrTree');
+goog.require('bigwig.IndexTree');
+goog.require('bigwig.DataRecord');
 
 /**
  * @param {string} uri
@@ -21,7 +25,7 @@ bigwig.BigwigFile = function(uri) {
   this._reader = new bigwig.BigwigReader(uri);
 
   /**
-   * @type {bigwig.Header}
+   * @type {bigwig.models.Header}
    * @private
    */
   this._header = null;
@@ -39,7 +43,12 @@ bigwig.BigwigFile = function(uri) {
   this._indexTree = null;
 };
 
-
+/**
+ * @param {string|number} chr
+ * @param {number} start
+ * @param {number} end
+ * @returns {goog.async.Deferred.<bigwig.DataRecord>}
+ */
 bigwig.BigwigFile.prototype.query = function(chr, start, end) {
   var self = this;
   var deferred = new goog.async.Deferred();
@@ -50,6 +59,7 @@ bigwig.BigwigFile.prototype.query = function(chr, start, end) {
         self._header = header;
         self.query(chr, start, end).chainDeferred(deferred);
       });
+    return deferred;
   }
 
   if (!this._chrTree) {
@@ -58,12 +68,75 @@ bigwig.BigwigFile.prototype.query = function(chr, start, end) {
         self._chrTree = chrTree;
         self.query(chr, start, end).chainDeferred(deferred);
       });
+    return deferred;
   }
 
   /**
    * @type {bigwig.ChrTree.Node}
    */
   var chrNode = this._chrTree.getLeaf(chr);
+  chr = chrNode.chrId;
+
+  if (!this._indexTree) {
+    this._reader.readRootedIndexBlock(this._header, chr, start, end)
+      .then(function(tree) {
+        self._indexTree = tree;
+        self.query(chr, start, end).chainDeferred(deferred);
+      });
+    return deferred;
+  }
+
+  /**
+   * @type {Array.<bigwig.IndexTree.Node>}
+   */
+  var nodes = this._indexTree.query(chr, start, end);
+  var remaining = 0;
+  nodes.forEach(function(node) {
+    if (!node.isLeaf) {
+      ++remaining;
+      self._reader.readIndexBlock(self._header, chr, start, end, node.dataOffset)
+        .then(function(children) {
+          node.children = children;
+          --remaining;
+          if (!remaining) {
+            self.query(chr, start, end).chainDeferred(deferred);
+          }
+        });
+    }
+  });
+
+  if (remaining) { return deferred; }
+
+  remaining = 0;
+  nodes.forEach(function(node) {
+    if (!node.dataRecords) {
+      ++remaining;
+      self._reader.readData(self._header, node)
+        .then(
+        /**
+         * @param {{sectionHeader: bigwig.models.SectionHeader, records: Array.<bigwig.models.Record>}} d
+         */
+        function(d) {
+          node.dataRecords = d.records.map(function(r, i) {
+            return new bigwig.DataRecord(node, d.sectionHeader, r, i, self._chrTree);
+          });
+
+          --remaining;
+          if (!remaining) {
+            self.query(chr, start, end).chainDeferred(deferred);
+          }
+        }
+      )
+    }
+  });
+
+  if (remaining) { return deferred; }
+
+  var ret = nodes
+    .map(function(node) { return node.dataRecords.filter(function(r) { return r.chr == chr && r.start < end && r.end > start; })})
+    .reduce(function(a1, a2) { return a1.concat(a2); });
+
+  deferred.callback(ret);
 
   return deferred;
 };

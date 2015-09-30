@@ -6,15 +6,15 @@
 
 goog.provide('bigwig.ChrTree');
 
+goog.require('bigwig.Tree');
+
 /**
  * @param {bigwig.ChrTree.Node} root
  * @constructor
+ * @extends {bigwig.Tree}
  */
 bigwig.ChrTree = function(root) {
-  /**
-   * @type {bigwig.ChrTree.Node}
-   */
-  this.root = root;
+  bigwig.Tree.apply(this, arguments);
 
   /**
    * @type {Object.<number, bigwig.ChrTree.Node>}
@@ -29,11 +29,16 @@ bigwig.ChrTree = function(root) {
   this._leavesByKey = null;
 };
 
+goog.inherits(bigwig.ChrTree, bigwig.Tree);
+
 /**
  * @param {{key: string=, chrId: number=, chrSize: number=, children: Array.<bigwig.ChrTree.Node>=}} node
  * @constructor
+ * @extends {bigwig.Tree.Node}
  */
 bigwig.ChrTree.Node = function(node) {
+  bigwig.Tree.Node.apply(this, arguments);
+
   /**
    * @type {string}
    */
@@ -48,12 +53,9 @@ bigwig.ChrTree.Node = function(node) {
    * @type {number}
    */
   this.chrSize = node.chrSize;
-
-  /**
-   * @type {Array.<bigwig.ChrTree.Node>}
-   */
-  this.children = node.children;
 };
+
+goog.inherits(bigwig.ChrTree.Node, bigwig.Tree.Node);
 
 /**
  * @param {number|string} chrIdOrKey
@@ -70,7 +72,7 @@ bigwig.ChrTree.prototype.getLeaf = function (chrIdOrKey) {
       });
       this._leavesById = leavesById;
     }
-    return this._leavesById[chrId];
+    return this._leavesById[chrIdOrKey];
   }
 
   // else typeof chrIdOrKey == 'string'
@@ -84,21 +86,4 @@ bigwig.ChrTree.prototype.getLeaf = function (chrIdOrKey) {
     this._leavesByKey = leavesByKey;
   }
   return this._leavesByKey[chrIdOrKey];
-};
-
-/**
- * @param {function(bigwig.ChrTree.Node)} iterate
- */
-bigwig.ChrTree.prototype.dfs = function(iterate) {
-  /**
-   * @param {bigwig.ChrTree.Node} node
-   */
-  var dfs = function(node) {
-    iterate.call(null, node);
-    if (node.children && node.children.length) {
-      node.children.forEach(dfs);
-    }
-  };
-
-  dfs(this.root);
 };
