@@ -6,19 +6,19 @@
 
 goog.provide('vis.ui.UiException');
 
-goog.require('vis.Exception');
+goog.require('u.Exception');
 
 /**
  * @param {string} message
  * @param {Error} [innerException]
  * @constructor
- * @extends vis.Exception
+ * @extends u.Exception
  */
 vis.ui.UiException = function(message, innerException) {
-  vis.Exception.apply(this, arguments);
+  u.Exception.apply(this, arguments);
 
   this.name = 'UiException';
 };
 
-goog.inherits(vis.ui.UiException, vis.Exception);
+goog.inherits(vis.ui.UiException, u.Exception);
 

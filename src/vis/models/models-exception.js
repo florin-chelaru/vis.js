@@ -6,18 +6,16 @@
 
 goog.provide('vis.models.ModelsException');
 
-goog.require('vis.Exception');
-
 /**
  * @param {string} message
  * @param {Error} [innerException]
  * @constructor
- * @extends vis.Exception
+ * @extends u.Exception
  */
 vis.models.ModelsException = function(message, innerException) {
-  vis.Exception.apply(this, arguments);
+  u.Exception.apply(this, arguments);
 
   this.name = 'ModelsException';
 };
 
-goog.inherits(vis.models.ModelsException, vis.Exception);
+goog.inherits(vis.models.ModelsException, u.Exception);

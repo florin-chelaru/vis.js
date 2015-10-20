@@ -6,7 +6,7 @@
 
 goog.provide('vis.models.DataSource');
 
-goog.require('vis.AbstractMethodException');
+goog.require('u.AbstractMethodException');
 goog.require('vis.models.DataArray');
 
 /**
@@ -39,8 +39,8 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   dirty: {
-    get: function() { throw new vis.AbstractMethodException(); },
-    set: function(value) { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); },
+    set: function(value) { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -49,7 +49,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   nrows: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -58,7 +58,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   ncols: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -67,7 +67,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   rows: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -76,7 +76,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   cols: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -85,7 +85,7 @@ Object.defineProperties(vis.models.DataSource.prototype, {
    * @memberof vis.models.DataSource
    */
   vals: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   }
 });
 

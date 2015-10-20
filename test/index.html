@@ -3,36 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title></title>
-  <base href="../" target="_blank">
 
-  <link href="test/style.css" rel="stylesheet" />
-  <link href="res/css/visualization.css" rel="stylesheet" />
-  <link href="res/css/axis.css" rel="stylesheet" />
-  <link href="res/css/window.css" rel="stylesheet" />
-  <link href="res/css/resizable.css" rel="stylesheet" />
+  <link href="../test/style.css" rel="stylesheet" />
+  <link href="../res/css/visualization.css" rel="stylesheet" />
+  <link href="../res/css/axis.css" rel="stylesheet" />
+  <link href="../res/css/window.css" rel="stylesheet" />
+  <link href="../res/css/resizable.css" rel="stylesheet" />
 
-  <script src="bower_components/jquery/dist/jquery.js"></script>
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/d3/d3.js"></script>
-  <script src="bower_components/google-closure-library/closure/goog/base.js"></script>
-  <script src="bower_components/zlib.js/bin/zlib.min.js"></script>
+  <script src="../bower_components/jquery/dist/jquery.js"></script>
+  <script src="../bower_components/angular/angular.js"></script>
+  <script src="../bower_components/d3/d3.js"></script>
+  <script src="../bower_components/utils.js/utils.min.js"></script>
+  <script src="../bower_components/google-closure-library/closure/goog/base.js"></script>
+  <!--<script src="../bower_components/zlib.js/bin/zlib.min.js"></script>-->
 
-  <script src="third-party/bigwig/deps.js"></script>
-  <!--<script src="third-party/bigwig/src/bigwig-reader.js"></script>
-  <script src="third-party/bigwig/src/bigwig-file.js"></script>-->
-  <!--<script src="bigwig.min.js"></script>-->
-  <script src="src/deps.js"></script>
-  <script src="src/vis/vis.js"></script>
-  <script src="third-party/vis/plugins/canvas/scatter-plot.js"></script>
-  <script src="third-party/vis/plugins/svg/scatter-plot.js"></script>
+  <script src="../src/deps.js"></script>
+  <script src="../src/vis/vis.js"></script>
+  <script src="../third-party/vis/plugins/canvas/scatter-plot.js"></script>
+  <script src="../third-party/vis/plugins/svg/scatter-plot.js"></script>
 
-  <script src="third-party/vis/plugins/svg/manhattan-plot-options.js"></script>
-  <script src="third-party/vis/plugins/svg/manhattan-plot.js"></script>
+  <script src="../third-party/vis/plugins/svg/manhattan-plot-options.js"></script>
+  <script src="../third-party/vis/plugins/svg/manhattan-plot.js"></script>
 
-  <script src="third-party/vis/plugins/canvas/manhattan-plot-options.js"></script>
-  <script src="third-party/vis/plugins/canvas/manhattan-plot.js"></script>
+  <script src="../third-party/vis/plugins/canvas/manhattan-plot-options.js"></script>
+  <script src="../third-party/vis/plugins/canvas/manhattan-plot.js"></script>
 
-  <script src="test/script.js"></script>
+  <script src="../test/script.js"></script>
 </head>
 <body ng-app="main">
   <script>
@@ -105,7 +101,9 @@
         </vis-values>
       </vis-input-data>
     </visualization>-->
-    <div visualization
+
+
+    <!--<div visualization
          type="scatterplot"
          render="svg"
          input-data="d"
@@ -126,21 +124,21 @@
       <vis-axis type="y"></vis-axis>
       <vis-grid type="x" ticks="10"></vis-grid>
       <vis-grid type="y"></vis-grid>
-    </div>
+    </div>-->
     <div visualization
          options="canvasOptions"
          vis-window
          vis-resizable
          vis-movable
          style="top: 15px; left: 520px;">
-      <vis-axis type="x" ticks="10"></vis-axis>
+      <!--<vis-axis type="x" ticks="10"></vis-axis>
       <vis-axis type="y"></vis-axis>
-      <vis-grid type="x" ticks="10"></vis-grid>
+      <vis-grid type="x" ticks="10"></vis-grid>-->
       <vis-grid type="y"></vis-grid>
     </div>
   </div>
 
-  <div ng-controller="GeneticVariants">
+  <!--<div ng-controller="GeneticVariants">
     <div visualization
          type="manhattan"
          render="svg"
@@ -201,6 +199,6 @@
       <vis-grid type="x" ticks="3"></vis-grid>
       <vis-grid type="y"></vis-grid>
     </div>
-  </div>
+  </div>-->
 </body>
 </html>

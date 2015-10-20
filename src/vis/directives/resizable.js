@@ -277,12 +277,12 @@ Object.defineProperties(vis.directives.Resizable.BoundingBox.prototype, {
   },
   width: {
     get: function() {
-      return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin;
+      return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin - 2;
     }
   },
   height: {
     get: function() {
-      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin;
+      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin - 1;
     }
   }
 });

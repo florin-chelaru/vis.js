@@ -34,7 +34,7 @@ vis.directives.Directive.createNew = function(name, controllerCtor, args, option
   var controller = ['$scope', function($scope) {
     var params = [].concat(args || []);
     params.unshift($scope);
-    this.handler = vis.reflection.applyConstructor(controllerCtor, params);
+    this.handler = u.reflection.applyConstructor(controllerCtor, params);
   }];
   var link;
   if ($.isFunction(controllerCtor.prototype.link)) {

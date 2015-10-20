@@ -59,4 +59,4 @@ Object.defineProperties(vis.ui.decorators.Axis.prototype, {
   }
 });
 
-vis.ui.decorators.Axis.prototype.draw = function() { throw new vis.AbstractMethodException(); };
+vis.ui.decorators.Axis.prototype.draw = function() { throw new u.AbstractMethodException(); };

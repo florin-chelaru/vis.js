@@ -6,8 +6,6 @@
 
 goog.require('goog.math.Long');
 goog.require('goog.async.Deferred');
-goog.require('bigwig.BigwigReader');
-goog.require('bigwig.BigwigFile');
 
 var main = angular.module('main', ['vis']);
 
@@ -107,73 +105,3 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
   };
   $scope.options = {};
 }]);
-
-$(function() {
-  //var bigwig = new bigwig.BigwigReader('http://localhost/wigVarStepExample.bigwig');
-  /*var reader = new bigwig.BigwigReader('http://localhost/E120-H3K9ac.pval.signal.bigwig');
-
-  var header, zoomHeader, totalSummary, chrTreeHeader, branch, dataCount, dataRecords, rTreeHeader, rNodeItems, rTree, rBranch, data, chrTree;
-  reader.readHeader()
-    .then(function(d) {
-      header = d;
-      return reader.readZoomHeader(header, 9);
-    })
-    .then(function(d) {
-      zoomHeader = d;
-      return reader.readTotalSummary(header);
-    })
-    .then(function(d) {
-      totalSummary = d;
-      return reader.readChrTreeHeader(header);
-    })
-    .then(function(d) {
-      chrTreeHeader = d;
-
-      var treeOffset = header.chromosomeTreeOffset;
-      var offset = treeOffset.add(goog.math.Long.fromNumber(bigwig.BigwigReader.CHR_TREE_HEADER_SIZE));
-      return reader.readChrTreeNodeItems(header, chrTreeHeader, offset);
-    })
-    .then(function(d) {
-      branch = d;
-      return reader.readDataCount(header);
-    })
-    .then(function(d) {
-      dataCount = d;
-      return reader.readRTreeHeader(header);
-    })
-    .then(function(d){
-      rTreeHeader = d;
-
-      var rTreeOffset = header.fullIndexOffset;
-      var offset = rTreeOffset.add(goog.math.Long.fromNumber(bigwig.BigwigReader.R_TREE_HEADER_SIZE));
-      return reader.readRTreeNodeItems(header, undefined, offset);
-    })
-    .then(function(d) {
-      rNodeItems = d;
-      return reader.readRTreeBranch(header);
-    })
-    .then(function(d) {
-      rBranch = d;
-      return reader.readData(header, rBranch.nodes[rBranch.nodes.length - 1].items[0]);
-    })
-    .then(function(d) {
-      data = d;
-      return reader.readChrTree(header);
-    })
-    .then(function(d) {
-      chrTree = d;
-    });*/
-
-  var file = new bigwig.BigwigFile('http://localhost/E120-H3K9ac.pval.signal.bigwig');
-  file.query('chr1', 0, 10197)
-    .then(function(d) {
-      console.log(d);
-      console.log(JSON.stringify(d, function (k, v) {
-        if (v instanceof bigwig.DataRecord) {
-          return v.toJSON();
-        }
-        return v;
-      }));
-    });
-});
-

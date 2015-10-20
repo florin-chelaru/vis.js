@@ -14,14 +14,14 @@ vis.models.RowDataItem = function() {};
 Object.defineProperties(vis.models.RowDataItem.prototype, {
   index: {
     /** @returns {number} */
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
   data: {
     /** @returns {Array.<{label: string, d: *}>} */
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
   vals: {
     /** @returns {Array.<number>} */
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   }
 });

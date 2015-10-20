@@ -8,7 +8,6 @@ goog.provide('vis.plugins.svg.ManhattanPlot');
 
 goog.require('vis.plugins.svg.ManhattanPlotOptions');
 goog.require('vis.ui.svg.SvgVisualization');
-goog.require('vis.utils');
 goog.require('vis.models.DataSource');
 goog.require('vis.models.RowDataItemWrapper');
 goog.require('vis.models.Boundaries');

@@ -13,7 +13,7 @@ goog.require('vis.models.DataSource');
 goog.require('vis.models.DataSourceWrapper');
 goog.require('vis.async.TaskService');
 
-goog.require('vis.reflection');
+goog.require('u.reflection');
 
 
 /**
@@ -38,7 +38,7 @@ vis.ui.VisualizationFactory = function(config) {
  */
 vis.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs, taskService) {
   var options = this.generateOptions($scope, $element, $attrs);
-  return vis.reflection.applyConstructor(options.visCtor, [$scope, $element, $attrs, taskService, options]);
+  return u.reflection.applyConstructor(options.visCtor, [$scope, $element, $attrs, taskService, options]);
 };
 
 /**
@@ -175,12 +175,12 @@ vis.ui.VisualizationFactory.prototype.generateOptions = function($scope, $elemen
   //
 
 
-  opt.visCtor = vis.reflection.evaluateFullyQualifiedTypeName(typeStr);
+  opt.visCtor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
 
   typeStr += 'Options';
   var ctor;
   try {
-    ctor = vis.reflection.evaluateFullyQualifiedTypeName(typeStr);
+    ctor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
   } catch (ex) {
     // No customized options defined for this visualization. We will use the standard ones.
     ctor = vis.ui.VisualizationOptions;
@@ -188,7 +188,7 @@ vis.ui.VisualizationFactory.prototype.generateOptions = function($scope, $elemen
 
   opt.visOptionsCtor = ctor;
 
-  var ret = vis.reflection.applyConstructor(ctor, [opt, inputData]);
+  var ret = u.reflection.applyConstructor(ctor, [opt, inputData]);
 
   if (!(ret instanceof vis.ui.VisualizationOptions)) {
     throw new vis.ui.UiException(typeStr + ' is not an instance of vis.ui.VisualizationOptions.');

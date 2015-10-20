@@ -48,4 +48,6 @@ Object.defineProperties(vis.ui.decorators.Grid.prototype, {
   }
 });
 
-vis.ui.decorators.Grid.prototype.draw = function() { throw new vis.AbstractMethodException(); };
+vis.ui.decorators.Grid.prototype.draw = function() {
+  vis.ui.Decorator.prototype.draw.apply(this, arguments);
+};

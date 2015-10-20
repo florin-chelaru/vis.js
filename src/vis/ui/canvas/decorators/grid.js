@@ -20,6 +20,7 @@ vis.ui.canvas.decorators.Grid = function() {
 goog.inherits(vis.ui.canvas.decorators.Grid, vis.ui.decorators.Grid);
 
 vis.ui.canvas.decorators.Grid.prototype.draw = function() {
+  vis.ui.decorators.Grid.prototype.draw.apply(this, arguments);
   var opts = this.visOptions;
   if (!opts) { return; }
 

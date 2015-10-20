@@ -5,8 +5,6 @@
  */
 
 goog.provide('vis.models.DataArray');
-
-goog.require('vis.AbstractMethodException');
 goog.require('vis.models.Boundaries');
 
 /**
@@ -21,7 +19,7 @@ Object.defineProperties(vis.models.DataArray.prototype, {
    * @memberof vis.models.DataArray
    */
   label: {
-    get: function () { throw new vis.AbstractMethodException(); }
+    get: function () { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -30,7 +28,7 @@ Object.defineProperties(vis.models.DataArray.prototype, {
    * @memberof vis.models.DataArray
    */
   d: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   },
 
   /**
@@ -39,6 +37,6 @@ Object.defineProperties(vis.models.DataArray.prototype, {
    * @memberof vis.models.DataArray
    */
   boundaries: {
-    get: function() { throw new vis.AbstractMethodException(); }
+    get: function() { throw new u.AbstractMethodException(); }
   }
 });
