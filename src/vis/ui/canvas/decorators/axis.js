@@ -20,6 +20,7 @@ vis.ui.canvas.decorators.Axis = function() {
 goog.inherits(vis.ui.canvas.decorators.Axis, vis.ui.decorators.Axis);
 
 vis.ui.canvas.decorators.Axis.prototype.draw = function() {
+  vis.ui.decorators.Axis.prototype.draw.apply(this, arguments);
   var opts = this.visOptions;
   if (!opts) { return; }
 

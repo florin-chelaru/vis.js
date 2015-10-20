@@ -63,7 +63,7 @@ Object.defineProperties(vis.ui.canvas.CanvasVisualization.prototype, {
 vis.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
   vis.ui.Visualization.prototype.preDraw.apply(this, arguments);
 
-  console.log('Canvas.preDraw');
+  // console.log('Canvas.preDraw');
 
   var pendingCanvas = this.pendingCanvas;
   if (this.pendingCanvas.length == 0) {
@@ -89,13 +89,13 @@ vis.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
 vis.ui.canvas.CanvasVisualization.prototype.draw = function () {
   vis.ui.Visualization.prototype.draw.apply(this, arguments);
 
-  console.log('Canvas.draw');
+  // console.log('Canvas.draw');
 };
 
 /**
  */
 vis.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
-  console.log('Canvas.finalizeDraw');
+  // console.log('Canvas.finalizeDraw');
   if (!this._doubleBuffer) { return; }
   var activeCanvas = this.activeCanvas;
   var pendingCanvas = this.pendingCanvas;
@@ -108,6 +108,7 @@ vis.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
  */
 vis.ui.canvas.CanvasVisualization.prototype.doDraw = function() {
   // TODO: Change back once we've figured out how to bind these actions together
+  // TODO: Currently, grid drawing seems to be ok but axis is not
   var self = this;
   if (!this._lastDraw.hasFired()) { return; }
   vis.ui.Visualization.prototype.doDraw.call(this)

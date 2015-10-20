@@ -127,6 +127,6 @@ Object.defineProperties(vis.ui.Decorator.prototype, {
   }
 });
 
-vis.ui.Decorator.prototype.preDraw = function() { console.log('Decorator.preDraw'); };
+vis.ui.Decorator.prototype.preDraw = function() { /* console.log('Decorator.preDraw'); */ };
 
-vis.ui.Decorator.prototype.draw = function() { console.log('Decorator.draw'); };
+vis.ui.Decorator.prototype.draw = function() { /* console.log('Decorator.draw'); */ };
