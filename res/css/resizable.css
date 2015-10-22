@@ -1,4 +1,4 @@
-.resize-box {
+.vs-resize-box {
   border: 1px dashed #aaaaaa;
   position: absolute;
   width: calc(100% + 2 * 24px);
@@ -6,7 +6,7 @@
   top: -24px;
   left: -24px;
 }
-.resize-grab {
+.vs-resize-grab {
   opacity: 0;
   position: absolute;
   border: 1px solid #aaaaaa;
@@ -14,51 +14,51 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.resize-grab.grab-diagonal {
+.vs-resize-grab.vs-grab-diagonal {
   width: 24px;
   height: 24px;
 }
-.resize-grab.grab-top-left {
+.vs-resize-grab.vs-grab-top-left {
   top: -12px;
   left: -12px;
   cursor: nw-resize;
 }
-.resize-grab.grab-top-right {
+.vs-resize-grab.vs-grab-top-right {
   top: -12px;
   right: -12px;
   cursor: ne-resize;
 }
-.resize-grab.grab-bottom-left {
+.vs-resize-grab.vs-grab-bottom-left {
   bottom: -12px;
   left: -12px;
   cursor: sw-resize;
 }
-.resize-grab.grab-bottom-right {
+.vs-resize-grab.vs-grab-bottom-right {
   bottom: -12px;
   right: -12px;
   cursor: se-resize;
 }
-.resize-grab.grab-vertical {
+.vs-resize-grab.vs-grab-vertical {
   top: 12px;
   width: 24px;
   height: calc(100% - 24px);
   cursor: ew-resize;
 }
-.resize-grab.grab-vertical.grab-left {
+.vs-resize-grab.vs-grab-vertical.vs-grab-left {
   left: -12px;
 }
-.resize-grab.grab-vertical.grab-right {
+.vs-resize-grab.vs-grab-vertical.vs-grab-right {
   right: -12px;
 }
-.resize-grab.grab-horizontal {
+.vs-resize-grab.vs-grab-horizontal {
   left: 12px;
   height: 24px;
   width: calc(100% - 24px);
   cursor: ns-resize;
 }
-.resize-grab.grab-horizontal.grab-top {
+.vs-resize-grab.vs-grab-horizontal.vs-grab-top {
   top: -12px;
 }
-.resize-grab.grab-horizontal.grab-bottom {
+.vs-resize-grab.vs-grab-horizontal.vs-grab-bottom {
   bottom: -12px;
 }

@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title></title>
 
+  <link href="../bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
   <link href="../test/style.css" rel="stylesheet" />
+  <link href="../res/css/vs.css" rel="stylesheet" />
   <link href="../res/css/visualization.css" rel="stylesheet" />
   <link href="../res/css/axis.css" rel="stylesheet" />
   <link href="../res/css/window.css" rel="stylesheet" />
@@ -13,96 +15,38 @@
   <script src="../bower_components/jquery/dist/jquery.js"></script>
   <script src="../bower_components/angular/angular.js"></script>
   <script src="../bower_components/d3/d3.js"></script>
+  <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
   <script src="../bower_components/utils.js/utils.min.js"></script>
   <script src="../bower_components/google-closure-library/closure/goog/base.js"></script>
   <!--<script src="../bower_components/zlib.js/bin/zlib.min.js"></script>-->
 
   <script src="../src/deps.js"></script>
-  <script src="../src/vis/vis.js"></script>
-  <script src="../third-party/vis/plugins/canvas/scatter-plot.js"></script>
-  <script src="../third-party/vis/plugins/svg/scatter-plot.js"></script>
+  <script src="../src/vs/vs.js"></script>
+  <script src="../third-party/vs/plugins/canvas/scatter-plot.js"></script>
+  <script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
 
-  <script src="../third-party/vis/plugins/svg/manhattan-plot-options.js"></script>
-  <script src="../third-party/vis/plugins/svg/manhattan-plot.js"></script>
+  <script src="../third-party/vs/plugins/svg/manhattan-plot-options.js"></script>
+  <script src="../third-party/vs/plugins/svg/manhattan-plot.js"></script>
 
-  <script src="../third-party/vis/plugins/canvas/manhattan-plot-options.js"></script>
-  <script src="../third-party/vis/plugins/canvas/manhattan-plot.js"></script>
+  <script src="../third-party/vs/plugins/canvas/manhattan-plot-options.js"></script>
+  <script src="../third-party/vs/plugins/canvas/manhattan-plot.js"></script>
 
   <script src="../test/script.js"></script>
 </head>
 <body ng-app="main">
-  <script>
-    //http://stackoverflow.com/questions/15200266/can-i-use-the-http-range-header-to-load-partial-files-on-purpose
-    /*var xmlhttp=new XMLHttpRequest();
-    xmlhttp.open("GET","http://localhost/gwasPval.txt",false);
-    xmlhttp.setRequestHeader("Range", "bytes=100-200");
-    xmlhttp.send();
-    console.info(xmlhttp);*/
-
-    // http://www.ioncannon.net/programming/1506/range-requests-with-ajax/
-    /*$(function() {
-      $.ajax({
-        url: 'http://localhost/gwasPval.txt',
-        headers: {Range: "bytes=0-3"},
-        success: function( data ) { $('#results').html( data ); }
-      });
-    });*/
-
-  </script>
-
-  <div id="results"></div>
-
-  <div ng-controller="PeopleGeneExpression">
-    <!--<visualization type="scatterplot"
-                   render="webgl"
-                   scale-coordinates="off"
-                   rows-order-by="age"
-                   cols-order-by="chr,start,end"
-                   color-by="row-sex"
-                   aggregate-by="row-sex"
-                   vis-resizable
-                   vis-rotatable
-                   vis-tooltip="on">
-      <vis-options close-button="on" move="on">
-        <vis-option type="to-static-image"></vis-option>
-        <vis-option type="edit-code"></vis-option>
-        <vis-option type="toggle-tooltip"></vis-option>
-        <vis-option type="axisBoundaries"></vis-option>
-        <vis-option type="rotate">
-          <vis-option type="rotate-90"></vis-option>
-          <vis-option type="rotate-180"></vis-option>
-          <vis-option type="rotate-270"></vis-option>
-        </vis-option>
-        <vis-option type="colors"></vis-option>
-        <vis-option type="axis-options">
-          <vis-option type="color-by"></vis-option>
-          <vis-option type="order-by"></vis-option>
-          <vis-option type="aggregate-by"></vis-option>
-        </vis-option>
-      </vis-options>
-      <vis-axis type="x"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-input-data>
-        <vis-rows>
-          <vis-array label="name" d="'florin','suze','wouter','apos'" />
-          <vis-array label="id" d="1,2,3,4" />
-          <vis-array label="age" d="30,24,35,22" />
-          <vis-array label="sex" d="'m','f','m','m'" />
-        </vis-rows>
-        <vis-cols>
-          <vis-array label="name" d="'gene1','gene2','gene3'" />
-          <vis-array label="id" d="1,2,3" />
-          <vis-array label="start" d="10,12,21" />
-          <vis-array label="end" d="15,16,25" />
-          <vis-array label="chr" d="1,1,1" />
-        </vis-cols>
-        <vis-values>
-          <vis-array label="gene expression" d="0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06, 0.865, 0.52, 0.915, 0.498" />
-        </vis-values>
-      </vis-input-data>
-    </visualization>-->
-
-
+  <div ng-include="'nav.html'"></div>
+  <div ng-controller="vs.MainController as main">
+    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context">
+      <div ng-repeat="v in dataContext.visualizations"
+           options="v"
+           input-data="dataContext.data"
+           visualization
+           vs-window
+           vs-resizable
+           vs-movable></div>
+    </div>
+  </div>
+  <!--<div ng-controller="PeopleGeneExpression">
     <div visualization
          type="scatterplot"
          render="svg"
@@ -115,28 +59,28 @@
          cols-filter="[0,1]"
          vals="gene expression"
 
-         vis-window
-         vis-resizable
-         vis-movable
+         vs-window
+         vs-resizable
+         vs-movable
 
          style="top: 15px; left: 15px;">
-      <vis-axis type="x" ticks="10"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-grid type="x" ticks="10"></vis-grid>
-      <vis-grid type="y"></vis-grid>
+      <vs-axis type="x" ticks="10"></vs-axis>
+      <vs-axis type="y"></vs-axis>
+      <vs-grid type="x" ticks="10"></vs-grid>
+      <vs-grid type="y"></vs-grid>
     </div>
     <div visualization
          options="canvasOptions"
-         vis-window
-         vis-resizable
-         vis-movable
+         vs-window
+         vs-resizable
+         vs-movable
          style="top: 15px; left: 520px;">
-      <vis-axis type="x" ticks="10"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-grid type="x" ticks="10"></vis-grid>
-      <vis-grid type="y"></vis-grid>
+      <vs-axis type="x" ticks="10"></vs-axis>
+      <vs-axis type="y"></vs-axis>
+      <vs-grid type="x" ticks="10"></vs-grid>
+      <vs-grid type="y"></vs-grid>
     </div>
-  </div>
+  </div>-->
 
   <div ng-controller="GeneticVariants">
     <div visualization
@@ -159,15 +103,15 @@
 
          vals="gwasPval"
 
-         vis-window
-         vis-resizable
-         vis-movable
+         vs-window
+         vs-resizable
+         vs-movable
 
          style="top: 235px; left: 15px;">
-      <vis-axis type="x" format="s" ticks="3"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-grid type="x" ticks="3"></vis-grid>
-      <vis-grid type="y"></vis-grid>
+      <vs-axis type="x" format="s" ticks="3"></vs-axis>
+      <vs-axis type="y"></vs-axis>
+      <vs-grid type="x" ticks="3"></vs-grid>
+      <vs-grid type="y"></vs-grid>
     </div>
     <div visualization
          type="manhattan"
@@ -189,15 +133,15 @@
 
          vals="gwasPval"
 
-         vis-window
-         vis-resizable
-         vis-movable
+         vs-window
+         vs-resizable
+         vs-movable
 
          style="top: 455px; left: 15px;">
-      <vis-axis type="x" format="s" ticks="3"></vis-axis>
-      <vis-axis type="y"></vis-axis>
-      <vis-grid type="x" ticks="3"></vis-grid>
-      <vis-grid type="y"></vis-grid>
+      <vs-axis type="x" format="s" ticks="3"></vs-axis>
+      <vs-axis type="y"></vs-axis>
+      <vs-grid type="x" ticks="3"></vs-grid>
+      <vs-grid type="y"></vs-grid>
     </div>
   </div>
 </body>

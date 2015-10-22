@@ -1,4 +1,4 @@
-.window {
+.vs-window {
   position: absolute;
   background-color: #b2b2b2;
   -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
@@ -6,4 +6,5 @@
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   border: 1px solid rgba(0, 0, 0, 0.3);
   padding-top: 12px;
+  overflow: hidden;
 }
