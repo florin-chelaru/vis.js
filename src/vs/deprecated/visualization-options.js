@@ -4,7 +4,7 @@
  * Time: 2:23 PM
  */
 
-goog.provide('vs.ui.VisualizationOptions');
+goog.provide('vs.deprecated.ui.VisualizationOptions');
 
 goog.require('vs.models.Boundaries');
 goog.require('vs.models.Margins');
@@ -17,11 +17,11 @@ goog.require('vs.models.DataSource');
  *   rowsFilter: Array.<number>=, rowsLabel: string=, rowsOrderBy: string=, rowsScale: boolean=,
  *   axisBoundaries: Object.<string, vs.models.Boundaries>=, margins: vs.models.Margins=,
  *   width: number=, height: number=, visCtor: function(new: vs.ui.Visualization)=, render: string=,
- *   visOptionsCtor: function(new: vs.ui.VisualizationOptions)= }} options
+ *   visOptionsCtor: function(new: vs.deprecated.ui.VisualizationOptions)= }} options
  * @param {vs.models.DataSource} [data]
  * @constructor
  */
-vs.ui.VisualizationOptions = function(options, data) {
+vs.deprecated.ui.VisualizationOptions = function(options, data) {
   /**
    * @type {Object.<string, vs.models.Boundaries>}
    * @protected
@@ -121,7 +121,7 @@ vs.ui.VisualizationOptions = function(options, data) {
   this._visCtor = options.visCtor;
 
   /**
-   * @type {function(new: vs.ui.VisualizationOptions)}
+   * @type {function(new: vs.deprecated.ui.VisualizationOptions)}
    * @private
    */
   this._visOptionsCtor = options.visOptionsCtor;
@@ -136,18 +136,18 @@ vs.ui.VisualizationOptions = function(options, data) {
 
 };
 
-Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
+Object.defineProperties(vs.deprecated.ui.VisualizationOptions.prototype, {
   /**
    * @type {vs.models.DataSource}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   data: { get: function() { return this._data; } },
 
   /**
    * @type {boolean}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   dirty: {
     get: function() { return this._dirty; }
@@ -156,7 +156,7 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {{x: vs.models.Boundaries, y: vs.models.Boundaries}}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   axisBoundaries: {
     get: function() {
@@ -193,7 +193,7 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {vs.models.Margins}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   margins: {
     get: function() { return this._margins; },
@@ -228,14 +228,14 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {string}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   vals: { get: function() { return this._vals; } },
 
   /**
    * @type {string}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   render: { get: function() { return this._render; } },
 
@@ -250,21 +250,21 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {function(new: vs.ui.Visualization)}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   visCtor: { get: function() { return this._visCtor; } },
 
   /**
-   * @type {function(new: vs.ui.VisualizationOptions)}
+   * @type {function(new: vs.deprecated.ui.VisualizationOptions)}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   visOptionsCtor: { get: function() { return this._visOptionsCtor; } },
 
   /**
    * @type {{x: number, y: number}}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   dimensions: {
     get: function() {
@@ -275,7 +275,7 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {{x: number, y: number}}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   origins: {
     get: function() { return { x: this.margins.left, y: this.height - this.margins.bottom }; }
@@ -284,7 +284,7 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
   /**
    * @type {{x: function(number): number, y: function(number): number}}
    * @instance
-   * @memberof vs.ui.VisualizationOptions
+   * @memberof vs.deprecated.ui.VisualizationOptions
    */
   scales: {
     get: function() {
@@ -305,4 +305,4 @@ Object.defineProperties(vs.ui.VisualizationOptions.prototype, {
 
 /**
  */
-vs.ui.VisualizationOptions.prototype.redrawRequired = function() { ++this._dirty; };
+vs.deprecated.ui.VisualizationOptions.prototype.redrawRequired = function() { ++this._dirty; };

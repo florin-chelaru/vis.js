@@ -7,7 +7,8 @@
 goog.provide('vs.directives.Visualization');
 
 goog.require('vs.directives.Directive');
-goog.require('vs.ui.VisualizationFactory');
+// TODO: Restore
+//goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.async.TaskService');
 
 /**
@@ -21,7 +22,7 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
   vs.directives.Directive.apply(this, arguments);
 
   /**
-   * @type {vs.ui.Visualization}
+   * @type {vs.ui.VisHandler}
    * @private
    */
   this._vis = null;
@@ -55,25 +56,25 @@ Object.defineProperties(vs.directives.Visualization.prototype, {
 vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
     this._vis = this._visualizationFactory.createNew($scope, $element, $attrs, this._taskService);
-    $element.addClass('visualization');
+    //$element.addClass('visualization');
     $element.css({
       width: this._vis.options.width + 'px',
       height: this._vis.options.height + 'px'
     });
-    this._vis.doDraw();
+    this._vis.draw();
   },
   post: function($scope, $element, $attrs, controller) {
-    var self = this;
+    /*var self = this;
     $scope.$watch(function(){ return self._vis.options.dirty; }, function(newValue, oldValue) {
-      self._vis.doDraw();
+      self._vis.draw();
     });
 
     $element.resize(function(event) {
       self._vis.options.width = event.width;
       self._vis.options.height = event.height;
-      self._vis.doDraw();
+      self._vis.draw();
     });
 
-    self._vis.doDraw();
+    self._vis.draw();*/
   }
 };

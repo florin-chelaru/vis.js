@@ -4,7 +4,7 @@
  * Time: 5:25 PM
  */
 
-goog.provide('vs.ui.canvas.CanvasVisualization');
+goog.provide('vs.deprecated.canvas.CanvasVisualization');
 
 goog.require('vs.ui.Visualization');
 goog.require('vs.ui.VisualizationOptions');
@@ -29,7 +29,7 @@ goog.require('goog.string.format');
  * @constructor
  * @extends vs.ui.Visualization
  */
-vs.ui.canvas.CanvasVisualization = function (scope, element, attrs, taskService, options) {
+vs.deprecated.canvas.CanvasVisualization = function (scope, element, attrs, taskService, options) {
   vs.ui.Visualization.apply(this, arguments);
 
   /**
@@ -39,20 +39,20 @@ vs.ui.canvas.CanvasVisualization = function (scope, element, attrs, taskService,
   this._doubleBuffer = options.doubleBuffer;
 };
 
-goog.inherits(vs.ui.canvas.CanvasVisualization, vs.ui.Visualization);
+goog.inherits(vs.deprecated.canvas.CanvasVisualization, vs.ui.Visualization);
 
-Object.defineProperties(vs.ui.canvas.CanvasVisualization.prototype, {
+Object.defineProperties(vs.deprecated.canvas.CanvasVisualization.prototype, {
   /**
    * @type {jQuery}
    * @instance
-   * @memberof vs.ui.canvas.CanvasVisualization
+   * @memberof vs.deprecated.canvas.CanvasVisualization
    */
   pendingCanvas: { get: function() { return this._doubleBuffer ? this.element.find('canvas').filter(':hidden') : this.element.find('canvas'); } },
 
   /**
    * @type {jQuery}
    * @instance
-   * @memberof vs.ui.canvas.CanvasVisualization
+   * @memberof vs.deprecated.canvas.CanvasVisualization
    */
   activeCanvas: { get: function() { return this._doubleBuffer ? this.element.find('canvas').filter(':visible') : this.element.find('canvas'); } }
 });
@@ -60,10 +60,10 @@ Object.defineProperties(vs.ui.canvas.CanvasVisualization.prototype, {
 /**
  * @override
  */
-vs.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
-  vs.ui.Visualization.prototype.preDraw.apply(this, arguments);
+vs.deprecated.canvas.CanvasVisualization.prototype.beginDraw = function () {
+  vs.ui.Visualization.prototype.beginDraw.apply(this, arguments);
 
-  // console.log('Canvas.preDraw');
+  // console.log('Canvas.beginDraw');
 
   var pendingCanvas = this.pendingCanvas;
   if (this.pendingCanvas.length == 0) {
@@ -86,7 +86,7 @@ vs.ui.canvas.CanvasVisualization.prototype.preDraw = function () {
 /**
  * @override
  */
-vs.ui.canvas.CanvasVisualization.prototype.draw = function () {
+vs.deprecated.canvas.CanvasVisualization.prototype.draw = function () {
   vs.ui.Visualization.prototype.draw.apply(this, arguments);
 
   // console.log('Canvas.draw');
@@ -94,7 +94,7 @@ vs.ui.canvas.CanvasVisualization.prototype.draw = function () {
 
 /**
  */
-vs.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
+vs.deprecated.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
   // console.log('Canvas.finalizeDraw');
   if (!this._doubleBuffer) { return; }
   var activeCanvas = this.activeCanvas;
@@ -106,7 +106,7 @@ vs.ui.canvas.CanvasVisualization.prototype.finalizeDraw = function() {
 /**
  * @override
  */
-vs.ui.canvas.CanvasVisualization.prototype.doDraw = function() {
+vs.deprecated.canvas.CanvasVisualization.prototype.doDraw = function() {
   // TODO: Change back once we've figured out how to bind these actions together
   // TODO: Currently, grid drawing seems to be ok but axis is not
   var self = this;

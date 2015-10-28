@@ -8,7 +8,7 @@ goog.provide('vs.directives.GraphicDecorator');
 
 goog.require('vs.directives.Visualization');
 goog.require('vs.ui.Decorator');
-goog.require('vs.ui.Visualization');
+goog.require('vs.ui.VisHandler');
 
 goog.require('vs.async.TaskService');
 
@@ -45,8 +45,8 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
 
   this._decorator = this.createDecorator($scope, $element, $attrs, visualization.taskService, $element.parent(), visualization.vs);
 
-  visualization.taskService.chain(this._decorator.drawTask, visualization.vs.drawTask);
-  visualization.taskService.chain(visualization.vs.preDrawTask, this._decorator.preDrawTask);
+  visualization.taskService.chain(this._decorator.endDrawTask, visualization.vs.endDrawTask);
+  visualization.taskService.chain(visualization.vs.beginDrawTask, this._decorator.beginDrawTask);
 };
 
 /**
@@ -55,7 +55,7 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
  * @param $attrs
  * @param {vs.async.TaskService} taskService
  * @param {jQuery} $targetElement
- * @param {vs.ui.Visualization} target
+ * @param {vs.ui.VisHandler} target
  * @returns {vs.ui.Decorator}
  */
 vs.directives.GraphicDecorator.prototype.createDecorator = function($scope, $element, $attrs, taskService, $targetElement, target) { throw new vs.AbstractMethodException(); };

@@ -4,7 +4,7 @@
  * Time: 2:39 PM
  */
 
-goog.provide('vs.ui.Decorator');
+goog.provide('vs.deprecated.ui.Decorator');
 
 goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
@@ -19,7 +19,7 @@ goog.require('vs.async.TaskService');
  * @constructor
  * @abstract
  */
-vs.ui.Decorator = function($scope, $element, $attrs, taskService, $targetElement, target) {
+vs.deprecated.ui.Decorator = function($scope, $element, $attrs, taskService, $targetElement, target) {
   /**
    * @private
    */
@@ -54,7 +54,7 @@ vs.ui.Decorator = function($scope, $element, $attrs, taskService, $targetElement
    * @type {vs.async.Task}
    * @private
    */
-  this._preDrawTask = taskService.createTask(function() { self.preDraw(); });
+  this._preDrawTask = taskService.createTask(function() { self.beginDraw(); });
 
   /**
    * @type {vs.async.Task}
@@ -63,10 +63,10 @@ vs.ui.Decorator = function($scope, $element, $attrs, taskService, $targetElement
   this._drawTask = taskService.createTask(function() { self.draw(); });
 };
 
-Object.defineProperties(vs.ui.Decorator.prototype, {
+Object.defineProperties(vs.deprecated.ui.Decorator.prototype, {
   /**
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   scope: {
     get: function() { return this._scope; }
@@ -74,7 +74,7 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
 
   /**
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   element: {
     get: function() { return this._element; }
@@ -82,7 +82,7 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
 
   /**
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   attrs: {
     get: function() { return this._attrs; }
@@ -90,7 +90,7 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
 
   /**
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   targetElement: {
     get: function() { return this._targetElement; }
@@ -111,7 +111,7 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
   /**
    * @type {vs.async.Task}
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   preDrawTask: {
     get: function() { return this._preDrawTask; }
@@ -120,13 +120,13 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
   /**
    * @type {vs.async.Task}
    * @instance
-   * @memberof vs.ui.Decorator
+   * @memberof vs.deprecated.ui.Decorator
    */
   drawTask: {
     get: function() { return this._drawTask; }
   }
 });
 
-vs.ui.Decorator.prototype.preDraw = function() { /* console.log('Decorator.preDraw'); */ };
+vs.deprecated.ui.Decorator.prototype.beginDraw = function() { /* console.log('Decorator.beginDraw'); */ };
 
-vs.ui.Decorator.prototype.draw = function() { /* console.log('Decorator.draw'); */ };
+vs.deprecated.ui.Decorator.prototype.draw = function() { /* console.log('Decorator.draw'); */ };

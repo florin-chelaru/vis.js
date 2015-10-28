@@ -29,9 +29,10 @@ vs.async.TaskService = function($timeout) {
 
 /**
  * @param {function} func
+ * @param {Object} [thisArg]
  */
-vs.async.TaskService.prototype.createTask = function(func) {
-  var ret = new vs.async.Task(func);
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {
+  var ret = new vs.async.Task(func, thisArg);
   this._tasks[ret.id] = ret;
   return ret;
 };
@@ -50,47 +51,44 @@ vs.async.TaskService.prototype.chain = function(t1, t2) {
     return this.chain(t1, new vs.async.Task(t2));
   }
 
-  t1._next = t1._next || t2._first;
-  t1._last._next = t2._first;
-  t1._last = t2._last;
+  t1.next = t1.next || t2.first;
+  t1.last.next = t2.first;
+  t1.last = t2.last;
 
-  t2._prev = t2._prev || t1._last;
-  t2._first._prev = t1._last;
-  t2._first = t1._first;
+  t2.prev = t2.prev || t1.last;
+  t2.first.prev = t1.last;
+  t2.first = t1.first;
 
-  return t1._first;
+  return t1.first;
 };
 
 /**
+ * TODO: test!
  * @param {vs.async.Task} task
  * @param {boolean} [sequential] If true, the tasks will run sequentially
  * @returns {goog.async.Deferred}
  */
 vs.async.TaskService.prototype.runChain = function(task, sequential) {
-  var current = task._first;
-  var deferred = new goog.async.Deferred();
+  // TODO: test!
+  var current = task.first;
   if (sequential) {
-    for (; !!current; current = current._next) {
-      current._func.apply();
-    }
-    deferred.callback();
-    return deferred;
+    return new Promise(function(resolve, reject) {
+      for (; !!current; current = current.next) {
+        current.func.apply(current.thisArg);
+      }
+      resolve();
+    });
   }
 
-  var timeout = this._timeout;
-  var iterate = function() {
-    timeout.call(null, function() {
-      current._func.apply();
-      current = current._next;
-      if (current) {
-        iterate();
-      } else {
-        deferred.callback();
-      }
-    }, 0);
-  };
+  var tasks = [];
+  for (; !!current; current = current.next) {
+    tasks.push(current);
+  }
 
-  iterate();
-
-  return deferred;
+  return u.async.each(tasks, function(task) {
+    return new Promise(function(resolve, reject) {
+      task.func.apply(task.thisArg);
+      resolve();
+    });
+  }, true);
 };

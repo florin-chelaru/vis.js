@@ -27,7 +27,7 @@ goog.inherits(vs.directives.Window, vs.directives.Directive);
  */
 vs.directives.Window.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
-    var $window = $('<div class="vs-window"></div>').appendTo($element.parent());
+    var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
 
     $window.css({
       top: $element.css('top'),

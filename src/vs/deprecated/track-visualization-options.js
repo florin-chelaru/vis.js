@@ -35,7 +35,7 @@ Object.defineProperties(vs.ui.TrackVisualizationOptions.prototype, {
         yBoundaries = this._axisBoundaries.y;
       }
 
-      var rowsArr = this._data.getRows(this._rowsLabel);
+      var rowsArr = this._data.getRow(this._rowsLabel);
       if (!xBoundaries) {
         xBoundaries = rowsArr.boundaries;
       }

@@ -9,7 +9,7 @@ goog.provide('vs.directives.Axis');
 goog.require('vs.directives.Visualization');
 goog.require('vs.directives.GraphicDecorator');
 
-goog.require('vs.ui.Visualization');
+goog.require('vs.ui.VisHandler');
 goog.require('vs.ui.svg.decorators.Axis');
 goog.require('vs.ui.canvas.decorators.Axis');
 
@@ -31,7 +31,7 @@ goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
  * @param $attrs
  * @param {vs.async.TaskService} taskService
  * @param {jQuery} $targetElement
- * @param {vs.ui.Visualization} target
+ * @param {vs.ui.VisHandler} target
  * @returns {vs.ui.Decorator}
  * @override
  */

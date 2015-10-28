@@ -23,19 +23,25 @@
   <script src="../src/deps.js"></script>
   <script src="../src/vs/vs.js"></script>
   <script src="../third-party/vs/plugins/canvas/scatter-plot.js"></script>
-  <script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
+  <!--<script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
 
   <script src="../third-party/vs/plugins/svg/manhattan-plot-options.js"></script>
   <script src="../third-party/vs/plugins/svg/manhattan-plot.js"></script>
 
   <script src="../third-party/vs/plugins/canvas/manhattan-plot-options.js"></script>
-  <script src="../third-party/vs/plugins/canvas/manhattan-plot.js"></script>
+  <script src="../third-party/vs/plugins/canvas/manhattan-plot.js"></script>-->
 
   <script src="../test/script.js"></script>
 </head>
 <body ng-app="main">
   <div ng-include="'nav.html'"></div>
   <div ng-controller="vs.MainController as main">
+    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context" ng-include="dataContext.template"></div>
+  </div>
+  <!--<div class="vs-window vs-movable vs-resizable">
+    <div style="width: 100px; height: 100px;"></div>
+  </div>-->
+  <!--<div ng-controller="vs.MainController as main">
     <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context">
       <div ng-repeat="v in dataContext.visualizations"
            options="v"
@@ -45,7 +51,7 @@
            vs-resizable
            vs-movable></div>
     </div>
-  </div>
+  </div>-->
   <!--<div ng-controller="PeopleGeneExpression">
     <div visualization
          type="scatterplot"
@@ -82,7 +88,7 @@
     </div>
   </div>-->
 
-  <div ng-controller="GeneticVariants">
+  <!--<div ng-controller="GeneticVariants">
     <div visualization
          type="manhattan"
          render="svg"
@@ -143,6 +149,6 @@
       <vs-grid type="x" ticks="3"></vs-grid>
       <vs-grid type="y"></vs-grid>
     </div>
-  </div>
+  </div>-->
 </body>
 </html>

@@ -21,4 +21,3 @@ vs.ui.UiException = function(message, innerException) {
 };
 
 goog.inherits(vs.ui.UiException, u.Exception);
-

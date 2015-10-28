@@ -4,14 +4,14 @@
  * Time: 2:42 PM
  */
 
-goog.provide('vs.models.RowDataItem');
+goog.provide('vs.deprecated.models.RowDataItem');
 
 /**
  * @interface
  */
-vs.models.RowDataItem = function() {};
+vs.deprecated.models.RowDataItem = function() {};
 
-Object.defineProperties(vs.models.RowDataItem.prototype, {
+Object.defineProperties(vs.deprecated.models.RowDataItem.prototype, {
   index: {
     /** @returns {number} */
     get: function() { throw new u.AbstractMethodException(); }

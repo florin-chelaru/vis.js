@@ -23,8 +23,8 @@ vs.ui.svg.SvgVisualization = function () {
 
 goog.inherits(vs.ui.svg.SvgVisualization, vs.ui.Visualization);
 
-vs.ui.svg.SvgVisualization.prototype.preDraw = function () {
-  vs.ui.Visualization.prototype.preDraw.apply(this, arguments);
+vs.ui.svg.SvgVisualization.prototype.beginDraw = function () {
+  vs.ui.Visualization.prototype.beginDraw.apply(this, arguments);
 
   if (d3.select(this.element[0]).select('svg').empty()) {
     d3.select(this.element[0])

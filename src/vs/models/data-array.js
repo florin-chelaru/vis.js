@@ -12,31 +12,26 @@ goog.require('vs.models.Boundaries');
  */
 vs.models.DataArray = function() {};
 
-Object.defineProperties(vs.models.DataArray.prototype, {
-  /**
-   * @type {string}
-   * @instance
-   * @memberof vs.models.DataArray
-   */
-  label: {
-    get: function () { throw new u.AbstractMethodException(); }
-  },
+/**
+ * @type {string}
+ * @name vs.models.DataArray#label
+ */
+vs.models.DataArray.prototype.label;
 
-  /**
-   * @type {Array}
-   * @instance
-   * @memberof vs.models.DataArray
-   */
-  d: {
-    get: function() { throw new u.AbstractMethodException(); }
-  },
+/**
+ * @type {Array}
+ * @name vs.models.DataArray#d
+ */
+vs.models.DataArray.prototype.d;
 
-  /**
-   * @type {vs.models.Boundaries}
-   * @instance
-   * @memberof vs.models.DataArray
-   */
-  boundaries: {
-    get: function() { throw new u.AbstractMethodException(); }
-  }
-});
+/**
+ * @type {vs.models.Boundaries}
+ * @name vs.models.DataArray#boundaries
+ */
+vs.models.DataArray.prototype.boundaries;
+
+/*Object.defineProperties(vs.models.DataArray.prototype, {
+  label: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function () { throw new u.AbstractMethodException(); })},
+  d: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function() { throw new u.AbstractMethodException(); })},
+  boundaries: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function() { throw new u.AbstractMethodException(); })}
+});*/

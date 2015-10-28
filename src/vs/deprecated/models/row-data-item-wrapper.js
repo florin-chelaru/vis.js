@@ -4,7 +4,7 @@
  * Time: 2:42 PM
  */
 
-goog.provide('vs.models.RowDataItemWrapper');
+goog.provide('vs.deprecated.models.RowDataItemWrapper');
 
 goog.require('vs.models.DataSource');
 goog.require('vs.models.RowDataItem');
@@ -16,7 +16,7 @@ goog.require('vs.models.RowDataItem');
  * @constructor
  * @implements vs.models.RowDataItem
  */
-vs.models.RowDataItemWrapper = function(dataSource, i, options) {
+vs.deprecated.models.RowDataItemWrapper = function(dataSource, i, options) {
   /**
    * @type {vs.models.DataSource}
    * @private
@@ -54,9 +54,9 @@ vs.models.RowDataItemWrapper = function(dataSource, i, options) {
   this._options = options;
 };
 
-goog.inherits(vs.models.RowDataItemWrapper, vs.models.RowDataItem);
+goog.inherits(vs.deprecated.models.RowDataItemWrapper, vs.models.RowDataItem);
 
-Object.defineProperties(vs.models.RowDataItemWrapper.prototype, {
+Object.defineProperties(vs.deprecated.models.RowDataItemWrapper.prototype, {
   index: {
     /** @returns {number} */
     get: function() { return this._i; }
@@ -67,6 +67,7 @@ Object.defineProperties(vs.models.RowDataItemWrapper.prototype, {
       if (!this._data) {
         var data = [];
         for (var i = 0; i < this._dataSource.ncols; ++i) {
+          data.push(this._dataSource.rows[i].d[this._i]);
           data.push(this._dataSource.rows[i].d[this._i]);
         }
         this._data = data;
@@ -96,11 +97,11 @@ Object.defineProperties(vs.models.RowDataItemWrapper.prototype, {
  * @param index
  * @returns {*}
  */
-vs.models.RowDataItemWrapper.prototype.row = function(index) {
+vs.deprecated.models.RowDataItemWrapper.prototype.row = function(index) {
   if (typeof index == 'number') {
     return this._dataSource.rows[index].d[this._i];
   }
 
   // else: string
-  return this._dataSource.getRows(index).d[this._i];
+  return this._dataSource.getRow(index).d[this._i];
 };

@@ -4,7 +4,7 @@
  * Time: 2:26 PM
  */
 
-goog.provide('vs.models.DataSourceWrapper');
+goog.provide('vs.deprecated.models.DataSourceWrapper');
 
 goog.require('vs.models.DataArray');
 goog.require('vs.models.DataSource');
@@ -15,7 +15,7 @@ goog.require('vs.models.DataSource');
  * @constructor
  * @extends vs.models.DataSource
  */
-vs.models.DataSourceWrapper = function(data) {
+vs.deprecated.models.DataSourceWrapper = function(data) {
   /**
    * @type {vs.models.DataSource}
    * @private
@@ -23,13 +23,13 @@ vs.models.DataSourceWrapper = function(data) {
   this._data = data;
 };
 
-goog.inherits(vs.models.DataSourceWrapper, vs.models.DataSource);
+goog.inherits(vs.deprecated.models.DataSourceWrapper, vs.models.DataSource);
 
-Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
+Object.defineProperties(vs.deprecated.models.DataSourceWrapper.prototype, {
   /**
    * @type {boolean}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   /*dirty: {
     get: function() { return this._data.dirty; },
@@ -39,7 +39,7 @@ Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
   /**
    * @type {number}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   nrows: {
     get: function() { return this._data.nrows; }
@@ -48,7 +48,7 @@ Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
   /**
    * @type {number}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   ncols: {
     get: function() { return this._data.ncols; }
@@ -57,7 +57,7 @@ Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
   /**
    * @type {Array.<vs.models.DataArray>}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   rows: {
     get: function() { return this._data.rows; }
@@ -66,7 +66,7 @@ Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
   /**
    * @type {Array.<vs.models.DataArray>}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   cols: {
     get: function() { return this._data.cols; }
@@ -75,7 +75,7 @@ Object.defineProperties(vs.models.DataSourceWrapper.prototype, {
   /**
    * @type {Array.<vs.models.DataArray>}
    * @instance
-   * @memberof vs.models.DataSourceWrapper
+   * @memberof vs.deprecated.models.DataSourceWrapper
    */
   vals: {
     get: function() { return this._data.vals; }

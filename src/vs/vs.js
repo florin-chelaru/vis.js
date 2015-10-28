@@ -13,16 +13,22 @@ goog.require('vs.async.TaskService');
 goog.require('vs.models.Transformer');
 
 goog.require('vs.ui.VisualizationFactory');
-goog.require('vs.ui.Visualization');
+goog.require('vs.ui.VisHandler');
+/*
 goog.require('vs.ui.svg.SvgVisualization');
-goog.require('vs.ui.canvas.CanvasVisualization');
+*/
+goog.require('vs.ui.canvas.CanvasVis');
+/*
 goog.require('vs.ui.TrackVisualizationOptions');
+*/
 
 
 goog.require('vs.directives.Visualization');
 
+/*
 goog.require('vs.directives.Axis');
 goog.require('vs.directives.Grid');
+*/
 
 goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
@@ -37,37 +43,39 @@ vs.main.provider('configuration', function() {
   self.$get = function() { return self; };
 });
 
-vs.main.factory('visualizationFactory', ['configuration', function(configuration) {
-  return new vs.ui.VisualizationFactory(configuration);
-}]);
-
 vs.main.factory('taskService', ['$timeout', '$q', function($timeout, $q) {
   return new vs.async.TaskService($timeout, $q);
 }]);
 
+vs.main.factory('visualizationFactory', ['configuration', 'taskService', function(configuration, taskService) {
+  return new vs.ui.VisualizationFactory(configuration, taskService);
+}]);
+
 vs.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
-  return vs.directives.Directive.createNew('visualization', vs.directives.Visualization, [visualizationFactory, taskService], {restrict: 'A'/*, transclude: true, replace: false*/});
+  return vs.directives.Directive.createNew('visualization', vs.directives.Visualization, [visualizationFactory, taskService], {restrict: 'C'});
 }]);
 
 vs.main.directive('vsWindow', function() {
-  return vs.directives.Directive.createNew('vsWindow', vs.directives.Window, null, {restrict: 'A'});
+  return vs.directives.Directive.createNew('vsWindow', vs.directives.Window, null, {restrict: 'C'});
 });
 
 vs.main.directive('vsMovable', ['$document', function($document) {
-  return vs.directives.Directive.createNew('vsMovable', vs.directives.Movable, [$document], {restrict: 'A', require: 'vsWindow'});
+  return vs.directives.Directive.createNew('vsMovable', vs.directives.Movable, [$document], {restrict: 'C', require: 'vsWindow'});
 }]);
 
 vs.main.directive('vsResizable', ['$document', function($document) {
-  return vs.directives.Directive.createNew('vsResizable', vs.directives.Resizable, [$document], {restrict: 'A', require: 'vsWindow'});
+  return vs.directives.Directive.createNew('vsResizable', vs.directives.Resizable, [$document], {restrict: 'C', require: 'vsWindow'});
 }]);
 
+/*
 vs.main.directive('vsAxis', function() {
-  return vs.directives.Directive.createNew('vsAxis', vs.directives.Axis, null, {restrict: 'E', require: '^visualization'/*, transclude: true*/});
+  return vs.directives.Directive.createNew('vsAxis', vs.directives.Axis, null, {restrict: 'E', require: '^visualization'/!*, transclude: true*!/});
 });
 
 vs.main.directive('vsGrid', function() {
-  return vs.directives.Directive.createNew('vsGrid', vs.directives.Grid, null, {restrict: 'E', require: '^visualization'/*, transclude: true*/});
+  return vs.directives.Directive.createNew('vsGrid', vs.directives.Grid, null, {restrict: 'E', require: '^visualization'/!*, transclude: true*!/});
 });
+*/
 
 
 /*

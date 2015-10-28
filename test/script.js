@@ -6,11 +6,13 @@
 
 goog.require('goog.math.Long');
 goog.require('goog.async.Deferred');
+goog.require('goog.string.format');
 
 var main = angular.module('main', ['vs']);
 
 main.config(['configurationProvider', function(configuration) {
   configuration.customize({
+    // TODO: Here I think, should go the doubleBuffer part; in something called renderOptions: {svg: {...}, canvas: {...}}
     visualizations: {
       scatterplot: {
         canvas: 'vs.plugins.canvas.ScatterPlot',
@@ -106,7 +108,7 @@ main.controller('GeneticVariants', ['$scope', '$interval', function($scope, $int
   $scope.options = {};
 }]);
 
-main.controller('vs.MainController', ['$scope', function($scope) {
+main.controller('vs.MainControllerOld', ['$scope', function($scope) {
   this.controller = {
     dataContexts: [
       {
@@ -192,4 +194,184 @@ main.controller('vs.MainController', ['$scope', function($scope) {
       }
     ]
   };
+}]);
+
+main.controller('vs.MainController', ['$scope', '$templateCache', function($scope, $templateCache) {
+  this.controller = {
+    dataContexts: [
+      {
+        name: 'Genetic Variants',
+        children: [],
+        dataChanged: new u.Event(),
+        visualContexts: [
+          {
+            construct: {
+              render: 'canvas',
+              type: 'scatterplot'
+            },
+            options: {
+              singleBuffer: false,
+              axisBoundaries: {},
+              x: 10,
+              y: 50,
+              width: 200,
+              height: 200,
+              margins: {
+                left: 10,
+                right: 10,
+                bottom: 10,
+                top: 10
+              },
+              cols: [0, 0],
+              vals: 'dna methylation'
+            },
+            decorators: {
+              cls: [
+                'vs-window',
+                'vs-resizable',
+                'vs-movable'
+              ],
+              elem: [
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'y'
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'y'
+                  }
+                }
+              ]
+            }
+          },
+          {
+            construct: {
+              render: 'canvas',
+              type: 'scatterplot'
+            },
+            options: {
+              singleBuffer: false,
+              axisBoundaries: {},
+              x: 210,
+              y: 50,
+              width: 200,
+              height: 200,
+              margins: {
+                left: 10,
+                right: 10,
+                bottom: 10,
+                top: 10
+              },
+              cols: [0, 0],
+              vals: 'dna methylation'
+            },
+            decorators: {
+              cls: [
+                'vs-window',
+                'vs-resizable',
+                'vs-movable'
+              ],
+              elem: [
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'y'
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'y'
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        data: u.reflection.wrap({
+          query: [
+            new vs.models.Query({target: 'rows', targetLabel: 'chr', test: '==', testArgs: 'chr1'}),
+            new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: 20}),
+            new vs.models.Query({target: 'rows', targetLabel: 'end', test: '>', testArgs: 10})
+          ],
+          nrows: 4,
+          ncols: 2,
+          cols: [
+            { label: 'name', d: ['florin','suze','wouter','apas'] },
+            { label: 'id', d: [1,2,3,4] },
+            { label: 'age', d: [30,24,35,22] },
+            { label: 'sex', d: ['m','f','m','m'] }
+          ],
+          rows: [
+            { label: 'name', d: ['gene1','gene2'] },
+            { label: 'id', d: [1,2] },
+            { label: 'start', d: [10,12] },
+            { label: 'end', d: [15,16] },
+            { label: 'chr', d: ['chr1','chr1'] }
+          ],
+          vals: [
+            {
+              label: 'gene expression',
+              d: [0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06],
+              boundaries: { min: 0, max: 1 }
+            },
+            {
+              label: 'dna methylation',
+              d: [0.625, 0.998, 0.66, 0.595, 0.254, 0.849, 0.374, 0.701],
+              boundaries: { min: 0, max: 1 }
+            }
+          ]
+        }, vs.models.DataSource)
+      }
+    ]
+  };
+
+  var visCtxtFmt = '<div vs-context="dataContext.visualContexts[%s]" vs-data="dataContext.data" class="visualization %s"></div>';
+  var decoratorFmt = '<div class="%s" vs-options="dataContext.visualContexts[%s].decorators.elem[%s].options"></div>';
+
+  // TODO: Put this in dataContext class
+  this.controller.dataContexts.forEach(function(dataContext) {
+    var t = $('<div></div>');
+    dataContext.visualContexts.forEach(function(visContext, i) {
+      var v = $(goog.string.format(visCtxtFmt, i, visContext.decorators.cls.join(' '))).appendTo(t);
+      visContext.decorators.elem.forEach(function(decorator, j) {
+        var d = $(goog.string.format(decoratorFmt, decorator.cls, i, j)).appendTo(v);
+      });
+    });
+    var template = t.html();
+    var templateId = u.generatePseudoGUID(10);
+    $templateCache.put(templateId, template);
+    dataContext.template = templateId;
+  });
 }]);

@@ -15,26 +15,26 @@ goog.require('vs.models.Query');
  */
 vs.models.DataSource = function() {
   /**
-   * @type {Object.<string, vs.models.DataArray>}
+   * @type {Object.<string, number>}
    * @private
    */
-  this._valsMap = null;
+  this._valsIndexMap = null;
 
   /**
-   * @type {Object.<string, vs.models.DataArray>}
+   * @type {Object.<string, number>}
    * @private
    */
-  this._rowsMap = null;
+  this._rowsIndexMap = null;
 
   /**
-   * @type {Object.<string, vs.models.DataArray>}
+   * @type {Object.<string, number>}
    * @private
    */
-  this._colsMap = null;
+  this._colsIndexMap = null;
 };
 
 /**
- * @type {vs.models.Query}
+ * @type {Array.<vs.models.Query>}
  * @name vs.models.DataSource#query
  */
 vs.models.DataSource.prototype.query;
@@ -135,50 +135,97 @@ vs.models.DataSource.prototype.vals;
   }
 });*/
 
+
+
 /**
  * @param {string} label
  * @returns {vs.models.DataArray}
  */
 vs.models.DataSource.prototype.getVals = function(label) {
-  if (!this._valsMap) {
-    var valsMap = {};
-    this.vals.forEach(function(d) {
-      valsMap[d.label] = d;
-    });
-    this._valsMap = valsMap;
-  }
-
-  return this._valsMap[label];
+  this._calcValsMap();
+  return this.vals[this._valsIndexMap[label]];
 };
 
 /**
  * @param {string} label
  * @returns {vs.models.DataArray}
  */
-vs.models.DataSource.prototype.getRows = function(label) {
-  if (!this._rowsMap) {
-    var rowsMap = {};
-    this.rows.forEach(function(d) {
-      rowsMap[d.label] = d;
-    });
-    this._rowsMap = rowsMap;
-  }
-
-  return this._rowsMap[label];
+vs.models.DataSource.prototype.getRow = function(label) {
+  this._calcRowsMap();
+  return this.rows[this._rowsIndexMap[label]];
 };
 
 /**
  * @param {string} label
  * @returns {vs.models.DataArray}
  */
-vs.models.DataSource.prototype.getCols = function(label) {
-  if (!this._colsMap) {
-    var colsMap = {};
-    this.cols.forEach(function(d) {
-      colsMap[d.label] = d;
-    });
-    this._colsMap = colsMap;
-  }
+vs.models.DataSource.prototype.getCol = function(label) {
+  this._calcColsMap();
+  return this.cols[this._colsIndexMap[label]];
+};
 
-  return this._colsMap[label];
+/**
+ * @param {string} label
+ * @returns {number}
+ */
+vs.models.DataSource.prototype.valsIndex = function(label) {
+  this._calcValsMap();
+  return this._valsIndexMap[label];
+};
+
+/**
+ * @param {string} label
+ * @returns {number}
+ */
+vs.models.DataSource.prototype.colIndex = function(label) {
+  this._calcColsMap();
+  return this._colsIndexMap[label];
+};
+
+/**
+ * @param {string} label
+ * @returns {number}
+ */
+vs.models.DataSource.prototype.rowIndex = function(label) {
+  this._calcRowsMap();
+  return this._rowsIndexMap[label];
+};
+
+/**
+ * @private
+ */
+vs.models.DataSource.prototype._calcValsMap = function() {
+  if (!this._valsIndexMap) {
+    var map = {};
+    this.vals.forEach(function(d, i) {
+      map[d.label] = i;
+    });
+    this._valsIndexMap = map;
+  }
+};
+
+/**
+ * @private
+ */
+vs.models.DataSource.prototype._calcColsMap = function() {
+  if (!this._colsIndexMap) {
+    var map = {};
+    this.cols.forEach(function(d, i) {
+      map[d.label] = i;
+    });
+    this._colsIndexMap = map;
+  }
+};
+
+/**
+ * @private
+ */
+vs.models.DataSource.prototype._calcRowsMap = function() {
+  if (!this._rowsIndexMap) {
+    var map = {};
+    this.rows.forEach(function(d, i) {
+      map[d.label] = i;
+    });
+    this._rowsIndexMap = map;
+  }
 };

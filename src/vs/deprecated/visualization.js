@@ -4,10 +4,10 @@
  * Time: 10:08 AM
  */
 
-goog.provide('vs.ui.Visualization');
+goog.provide('vs.deprecated.ui.Visualization');
 
 goog.require('vs.models.DataSource');
-goog.require('vs.ui.VisualizationOptions');
+goog.require('vs.deprecated.ui.VisualizationOptions');
 
 goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
@@ -18,10 +18,10 @@ goog.require('goog.async.Deferred');
  * @param $element
  * @param $attrs
  * @param {vs.async.TaskService} taskService
- * @param {vs.ui.VisualizationOptions} options
+ * @param {vs.deprecated.ui.VisualizationOptions} options
  * @constructor
  */
-vs.ui.Visualization = function($scope, $element, $attrs, taskService, options) {
+vs.deprecated.ui.Visualization = function($scope, $element, $attrs, taskService, options) {
   /**
    * @private
    */
@@ -44,7 +44,7 @@ vs.ui.Visualization = function($scope, $element, $attrs, taskService, options) {
   this._taskService = taskService;
 
   /**
-   * @type {vs.ui.VisualizationOptions}
+   * @type {vs.deprecated.ui.VisualizationOptions}
    * @private
    */
   this._options = options;
@@ -55,7 +55,7 @@ vs.ui.Visualization = function($scope, $element, $attrs, taskService, options) {
    * @type {vs.async.Task}
    * @private
    */
-  this._preDrawTask = this._taskService.createTask(function() { self.preDraw(); });
+  this._preDrawTask = this._taskService.createTask(function() { self.beginDraw(); });
 
   /**
    * @type {vs.async.Task}
@@ -71,7 +71,7 @@ vs.ui.Visualization = function($scope, $element, $attrs, taskService, options) {
   this._lastDraw.callback();
 };
 
-Object.defineProperties(vs.ui.Visualization.prototype, {
+Object.defineProperties(vs.deprecated.ui.Visualization.prototype, {
   scope: {
     get: function() { return this._scope; }
   },
@@ -85,7 +85,7 @@ Object.defineProperties(vs.ui.Visualization.prototype, {
   /**
    * @type {vs.models.VisualizationOptions}
    * @instance
-   * @memberof vs.ui.Visualization
+   * @memberof vs.deprecated.ui.Visualization
    */
   options: {
     get: function() { return this._options; }
@@ -94,7 +94,7 @@ Object.defineProperties(vs.ui.Visualization.prototype, {
   /**
    * @type {vs.models.DataSource}
    * @instance
-   * @memberof vs.ui.Visualization
+   * @memberof vs.deprecated.ui.Visualization
    */
   data: {
     get: function() { return this._options.data; }
@@ -103,7 +103,7 @@ Object.defineProperties(vs.ui.Visualization.prototype, {
   /**
    * @type {vs.async.Task}
    * @instance
-   * @memberof vs.ui.Visualization
+   * @memberof vs.deprecated.ui.Visualization
    */
   preDrawTask: {
     get: function() { return this._preDrawTask; }
@@ -112,7 +112,7 @@ Object.defineProperties(vs.ui.Visualization.prototype, {
   /**
    * @type {vs.async.Task}
    * @instance
-   * @memberof vs.ui.Visualization
+   * @memberof vs.deprecated.ui.Visualization
    */
   drawTask: {
     get: function() { return this._drawTask; }
@@ -121,16 +121,16 @@ Object.defineProperties(vs.ui.Visualization.prototype, {
 
 /**
  */
-vs.ui.Visualization.prototype.preDraw = function() {};
+vs.deprecated.ui.Visualization.prototype.beginDraw = function() {};
 
 /**
  */
-vs.ui.Visualization.prototype.draw = function() {};
+vs.deprecated.ui.Visualization.prototype.draw = function() {};
 
 /**
  * @returns {goog.async.Deferred}
  */
-vs.ui.Visualization.prototype.doDraw = function() {
+vs.deprecated.ui.Visualization.prototype.doDraw = function() {
   var self = this;
   var lastDraw = this._lastDraw;
   if (!lastDraw.hasFired()) { return lastDraw; }
@@ -140,8 +140,8 @@ vs.ui.Visualization.prototype.doDraw = function() {
   var taskService = this._taskService;
 
   // Since we chose to run draw tasks sequentially, there is no need to queue them using promises.
-  // The preDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
-  // TODO: Create an entirely new chain, containing both the preDraw and draw tasks and run that instead.
+  // The beginDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
+  // TODO: Create an entirely new chain, containing both the beginDraw and draw tasks and run that instead.
   /*lastDraw
     .then(function() { return taskService.runChain(self.preDrawTask); })
     .then(function() { return taskService.runChain(self.drawTask); })

@@ -7,7 +7,7 @@
 goog.provide('vs.plugins.canvas.ManhattanPlot');
 
 goog.require('vs.plugins.canvas.ManhattanPlotOptions');
-goog.require('vs.ui.canvas.CanvasVisualization');
+goog.require('vs.ui.canvas.CanvasVis');
 goog.require('vs.models.DataSource');
 goog.require('vs.models.RowDataItemWrapper');
 goog.require('vs.models.Boundaries');
@@ -17,23 +17,23 @@ goog.require('goog.array');
 
 /**
  * @constructor
- * @extends vs.ui.canvas.CanvasVisualization
+ * @extends vs.ui.canvas.CanvasVis
  */
 vs.plugins.canvas.ManhattanPlot = function() {
-  vs.ui.canvas.CanvasVisualization.apply(this, arguments);
+  vs.ui.canvas.CanvasVis.apply(this, arguments);
 };
 
-goog.inherits(vs.plugins.canvas.ManhattanPlot, vs.ui.canvas.CanvasVisualization);
+goog.inherits(vs.plugins.canvas.ManhattanPlot, vs.ui.canvas.CanvasVis);
 
-vs.plugins.canvas.ManhattanPlot.prototype.preDraw = function() {
-  vs.ui.canvas.CanvasVisualization.prototype.preDraw.apply(this, arguments);
+vs.plugins.canvas.ManhattanPlot.prototype.beginDraw = function() {
+  vs.ui.canvas.CanvasVis.prototype.beginDraw.apply(this, arguments);
 };
 
 /**
  * @override
  */
 vs.plugins.canvas.ManhattanPlot.prototype.draw = function() {
-  vs.ui.canvas.CanvasVisualization.prototype.draw.apply(this, arguments);
+  vs.ui.canvas.CanvasVis.prototype.draw.apply(this, arguments);
 
   /** @type {vs.models.DataSource} */
   var data = this.data;

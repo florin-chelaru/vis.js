@@ -10,9 +10,10 @@ goog.require('goog.async.Deferred');
 
 /**
  * @param {function} func
+ * @param {Object} [thisArg]
  * @constructor
  */
-vs.async.Task = function(func) {
+vs.async.Task = function(func, thisArg) {
   /**
    * @type {number}
    * @private
@@ -24,6 +25,12 @@ vs.async.Task = function(func) {
    * @private
    */
   this._func = func;
+
+  /**
+   * @type {Object|undefined}
+   * @private
+   */
+  this._thisArg = thisArg;
 
   /**
    * @type {vs.async.Task}
@@ -51,7 +58,26 @@ vs.async.Task = function(func) {
 };
 
 Object.defineProperties(vs.async.Task.prototype, {
-  id: { get: function() { return this._id; } }
+  id: { get: function() { return this._id; } },
+  thisArg: { get: function() { return this._thisArg; } },
+  func: { get: function() { return this._func; } },
+  prev: {
+    get: function() { return this._prev; },
+    set: function(value) { this._prev = value; }
+  },
+  next: {
+    get: function() { return this._next; },
+    set: function(value) { this._next = value; }
+  },
+  first: {
+    get: function() { return this._first; },
+    set: function(value) { this._first = value; }
+  },
+  last: {
+    get: function() { return this._last; },
+    set: function(value) { this._last = value; }
+  }
+
 });
 
 /**

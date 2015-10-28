@@ -25,8 +25,8 @@ vs.plugins.svg.ManhattanPlot = function() {
 
 goog.inherits(vs.plugins.svg.ManhattanPlot, vs.ui.svg.SvgVisualization);
 
-vs.plugins.svg.ManhattanPlot.prototype.preDraw = function() {
-  vs.ui.svg.SvgVisualization.prototype.preDraw.apply(this, arguments);
+vs.plugins.svg.ManhattanPlot.prototype.beginDraw = function() {
+  vs.ui.svg.SvgVisualization.prototype.beginDraw.apply(this, arguments);
 };
 
 /**

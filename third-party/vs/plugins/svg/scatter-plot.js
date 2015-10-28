@@ -24,8 +24,8 @@ vs.plugins.svg.ScatterPlot = function() {
 
 goog.inherits(vs.plugins.svg.ScatterPlot, vs.ui.svg.SvgVisualization);
 
-vs.plugins.svg.ScatterPlot.prototype.preDraw = function() {
-  vs.ui.svg.SvgVisualization.prototype.preDraw.apply(this, arguments);
+vs.plugins.svg.ScatterPlot.prototype.beginDraw = function() {
+  vs.ui.svg.SvgVisualization.prototype.beginDraw.apply(this, arguments);
 };
 
 /**
