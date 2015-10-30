@@ -319,7 +319,23 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
             }
           }*/
         ],
-        data: new vs.plugins.BigwigDataSource()/*u.reflection.wrap({
+        data: new vs.plugins.BigwigDataSource(
+          [
+            'http://localhost/E001-H3K4me1.pval.signal.bigwig',
+            'http://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/pval/E001-H3K4me3.pval.signal.bigwig',
+            'http://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/pval/E001-H3K9ac.pval.signal.bigwig',
+            'http://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/pval/E001-H3K9me3.pval.signal.bigwig',
+            'http://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/pval/E001-H3K27me3.pval.signal.bigwig',
+            'http://egg2.wustl.edu/roadmap/data/byFileType/signal/consolidated/macs2signal/pval/E001-H3K36me3.pval.signal.bigwig'],
+          {
+            proxyURI: 'http://localhost/bigwig/test/partial.php',
+            initialQuery: [
+              new vs.models.Query({target: 'rows', targetLabel: 'chr', test: '==', testArgs: 'chr1'}),
+              new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: '100000'}),
+              new vs.models.Query({target: 'rows', targetLabel: 'end', test: '>=', testArgs: '1000'})
+            ]
+          }
+        )/*u.reflection.wrap({
           query: [
             new vs.models.Query({target: 'rows', targetLabel: 'chr', test: '==', testArgs: 'chr1'}),
             new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: 20}),

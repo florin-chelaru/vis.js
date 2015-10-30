@@ -43,6 +43,12 @@ vs.models.DataSource = function() {
    * @private
    */
   this._ready = null;
+
+  /**
+   * @type {boolean|undefined}
+   * @private
+   */
+  this._isReady = null;
 };
 
 /**
@@ -112,14 +118,14 @@ Object.defineProperties(vs.models.DataSource.prototype, {
       return this._ready;
     })
   },
-  isReady: { get: /** @type {function (this:vs.models.DataSource)} */ (function() { return true; })}
+  isReady: { get: /** @type {function (this:vs.models.DataSource)} */ (function() { return (this._isReady == undefined) ? true : this._isReady; })}
 });
 
 /**
  * @param {vs.models.Query|Array.<vs.models.Query>} queries
  * @returns {Promise.<vs.models.DataSource>}
  */
-vs.models.DataSource.prototype.query = function(queries) {
+vs.models.DataSource.prototype.applyQuery = function(queries) {
   if (queries instanceof vs.models.Query) { queries = [queries]; }
   if (!queries || !queries.length) { return Promise.resolve(this); }
 

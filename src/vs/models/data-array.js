@@ -8,9 +8,30 @@ goog.provide('vs.models.DataArray');
 goog.require('vs.models.Boundaries');
 
 /**
- * @interface
+ * @param {Array} d
+ * @param {string} [label]
+ * @param {vs.models.Boundaries} [boundaries]
+ * @constructor
  */
-vs.models.DataArray = function() {};
+vs.models.DataArray = function(d, label, boundaries) {
+  /**
+   * @type {Array}
+   * @private
+   */
+  this._d = d;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._label = label;
+
+  /**
+   * @type {vs.models.Boundaries}
+   * @private
+   */
+  this._boundaries = boundaries;
+};
 
 /**
  * @type {string}
@@ -30,8 +51,8 @@ vs.models.DataArray.prototype.d;
  */
 vs.models.DataArray.prototype.boundaries;
 
-/*Object.defineProperties(vs.models.DataArray.prototype, {
-  label: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function () { throw new u.AbstractMethodException(); })},
-  d: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function() { throw new u.AbstractMethodException(); })},
-  boundaries: { get: /!** @type {function (this:vs.ui.DataArray)} *!/ (function() { throw new u.AbstractMethodException(); })}
-});*/
+Object.defineProperties(vs.models.DataArray.prototype, {
+  label: { get: /** @type {function (this:vs.models.DataArray)} */ (function () { return this._label; })},
+  d: { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._d; })},
+  boundaries: { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._boundaries; })}
+});
