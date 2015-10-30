@@ -70,6 +70,8 @@ vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
     this._handler = this._handlerualizationFactory.createNew($scope, $element, $attrs);
     $element.css({
+      top: (this._handler.options.y || 0) + 'px',
+      left: (this._handler.options.x || 0) + 'px',
       width: this._handler.options.width + 'px',
       height: this._handler.options.height + 'px'
     });

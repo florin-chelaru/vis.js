@@ -259,6 +259,40 @@ vs.ui.Setting.valueBoundaries = function (options, $attrs, data, settings) {
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
+vs.ui.Setting.rowBoundaries = function (options, $attrs, data, settings) {
+  var boundaries;
+
+  if (!settings || !('rows' in settings)) { throw new vs.ui.UiException('Missing dependency for "row" in the "boundaries" defaultValue function'); }
+
+  var min, max;
+  var rows = settings['rows'].getValue(options, $attrs, data, settings);
+
+  rows.forEach(function(label) {
+    var row = data.getRow(label);
+    if (!row.boundaries && !data.nrows) {
+      return;
+    }
+    var b = row.boundaries || new vs.models.Boundaries(
+        Math.min.apply(null, row.d),
+        Math.max.apply(null, row.d));
+    if (min == undefined || b.min < min) { min = b.min; }
+    if (max == undefined || b.max > max) { max = b.max; }
+  });
+
+  if (min == undefined && max == undefined) { min = max = 0; }
+  if (min == undefined) { min = max; }
+  if (max == undefined) { max = min; }
+
+  return new vs.models.Boundaries(min, max);
+};
+
+/**
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {vs.models.DataSource} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ */
 vs.ui.Setting.firstColsLabel = function (options, $attrs, data, settings) {
   return data.cols[0].label
 };

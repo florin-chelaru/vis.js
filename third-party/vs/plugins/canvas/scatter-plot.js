@@ -9,18 +9,6 @@ goog.provide('vs.plugins.canvas.ScatterPlot');
 goog.require('vs.ui.canvas.CanvasVis');
 goog.require('vs.models.DataRow');
 
-/*goog.require('vs.models.DataSource');
-goog.require('vs.models.RowDataItemWrapper');
-goog.require('vs.models.Boundaries');
-goog.require('vs.models.Margins');
-
-goog.require('vs.ui.canvas');
-goog.require('vs.models.Point');
-goog.require('vs.models.Transformer');
-
-goog.require('goog.async.Deferred');
-goog.require('goog.array');*/
-
 /**
  * @constructor
  * @extends vs.ui.canvas.CanvasVis
@@ -47,17 +35,8 @@ Object.defineProperties(vs.plugins.canvas.ScatterPlot.prototype, {
   settings: { get: /** @type {function (this:vs.plugins.canvas.ScatterPlot)} */ (function() { return vs.plugins.canvas.ScatterPlot.Settings; })}
 });
 
-vs.plugins.canvas.ScatterPlot.prototype.beginDraw = function() {
-  vs.ui.canvas.CanvasVis.prototype.beginDraw.apply(this, arguments);
-};
-
-/**
- * @override
- */
 vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
   vs.ui.canvas.CanvasVis.prototype.endDraw.apply(this, arguments);
-
-  //console.log('scatterplot.endDraw');
 
   var data = this.data;
   if (!this.data.isReady) { return; }
@@ -71,6 +50,7 @@ vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
   var cols = this.optionValue('cols');
   var xCol = cols[0];
   var yCol = cols[1];
+  var valsLabel = this.optionValue('vals');
 
   var context = this.pendingCanvas[0].getContext('2d');
 
@@ -82,7 +62,7 @@ vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
   });
 
   items.forEach(function(d) {
-    var point = transform.calc({x: d.val(xCol), y: d.val(yCol)});
-    vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 10, '#ff6520')
+    var point = transform.calc({x: d.val(xCol, valsLabel), y: d.val(yCol, valsLabel)});
+    vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 10, '#ff6520');
   });
 };

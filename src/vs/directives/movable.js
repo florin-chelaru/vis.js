@@ -38,7 +38,6 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
   $window.css({ cursor: 'move' });
 
   var startX = 0, startY = 0, x, y;
-  var windowMargin = 0;//-parseInt($window.css('top'));
 
   var $document = this._document;
   function mousedown(event) {
@@ -59,7 +58,7 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
     y = event.pageY - startY;
     x = event.pageX - startX;
     $window.css({
-      top: (y + windowMargin) + 'px',
+      top: y + 'px',
       left:  x + 'px'
     });
   }

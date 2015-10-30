@@ -6,14 +6,8 @@
 
 goog.provide('vs.plugins.canvas.ManhattanPlot');
 
-goog.require('vs.plugins.canvas.ManhattanPlotOptions');
 goog.require('vs.ui.canvas.CanvasVis');
 goog.require('vs.models.DataSource');
-goog.require('vs.models.RowDataItemWrapper');
-goog.require('vs.models.Boundaries');
-goog.require('vs.models.Margins');
-
-goog.require('goog.array');
 
 /**
  * @constructor
@@ -25,41 +19,52 @@ vs.plugins.canvas.ManhattanPlot = function() {
 
 goog.inherits(vs.plugins.canvas.ManhattanPlot, vs.ui.canvas.CanvasVis);
 
-vs.plugins.canvas.ManhattanPlot.prototype.beginDraw = function() {
-  vs.ui.canvas.CanvasVis.prototype.beginDraw.apply(this, arguments);
-};
-
 /**
- * @override
+ * @type {Object.<string, vs.ui.Setting>}
  */
-vs.plugins.canvas.ManhattanPlot.prototype.draw = function() {
-  vs.ui.canvas.CanvasVis.prototype.draw.apply(this, arguments);
+vs.plugins.canvas.ManhattanPlot.Settings = u.extend({}, vs.ui.canvas.CanvasVis.Settings, {
+  'rows': vs.ui.Setting.PredefinedSettings['rows'],
+  'vals': vs.ui.Setting.PredefinedSettings['vals'],
+  'xBoundaries': new vs.ui.Setting({key:'xBoundaries', type:'vs.models.Boundaries', defaultValue:vs.ui.Setting.rowBoundaries, label:'x boundaries', template:'_boundaries.html'}),
+  'yBoundaries': vs.ui.Setting.PredefinedSettings['yBoundaries'],
+  'xScale': vs.ui.Setting.PredefinedSettings['xScale'],
+  'yScale': vs.ui.Setting.PredefinedSettings['yScale'],
+  'cols': vs.ui.Setting.PredefinedSettings['cols']
+});
+
+Object.defineProperties(vs.plugins.canvas.ManhattanPlot.prototype, {
+  settings: { get: /** @type {function (this:vs.plugins.canvas.ManhattanPlot)} */ (function() { return vs.plugins.canvas.ManhattanPlot.Settings; })}
+});
+
+vs.plugins.canvas.ManhattanPlot.prototype.endDraw = function() {
+  vs.ui.canvas.CanvasVis.prototype.endDraw.apply(this, arguments);
 
   /** @type {vs.models.DataSource} */
   var data = this.data;
+  if (!this.data.isReady) { return; }
 
   // Nothing to draw
   if (!data.nrows) { return; }
 
-  var options = this.options;
-
-  var margins = options.margins;
-  var xScale = options.scales.x;
-  var yScale = options.scales.y;
-  var cols = options.colsFilter;
+  var margins = this.optionValue('margins');
+  var xScale = this.optionValue('xScale');
+  var yScale = this.optionValue('yScale');
+  var cols = this.optionValue('cols');
+  var row = this.optionValue('rows')[0];
+  var valsLabel = this.optionValue('vals');
 
   var context = this.pendingCanvas[0].getContext('2d');
 
   var transform =
     vs.models.Transformer.scale(xScale, yScale)
       .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
-  var items = goog.array.range(data.nrows).map(function(i) {
-    return new vs.models.RowDataItemWrapper(data, i, options);
+  var items = u.array.range(data.nrows).map(function(i) {
+    return new vs.models.DataRow(data, i);
   });
 
   items.forEach(function(d) {
-    var point = transform.calc({x: d.row(options.rowsOrderBy), y: d.vals[cols[0]]});
-    vs.ui.canvas.circle(context, point.x, point.y, 3, '#1e60d4')
+    var point = transform.calc({x: parseFloat(d.info(row)), y: d.val(cols[0], valsLabel)});
+    vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 3, '#1e60d4');
   });
 };
 

@@ -210,7 +210,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               type: 'scatterplot'
             },
             options: {
-              doubleBuffer: false,
+              doubleBuffer: true,
               axisBoundaries: {},
               x: 10,
               y: 50,
@@ -260,16 +260,16 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
                 }
               ]
             }
-          }/*,
+          },
           {
             construct: {
               render: 'canvas',
               type: 'scatterplot'
             },
             options: {
-              singleBuffer: false,
+              doubleBuffer: false,
               axisBoundaries: {},
-              x: 210,
+              x: 220,
               y: 50,
               width: 200,
               height: 200,
@@ -317,7 +317,66 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
                 }
               ]
             }
-          }*/
+          },
+          {
+            construct: {
+              render: 'canvas',
+              type: 'manhattan'
+            },
+            options: {
+              doubleBuffer: true,
+              xBoundries: {min: 1000, max: 100000},
+              yBoundaries: {min: 0, max: 0.5},
+              x: 430,
+              y: 50,
+              width: 400,
+              height: 200,
+              margins: {
+                left: 10,
+                right: 10,
+                bottom: 10,
+                top: 10
+              },
+              cols: [0, 1],
+              vals: 'v0',
+              rows: ['start', 'end']
+            },
+            decorators: {
+              cls: [
+                'vs-window',
+                'vs-resizable',
+                'vs-movable'
+              ],
+              elem: [
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'y'
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'y'
+                  }
+                }
+              ]
+            }
+          }
         ],
         data: new vs.plugins.BigwigDataSource(
           [

@@ -59,3 +59,13 @@ vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
 
   return vals.d[index * this.data.nrows + this.index];
 };
+
+/**
+ * @param label
+ * @returns {*}
+ */
+vs.models.DataRow.prototype.info = function(label) {
+  var arr = this.data.getRow(label);
+  if (!arr) { return undefined; }
+  return arr.d[this.index];
+};
