@@ -25,7 +25,7 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
    * @type {vs.ui.VisHandler}
    * @private
    */
-  this._vis = null;
+  this._handler = null;
 
   /**
    * @type {vs.async.TaskService}
@@ -37,14 +37,27 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
    * @type {vs.ui.VisualizationFactory}
    * @private
    */
-  this._visualizationFactory = visualizationFactory;
+  this._handlerualizationFactory = visualizationFactory;
 };
 
 goog.inherits(vs.directives.Visualization, vs.directives.Directive);
 
+
+/**
+ * @type {vs.async.TaskService}
+ * @name vs.directives.Visualization#taskService
+ */
+vs.directives.Visualization.prototype.taskService;
+
+/**
+ * @type {vs.ui.VisHandler}
+ * @name vs.directives.Visualization#handler
+ */
+vs.directives.Visualization.prototype.handler;
+
 Object.defineProperties(vs.directives.Visualization.prototype, {
-  taskService: { get: function() { return this._taskService; } },
-  vs: { get: function() { return this._vis; } }
+  taskService: { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._taskService; })},
+  handler: { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._handler; })}
 });
 
 /**
@@ -55,26 +68,18 @@ Object.defineProperties(vs.directives.Visualization.prototype, {
  */
 vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
-    this._vis = this._visualizationFactory.createNew($scope, $element, $attrs, this._taskService);
-    //$element.addClass('visualization');
+    this._handler = this._handlerualizationFactory.createNew($scope, $element, $attrs);
     $element.css({
-      width: this._vis.options.width + 'px',
-      height: this._vis.options.height + 'px'
+      width: this._handler.options.width + 'px',
+      height: this._handler.options.height + 'px'
     });
-    this._vis.draw();
   },
   post: function($scope, $element, $attrs, controller) {
-    /*var self = this;
-    $scope.$watch(function(){ return self._vis.options.dirty; }, function(newValue, oldValue) {
-      self._vis.draw();
-    });
-
+    var self = this;
     $element.resize(function(event) {
-      self._vis.options.width = event.width;
-      self._vis.options.height = event.height;
-      self._vis.draw();
+      self._handler.options.width = event.width;
+      self._handler.options.height = event.height;
+      if (!$scope.$$phase) { $scope.$apply(); }
     });
-
-    self._vis.draw();*/
   }
 };

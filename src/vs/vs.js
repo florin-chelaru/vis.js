@@ -24,9 +24,8 @@ goog.require('vs.ui.TrackVisualizationOptions');
 
 
 goog.require('vs.directives.Visualization');
-
-/*
 goog.require('vs.directives.Axis');
+/*
 goog.require('vs.directives.Grid');
 */
 
@@ -47,8 +46,8 @@ vs.main.factory('taskService', ['$timeout', '$q', function($timeout, $q) {
   return new vs.async.TaskService($timeout, $q);
 }]);
 
-vs.main.factory('visualizationFactory', ['configuration', 'taskService', function(configuration, taskService) {
-  return new vs.ui.VisualizationFactory(configuration, taskService);
+vs.main.factory('visualizationFactory', ['configuration', 'taskService', '$timeout', function(configuration, taskService, $timeout) {
+  return new vs.ui.VisualizationFactory(configuration, taskService, $timeout);
 }]);
 
 vs.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
@@ -67,11 +66,11 @@ vs.main.directive('vsResizable', ['$document', function($document) {
   return vs.directives.Directive.createNew('vsResizable', vs.directives.Resizable, [$document], {restrict: 'C', require: 'vsWindow'});
 }]);
 
-/*
-vs.main.directive('vsAxis', function() {
-  return vs.directives.Directive.createNew('vsAxis', vs.directives.Axis, null, {restrict: 'E', require: '^visualization'/!*, transclude: true*!/});
-});
 
+vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $timeout) {
+  return vs.directives.Directive.createNew('vsAxis', vs.directives.Axis, [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+}]);
+/*
 vs.main.directive('vsGrid', function() {
   return vs.directives.Directive.createNew('vsGrid', vs.directives.Grid, null, {restrict: 'E', require: '^visualization'/!*, transclude: true*!/});
 });
@@ -115,5 +114,9 @@ vs.main
     //throw exception;
   };
 });
+
+vs.main.run(['$timeout', function($timeout) {
+  // u.Event.TIMEOUT = $timeout;
+}]);
 
 

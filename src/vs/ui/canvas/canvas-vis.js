@@ -23,16 +23,10 @@ goog.require('vs.models.Margins');
 goog.require('goog.string.format');
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
- * @param {vs.async.TaskService} taskService
- * @param {Object.<string, *>} options
- * @param {vs.models.DataSource} data
  * @constructor
  * @extends {vs.ui.VisHandler}
  */
-vs.ui.canvas.CanvasVis = function ($scope, $element, $attrs, taskService, options, data) {
+vs.ui.canvas.CanvasVis = function () {
   vs.ui.VisHandler.apply(this, arguments);
 };
 
@@ -64,6 +58,7 @@ vs.ui.canvas.CanvasVis.prototype.activeCanvas;
 vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
 
 Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
+  render: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
   settings: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
   doubleBuffer: {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
@@ -98,6 +93,8 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   context.rect(0, 0, this.options.width, this.options.height);
   context.fillStyle = '#ffffff';
   context.fill();
+
+  //console.log('canvas.beginDraw');
 };
 
 /**
@@ -116,6 +113,8 @@ vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
   var pendingCanvas = this.pendingCanvas;
   activeCanvas.css({ display: 'none' });
   pendingCanvas.css({ display: 'block' });
+
+  //console.log('canvas.finalizeDraw');
 };
 
 /**

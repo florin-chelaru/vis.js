@@ -19,9 +19,7 @@ vs.Configuration = function() {
 };
 
 Object.defineProperties(vs.Configuration.prototype, {
-  options: {
-    get: function () { return this._options; }
-  }
+  options: { get: function () { return this._options; }}
 });
 
 /**

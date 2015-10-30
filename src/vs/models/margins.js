@@ -39,6 +39,42 @@ vs.models.Margins = function(top, left, bottom, right) {
   this._right = right;
 };
 
+/**
+ * @type {number}
+ * @name vs.models.Margins#top
+ */
+vs.models.Margins.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#left
+ */
+vs.models.Margins.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#bottom
+ */
+vs.models.Margins.prototype.bottom;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#right
+ */
+vs.models.Margins.prototype.right;
+
+/**
+ * @type {Array.<number>}
+ * @name vs.models.Margins#x
+ */
+vs.models.Margins.prototype.x;
+
+/**
+ * @type {Array.<number>}
+ * @name vs.models.Margins#y
+ */
+vs.models.Margins.prototype.y;
+
 Object.defineProperties(vs.models.Margins.prototype, {
   top: { get: function() { return this._top; } },
   left: { get: function() { return this._left; } },
@@ -53,10 +89,10 @@ Object.defineProperties(vs.models.Margins.prototype, {
  */
 vs.models.Margins.prototype.add = function(offset) {
   return new vs.models.Margins(
-    this._top + offset.top,
-    this._left + offset.left,
-    this._bottom + offset.bottom,
-    this._right + offset.right);
+    this.top + offset.top,
+    this.left + offset.left,
+    this.bottom + offset.bottom,
+    this.right + offset.right);
 };
 
 /**
@@ -64,5 +100,5 @@ vs.models.Margins.prototype.add = function(offset) {
  * @returns {boolean}
  */
 vs.models.Margins.prototype.equals = function(other) {
-  return (!!other && this._top == other._top && this._left == other._left && this._bottom == other._bottom && this._right == other._right);
+  return (!!other && this.top == other.top && this.left == other.left && this.bottom == other.bottom && this.right == other.right);
 };

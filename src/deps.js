@@ -21,7 +21,7 @@ goog.addDependency('../../../../src/vs/deprecated/track-visualization-options.js
 goog.addDependency('../../../../src/vs/deprecated/visualization-factory.js', ['vs.deprecated.VisualizationFactory'], ['u.reflection', 'vs.Configuration', 'vs.async.TaskService', 'vs.models.DataSource', 'vs.models.DataSourceWrapper', 'vs.ui.UiException', 'vs.ui.Visualization'], false);
 goog.addDependency('../../../../src/vs/deprecated/visualization-options.js', ['vs.deprecated.ui.VisualizationOptions'], ['vs.models.Boundaries', 'vs.models.DataSource', 'vs.models.Margins'], false);
 goog.addDependency('../../../../src/vs/deprecated/visualization.js', ['vs.deprecated.ui.Visualization'], ['goog.async.Deferred', 'vs.async.Task', 'vs.async.TaskService', 'vs.deprecated.ui.VisualizationOptions', 'vs.models.DataSource'], false);
-goog.addDependency('../../../../src/vs/directives/axis.js', ['vs.directives.Axis'], ['vs.async.TaskService', 'vs.directives.GraphicDecorator', 'vs.directives.Visualization', 'vs.ui.VisHandler', 'vs.ui.canvas.decorators.Axis', 'vs.ui.svg.decorators.Axis'], false);
+goog.addDependency('../../../../src/vs/directives/axis.js', ['vs.directives.Axis'], ['vs.async.TaskService', 'vs.directives.GraphicDecorator', 'vs.directives.Visualization', 'vs.ui.VisHandler', 'vs.ui.canvas.CanvasAxis'], false);
 goog.addDependency('../../../../src/vs/directives/directive.js', ['vs.directives.Directive'], [], false);
 goog.addDependency('../../../../src/vs/directives/graphic-decorator.js', ['vs.directives.GraphicDecorator'], ['vs.async.TaskService', 'vs.directives.Visualization', 'vs.ui.Decorator', 'vs.ui.VisHandler'], false);
 goog.addDependency('../../../../src/vs/directives/grid.js', ['vs.directives.Grid'], ['vs.directives.GraphicDecorator', 'vs.directives.Visualization', 'vs.ui.canvas.decorators.Grid', 'vs.ui.svg.decorators.Grid'], false);
@@ -39,11 +39,14 @@ goog.addDependency('../../../../src/vs/models/models-exception.js', ['vs.models.
 goog.addDependency('../../../../src/vs/models/point.js', ['vs.models.Point'], [], false);
 goog.addDependency('../../../../src/vs/models/query.js', ['vs.models.Query'], [], false);
 goog.addDependency('../../../../src/vs/models/transformer.js', ['vs.models.Transformer'], ['vs.models.Point'], false);
+goog.addDependency('../../../../src/vs/ui/canvas/canvas-axis.js', ['vs.ui.canvas.CanvasAxis'], ['vs.ui.decorators.Axis'], false);
 goog.addDependency('../../../../src/vs/ui/canvas/canvas-vis.js', ['vs.ui.canvas.CanvasVis'], ['goog.string.format', 'vs.ui.VisHandler'], false);
 goog.addDependency('../../../../src/vs/ui/data-context.js', ['vs.ui.DataContext'], ['vs.models.DataSource', 'vs.models.Query', 'vs.ui.VisualContext'], false);
+goog.addDependency('../../../../src/vs/ui/decorator.js', ['vs.ui.Decorator'], ['vs.async.Task', 'vs.async.TaskService'], false);
+goog.addDependency('../../../../src/vs/ui/decorators/axis.js', ['vs.ui.decorators.Axis'], ['vs.ui.Decorator', 'vs.ui.Setting'], false);
 goog.addDependency('../../../../src/vs/ui/setting.js', ['vs.ui.Setting'], ['vs.models.Boundaries', 'vs.models.DataSource', 'vs.models.Margins'], false);
 goog.addDependency('../../../../src/vs/ui/ui-exception.js', ['vs.ui.UiException'], ['u.Exception'], false);
 goog.addDependency('../../../../src/vs/ui/vis-handler.js', ['vs.ui.VisHandler'], ['vs.async.Task', 'vs.async.TaskService', 'vs.models.DataSource', 'vs.ui.Setting'], false);
 goog.addDependency('../../../../src/vs/ui/visual-context.js', ['vs.ui.VisualContext'], ['vs.ui.FactoryOptions'], false);
 goog.addDependency('../../../../src/vs/ui/visualization-factory.js', ['vs.ui.VisualizationFactory'], ['u.reflection', 'vs.Configuration', 'vs.async.TaskService', 'vs.models.DataSource', 'vs.ui.UiException', 'vs.ui.VisHandler'], false);
-goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.directives.Movable', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.models.Transformer', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis'], false);
+goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.directives.Axis', 'vs.directives.Movable', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.models.Transformer', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis'], false);

@@ -145,8 +145,10 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
       return defaultValue();
 
     case vs.ui.Setting.Type.CATEGORICAL:
-      if (this.possibleValues === null) { return val; }
-      return this.possibleValues.indexOf(val) < 0 ? defaultValue() : val;
+      if (this._possibleValues === null) { return val; }
+      possibleVals = (typeof this._possibleValues == 'function') ?
+        this._possibleValues.call(null, options, $attrs, data, settings) : this._possibleValues;
+      return possibleVals.indexOf(val) < 0 ? defaultValue() : val;
 
     case vs.ui.Setting.Type.OBJECT:
       if (typeof val == 'object') { return val; }
@@ -302,9 +304,9 @@ vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
   var xBoundaries = settings['xBoundaries'].getValue(options, $attrs, data, settings);
   var width = settings['width'].getValue(options, $attrs, data, settings);
   var margins = settings['margins'].getValue(options, $attrs, data, settings);
-  return u.math.scaleLinear(
-    [xBoundaries.min, xBoundaries.max],
-    [0, width - margins.left - margins.right]);
+  return d3.scale.linear()
+    .domain([xBoundaries.min, xBoundaries.max])
+    .range([0, width - margins.left - margins.right]);
 };
 
 /**
@@ -326,9 +328,9 @@ vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
   var yBoundaries = settings['yBoundaries'].getValue(options, $attrs, data, settings);
   var height = settings['height'].getValue(options, $attrs, data, settings);
   var margins = settings['margins'].getValue(options, $attrs, data, settings);
-  return u.math.scaleLinear(
-    [yBoundaries.min, yBoundaries.max],
-    [height - margins.top - margins.bottom, 0]);
+  return d3.scale.linear()
+    .domain([yBoundaries.min, yBoundaries.max])
+    .range([height - margins.top - margins.bottom, 0]);
 };
 
 /**

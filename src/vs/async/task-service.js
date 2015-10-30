@@ -43,11 +43,11 @@ vs.async.TaskService.prototype.createTask = function(func, thisArg) {
  * @returns {vs.async.Task}
  */
 vs.async.TaskService.prototype.chain = function(t1, t2) {
-  if ($.isFunction(t1)) {
+  if (typeof t1 == 'function') {
     return this.chain(new vs.async.Task(t1), t2);
   }
 
-  if ($.isFunction(t2)) {
+  if (typeof t2 == 'function') {
     return this.chain(t1, new vs.async.Task(t2));
   }
 

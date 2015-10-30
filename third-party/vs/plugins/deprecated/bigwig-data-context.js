@@ -4,31 +4,27 @@
  * Time: 5:45 PM
  */
 
-goog.provide('vs.plugins.ui.BigwigDataContext');
+goog.provide('vs.plugins.deprecated.BigwigDataContext');
 
 goog.require('vs.ui.DataContext');
 goog.require('vs.models.DataSource');
 goog.require('vs.models.Query');
 
 /**
- * @param {string} name
- * @param {Object.<string, string>} bigwigFiles
+ * @param {{visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataContext>|undefined), name: (string|undefined)}} options
+ * @param {Object.<string, string>} bigwigFileNames
  * @param {string} [proxyEndpoint]
  * @constructor
- * @implements {vs.ui.DataContext}
+ * @extends {vs.ui.DataContext}
  */
-vs.plugins.ui.BigwigDataContext = function(name, bigwigFiles, proxyEndpoint) {
-  /**
-   * @type {string}
-   * @private
-   */
-  this._name = name;
+vs.plugins.deprecated.BigwigDataContext = function(options, bigwigFileNames, proxyEndpoint) {
+  vs.ui.DataContext.prototype.apply(this, options);
 
   /**
    * @type {Object.<string, string>}
    * @private
    */
-  this._bigwigFileNames = bigwigFiles;
+  this.bigwigFileNames = bigwigFileNames;
 
   /**
    * @type {vs.models.DataSource}
@@ -50,7 +46,7 @@ vs.plugins.ui.BigwigDataContext = function(name, bigwigFiles, proxyEndpoint) {
 
   this._bigwigFiles = {};
   var self = this;
-  u.each(bigwigFiles, function(label, uri) {
+  u.each(bigwigFileNames, function(label, uri) {
     self._bigwigFiles[label] = new bigwig.BigwigFile(uri, proxyEndpoint);
   });
 
@@ -62,34 +58,34 @@ vs.plugins.ui.BigwigDataContext = function(name, bigwigFiles, proxyEndpoint) {
 
 /**
  * @type {string}
- * @name vs.plugins.ui.BigwigDataContext#name
+ * @name vs.plugins.deprecated.BigwigDataContext#name
  */
-vs.plugins.ui.BigwigDataContext.prototype.name;
+vs.plugins.deprecated.BigwigDataContext.prototype.name;
 
 /**
  * @type {vs.models.DataSource}
- * @name vs.plugins.ui.BigwigDataContext#data
+ * @name vs.plugins.deprecated.BigwigDataContext#data
  */
-vs.plugins.ui.BigwigDataContext.prototype.data;
+vs.plugins.deprecated.BigwigDataContext.prototype.data;
 
 /**
  * @type {u.Event.<vs.models.DataSource>}
- * @name vs.plugins.ui.BigwigDataContext#dataChanged
+ * @name vs.plugins.deprecated.BigwigDataContext#dataChanged
  */
-vs.plugins.ui.BigwigDataContext.prototype.dataChanged;
+vs.plugins.deprecated.BigwigDataContext.prototype.dataChanged;
 
-Object.defineProperties(vs.plugins.ui.BigwigDataContext.prototype, {
+Object.defineProperties(vs.plugins.deprecated.BigwigDataContext.prototype, {
   name: {
-    get: /** @type {function (this:vs.plugins.ui.BigwigDataContext)} */ (function() { return this._name; })
+    get: /** @type {function (this:vs.plugins.deprecated.BigwigDataContext)} */ (function() { return this._name; })
   },
 
   data: {
-    get: /** @type {function (this:vs.plugins.ui.BigwigDataContext)} */ (function() { throw new u.AbstractMethodException(); }),
-    set: /** @type {function (this:vs.plugins.ui.BigwigDataContext)} */ (function(value) { throw new u.AbstractMethodException(); })
+    get: /** @type {function (this:vs.plugins.deprecated.BigwigDataContext)} */ (function() { throw new u.AbstractMethodException(); }),
+    set: /** @type {function (this:vs.plugins.deprecated.BigwigDataContext)} */ (function(value) { throw new u.AbstractMethodException(); })
   },
 
   dataChanged: {
-    get: /** @type {function (this:vs.plugins.ui.BigwigDataContext)} */ (function() { return this._dataChanged; })
+    get: /** @type {function (this:vs.plugins.deprecated.BigwigDataContext)} */ (function() { return this._dataChanged; })
   }
 });
 
@@ -97,7 +93,7 @@ Object.defineProperties(vs.plugins.ui.BigwigDataContext.prototype, {
  * @param {vs.models.Query|Array.<vs.models.Query>} q
  * @returns {Promise.<vs.models.DataSource>}
  */
-vs.plugins.ui.BigwigDataContext.prototype.query = function(q) {
+vs.plugins.deprecated.BigwigDataContext.prototype.query = function(q) {
   var self = this;
 
   var deferred = function(resolve, reject) {

@@ -57,7 +57,10 @@ vs.plugins.canvas.ScatterPlot.prototype.beginDraw = function() {
 vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
   vs.ui.canvas.CanvasVis.prototype.endDraw.apply(this, arguments);
 
+  //console.log('scatterplot.endDraw');
+
   var data = this.data;
+  if (!this.data.isReady) { return; }
 
   // Nothing to draw
   if (!data.nrows) { return; }

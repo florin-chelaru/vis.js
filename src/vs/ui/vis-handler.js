@@ -15,35 +15,38 @@ goog.require('vs.async.TaskService');
 //goog.require('goog.async.Deferred');
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
- * @param {vs.async.TaskService} taskService
+ * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService}} $ng
  * @param {Object.<string, *>} options
  * @param {vs.models.DataSource} data
  * @constructor
  */
-vs.ui.VisHandler = function($scope, $element, $attrs, taskService, options, data) {
+vs.ui.VisHandler = function($ng, options, data) {
   /**
    * @private
    */
-  this._$scope = $scope;
+  this._$scope = $ng.$scope;
 
   /**
    * @private
    */
-  this._$element = $element;
+  this._$element = $ng.$element;
 
   /**
    * @private
    */
-  this._$attrs = $attrs;
+  this._$attrs = $ng.$attrs;
+
+  /**
+   * @type {Function}
+   * @private
+   */
+  this._$timeout = $ng.$timeout;
 
   /**
    * @type {vs.async.TaskService}
    * @private
    */
-  this._taskService = taskService;
+  this._taskService = $ng.taskService;
 
   /**
    * @type {Object.<string, *>}
@@ -80,6 +83,21 @@ vs.ui.VisHandler = function($scope, $element, $attrs, taskService, options, data
    * @private
    */
   this._lastDrawFired = true;
+
+  // Redraw if:
+
+  // Data changed
+  this._data.changed.addListener(this.draw, this);
+
+  // Data ready for the first time
+  var self = this;
+  this._data.ready.then(function() { self.draw(); });
+
+  // Options changed
+  this._$scope.$watch(
+    function(){ return self._options; },
+    function() { self.draw(); },
+    true);
 };
 
 /**
@@ -90,6 +108,12 @@ vs.ui.VisHandler.Settings = {
   'width': vs.ui.Setting.PredefinedSettings['width'],
   'height': vs.ui.Setting.PredefinedSettings['height']
 };
+
+/**
+ * @type {string}
+ * @name vs.ui.VisHandler#render
+ */
+vs.ui.VisHandler.prototype.render;
 
 /**
  * Gets a list of all settings (option definitions) for this type of visualization
@@ -138,6 +162,24 @@ vs.ui.VisHandler.prototype.beginDrawTask;
  */
 vs.ui.VisHandler.prototype.endDrawTask;
 
+/**
+ * @type {vs.models.Margins}
+ * @name vs.ui.VisHandler#margins
+ */
+vs.ui.VisHandler.prototype.margins;
+
+/**
+ * @type {number}
+ * @name vs.ui.VisHandler#width
+ */
+vs.ui.VisHandler.prototype.width;
+
+/**
+ * @type {number}
+ * @name vs.ui.VisHandler#height
+ */
+vs.ui.VisHandler.prototype.height;
+
 Object.defineProperties(vs.ui.VisHandler.prototype, {
   settings: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return vs.ui.VisHandler.Settings; })},
   $scope: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$scope; })},
@@ -146,7 +188,22 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
   options: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._options; })},
   data: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._data; })},
   beginDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._beginDrawTask; })},
-  endDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._endDrawTask; })}
+  endDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._endDrawTask; })},
+
+  margins: {
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('margins'); }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['margins'] = value; })
+  },
+
+  width: {
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('width'); }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['width'] = value; })
+  },
+
+  height: {
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('height'); }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['height'] = value; })
+  }
 });
 
 /**
@@ -160,11 +217,11 @@ vs.ui.VisHandler.prototype.optionValue = function(optionKey) {
 
 /**
  */
-vs.ui.VisHandler.prototype.beginDraw = function() {};
+vs.ui.VisHandler.prototype.beginDraw = function() { console.log('Vis.beginDraw'); };
 
 /**
  */
-vs.ui.VisHandler.prototype.endDraw = function() {};
+vs.ui.VisHandler.prototype.endDraw = function() { console.log('Vis.endDraw'); };
 
 /**
  * @returns {Promise}
@@ -193,4 +250,9 @@ vs.ui.VisHandler.prototype.draw = function() {
   });
   this._lastDraw = promise;
   return promise;
+};
+
+vs.ui.VisHandler.prototype.scheduleRedraw = function() {
+  // This will trigger an asynchronous angular digest
+  this._$timeout.call(null, function() {}, 0);
 };

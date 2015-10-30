@@ -18,9 +18,10 @@ goog.require('u.reflection');
 /**
  * @param {vs.Configuration} config
  * @param {vs.async.TaskService} taskService
+ * @param {Function} $timeout
  * @constructor
  */
-vs.ui.VisualizationFactory = function(config, taskService) {
+vs.ui.VisualizationFactory = function(config, taskService, $timeout) {
   /**
    * visualization alias -> rendering type -> fully qualified type
    * @type {Object.<string, Object.<string, string>>}
@@ -28,7 +29,17 @@ vs.ui.VisualizationFactory = function(config, taskService) {
    */
   this._visMap = config.options['visualizations'];
 
+  /**
+   * @type {vs.async.TaskService}
+   * @private
+   */
   this._taskService = taskService;
+
+  /**
+   * @type {Function}
+   * @private
+   */
+  this._$timeout = $timeout;
 };
 
 /**
@@ -57,5 +68,5 @@ vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $att
   var data = $scope.$eval($attrs.vsData);
   if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
 
-  return u.reflection.applyConstructor(visCtor, [$scope, $element, $attrs, this._taskService, visualContext.options, data]);
+  return u.reflection.applyConstructor(visCtor, [{$scope:$scope, $element:$element, $attrs:$attrs, taskService:this._taskService, $timeout: this._$timeout}, visualContext.options, data]);
 };

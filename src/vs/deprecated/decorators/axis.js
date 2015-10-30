@@ -13,7 +13,7 @@ goog.require('vs.ui.VisualizationOptions');
  * @constructor
  * @extends vs.ui.Decorator
  */
-vs.ui.decorators.Axis = function($scope, $element, $attrs, taskService, $targetElement, target) {
+vs.ui.decorators.Axis = function($scope, $element, $attrs, taskService, $targetElement, target, options) {
   vs.ui.Decorator.apply(this, arguments);
 
   /**

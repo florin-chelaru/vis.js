@@ -14,11 +14,11 @@ vs.directives.Directive = function($scope) {
   /**
    * @private
    */
-  this._scope = $scope;
+  this._$scope = $scope;
 };
 
 Object.defineProperties(vs.directives.Directive.prototype, {
-  scope: { get: function() { return this._scope; } }
+  $scope: { get: function() { return this._$scope; } }
 });
 
 vs.directives.Directive.prototype.link = function($scope, $element, $attrs) {};
@@ -34,10 +34,12 @@ vs.directives.Directive.createNew = function(name, controllerCtor, args, options
   var controller = ['$scope', function($scope) {
     var params = [].concat(args || []);
     params.unshift($scope);
+
+    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
     this.handler = u.reflection.applyConstructor(controllerCtor, params);
   }];
   var link;
-  if ($.isFunction(controllerCtor.prototype.link)) {
+  if (typeof controllerCtor.prototype.link == 'function') {
     link = function ($scope, $element, $attrs) {
       var ctrl = $scope[name];
       return ctrl.handler.link($scope, $element, $attrs, ctrl);

@@ -210,7 +210,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               type: 'scatterplot'
             },
             options: {
-              singleBuffer: false,
+              doubleBuffer: false,
               axisBoundaries: {},
               x: 10,
               y: 50,
@@ -260,7 +260,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
                 }
               ]
             }
-          },
+          }/*,
           {
             construct: {
               render: 'canvas',
@@ -317,9 +317,9 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
                 }
               ]
             }
-          }
+          }*/
         ],
-        data: u.reflection.wrap({
+        data: new vs.plugins.BigwigDataSource()/*u.reflection.wrap({
           query: [
             new vs.models.Query({target: 'rows', targetLabel: 'chr', test: '==', testArgs: 'chr1'}),
             new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: 20}),
@@ -352,7 +352,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               boundaries: { min: 0, max: 1 }
             }
           ]
-        }, vs.models.DataSource)
+        }, vs.models.DataSource)*/
       }
     ]
   };
