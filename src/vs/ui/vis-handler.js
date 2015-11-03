@@ -128,6 +128,7 @@ vs.ui.VisHandler.prototype.settings;
 vs.ui.VisHandler.prototype.$scope;
 
 /**
+ * @type {jQuery}
  * @name vs.ui.VisHandler#$element
  */
 vs.ui.VisHandler.prototype.$element;

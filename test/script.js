@@ -213,7 +213,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               doubleBuffer: true,
               axisBoundaries: {},
               x: 10,
-              y: 50,
+              y: 10,
               width: 200,
               height: 200,
               margins: {
@@ -263,14 +263,14 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
           },
           {
             construct: {
-              render: 'canvas',
+              render: 'svg',
               type: 'scatterplot'
             },
             options: {
               doubleBuffer: false,
               axisBoundaries: {},
               x: 220,
-              y: 50,
+              y: 10,
               width: 200,
               height: 200,
               margins: {
@@ -279,7 +279,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
                 bottom: 10,
                 top: 10
               },
-              cols: [0, 0],
+              cols: [0, 1],
               vals: 'dna methylation'
             },
             decorators: {
@@ -328,7 +328,65 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               xBoundries: {min: 1000, max: 100000},
               yBoundaries: {min: 0, max: 0.5},
               x: 430,
-              y: 50,
+              y: 10,
+              width: 400,
+              height: 200,
+              margins: {
+                left: 10,
+                right: 10,
+                bottom: 10,
+                top: 10
+              },
+              cols: [0, 1],
+              vals: 'v0',
+              rows: ['start', 'end']
+            },
+            decorators: {
+              cls: [
+                'vs-window',
+                'vs-resizable',
+                'vs-movable'
+              ],
+              elem: [
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-axis',
+                  options: {
+                    type: 'y'
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'x',
+                    ticks: 10
+                  }
+                },
+                {
+                  cls: 'vs-grid',
+                  options: {
+                    type: 'y'
+                  }
+                }
+              ]
+            }
+          },
+          {
+            construct: {
+              render: 'svg',
+              type: 'manhattan'
+            },
+            options: {
+              xBoundries: {min: 1000, max: 100000},
+              yBoundaries: {min: 0, max: 0.5},
+              x: 430,
+              y: 240,
               width: 400,
               height: 200,
               margins: {

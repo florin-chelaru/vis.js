@@ -109,6 +109,10 @@ vs.directives.Resizable.ResizeHandler = function($elem) {
   /** @type {jQuery} */
   this.$elem = $elem;
   var rect = $elem[0].getBoundingClientRect();
+
+  // We compute the relative position of this handler to the window's parent element
+  // We add 1 to each because jQuery.position() includes all margins and borders; so if we change the border of window,
+  // this should also change
   var pos = {left:$elem.position().left + $elem.parent().position().left + 1, top:$elem.position().top + $elem.parent().position().top + 1};
   this.top = pos.top;
   this.left = pos.left;

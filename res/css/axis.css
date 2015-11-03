@@ -1,5 +1,7 @@
-.vs-axis path,
-.vs-axis line {
+.vs-axis-x path,
+.vs-axis-y path,
+.vs-axis-x line,
+.vs-axis-y line {
   fill: none;
   stroke: #565656;
   shape-rendering: crispEdges;

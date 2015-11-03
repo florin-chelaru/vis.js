@@ -14,9 +14,8 @@ goog.require('vs.models.Transformer');
 
 goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.ui.VisHandler');
-/*
-goog.require('vs.ui.svg.SvgVisualization');
-*/
+
+goog.require('vs.ui.svg.SvgVis');
 goog.require('vs.ui.canvas.CanvasVis');
 /*
 goog.require('vs.ui.TrackVisualizationOptions');
@@ -25,9 +24,7 @@ goog.require('vs.ui.TrackVisualizationOptions');
 
 goog.require('vs.directives.Visualization');
 goog.require('vs.directives.Axis');
-/*
 goog.require('vs.directives.Grid');
-*/
 
 goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
@@ -70,11 +67,10 @@ vs.main.directive('vsResizable', ['$document', function($document) {
 vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $timeout) {
   return vs.directives.Directive.createNew('vsAxis', vs.directives.Axis, [taskService, $timeout], {restrict: 'C', require: '^visualization'});
 }]);
-/*
-vs.main.directive('vsGrid', function() {
-  return vs.directives.Directive.createNew('vsGrid', vs.directives.Grid, null, {restrict: 'E', require: '^visualization'/!*, transclude: true*!/});
-});
-*/
+
+vs.main.directive('vsGrid', ['taskService', '$timeout', function(taskService, $timeout) {
+  return vs.directives.Directive.createNew('vsGrid', vs.directives.Grid, [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+}]);
 
 
 /*

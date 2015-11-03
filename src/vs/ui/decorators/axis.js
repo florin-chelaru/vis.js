@@ -26,7 +26,7 @@ goog.inherits(vs.ui.decorators.Axis, vs.ui.Decorator);
 vs.ui.decorators.Axis.Settings = {
   'type': new vs.ui.Setting({key:'type', type: vs.ui.Setting.Type.CATEGORICAL, defaultValue: 'x', possibleValues: ['x', 'y']}),
   'ticks': new vs.ui.Setting({key:'ticks', type: vs.ui.Setting.Type.NUMBER, defaultValue: 10}),
-  'format': new vs.ui.Setting({key:'format', type: vs.ui.Setting.Type.STRING, defaultValue: ''})
+  'format': new vs.ui.Setting({key:'format', type: vs.ui.Setting.Type.STRING, defaultValue: 's'})
 };
 
 /**

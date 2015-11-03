@@ -37,8 +37,9 @@ Object.defineProperties(vs.plugins.canvas.ScatterPlot.prototype, {
 
 vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
   var self = this;
+  var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, arguments)
+    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, args)
       .then(function() {
         var data = self.data;
         if (!self.data.isReady) { return; }
@@ -65,7 +66,7 @@ vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
 
         items.forEach(function(d) {
           var point = transform.calc({x: d.val(xCol, valsLabel), y: d.val(yCol, valsLabel)});
-          vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 10, '#ff6520');
+          vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 3, '#ff6520');
         });
 
         resolve();

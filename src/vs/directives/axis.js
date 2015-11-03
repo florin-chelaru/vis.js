@@ -10,7 +10,7 @@ goog.require('vs.directives.Visualization');
 goog.require('vs.directives.GraphicDecorator');
 
 goog.require('vs.ui.VisHandler');
-//goog.require('vs.ui.svg.decorators.Axis');
+goog.require('vs.ui.svg.SvgAxis');
 goog.require('vs.ui.canvas.CanvasAxis');
 
 goog.require('vs.async.TaskService');
@@ -35,9 +35,8 @@ goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
  */
 vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {
   switch (target.render) {
-    // TODO: Re-enable
-    /*case 'svg':
-      return new vs.ui.svg.SvgAxis($scope, $element, $attrs, taskService, $targetElement, target, options);*/
+    case 'svg':
+      return new vs.ui.svg.SvgAxis($ng, $targetElement, target, options);
     case 'canvas':
       return new vs.ui.canvas.CanvasAxis($ng, $targetElement, target, options);
   }

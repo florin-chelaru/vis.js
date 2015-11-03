@@ -28,6 +28,9 @@
   <script src="../third-party/vs/plugins/canvas/scatter-plot.js"></script>
   <script src="../third-party/vs/plugins/canvas/manhattan-plot.js"></script>
 
+  <script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
+  <script src="../third-party/vs/plugins/svg/manhattan-plot.js"></script>
+
   <script src="../third-party/vs/plugins/bigwig-data-source.js"></script>
   <!--<script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
 
@@ -42,7 +45,7 @@
 <body ng-app="main">
   <div ng-include="'nav.html'"></div>
   <div ng-controller="vs.MainController as main">
-    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context vs-window vs-resizable vs-movable" style="width: 500px; height: 500px;" ng-include="dataContext.template"></div>
+    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context vs-window vs-resizable vs-movable" style="width: 1000px; height: 500px;" ng-include="dataContext.template"></div>
   </div>
   <!--<div class="vs-window vs-movable vs-resizable">
     <div style="width: 100px; height: 100px;"></div>

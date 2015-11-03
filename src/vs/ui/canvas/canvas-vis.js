@@ -7,18 +7,6 @@
 goog.provide('vs.ui.canvas.CanvasVis');
 
 goog.require('vs.ui.VisHandler');
-//goog.require('vs.ui.VisOptions');
-
-/*
-goog.require('vs.models.DataSource');
-goog.require('vs.models.RowDataItemWrapper');
-goog.require('vs.models.Boundaries');
-goog.require('vs.models.Margins');
-*/
-
-//goog.require('vs.ui.canvas');
-
-//goog.require('vs.async.TaskService');
 
 goog.require('goog.string.format');
 
@@ -73,12 +61,11 @@ Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
  */
 vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   var self = this;
+  var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.VisHandler.prototype.beginDraw.apply(self, arguments)
+    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
       .then(
       function() {
-        // console.log('Canvas.beginDraw');
-
         var pendingCanvas = self.pendingCanvas;
         if (self.pendingCanvas.length == 0) {
           var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', self.options.width, self.options.height);
@@ -95,46 +82,23 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
         context.rect(0, 0, self.options.width, self.options.height);
         context.fillStyle = '#ffffff';
         context.fill();
-
-        //console.log('canvas.beginDraw');
         resolve();
       }, reject);
   });
 };
 
-/**
- * @returns {Promise}
- */
-vs.ui.canvas.CanvasVis.prototype.endDraw = function () {
-  return vs.ui.VisHandler.prototype.endDraw.apply(this, arguments);
-
-  // console.log('Canvas.draw');
-};
-
 vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
-  // console.log('Canvas.finalizeDraw');
   if (!this.doubleBuffer) { return; }
   var activeCanvas = this.activeCanvas;
   var pendingCanvas = this.pendingCanvas;
   activeCanvas.css({ display: 'none' });
   pendingCanvas.css({ display: 'block' });
-
-  //console.log('canvas.finalizeDraw');
 };
 
 /**
  * @override
  */
 vs.ui.canvas.CanvasVis.prototype.draw = function() {
-  // TODO: Change back once we've figured out how to bind these actions together
-  // TODO: Currently, grid drawing seems to be ok but axis is not
-  //vs.ui.VisHandler.prototype.draw.apply(this, arguments);
-  /*var self = this;
-  if (!this._lastDraw.hasFired()) { return; }
-  vs.ui.Visualization.prototype.draw.call(this)
-    .then(function() { self.finalizeDraw(); });*/
-
-  // Older
   var self = this;
   return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
     .then(function() { self.finalizeDraw(); });

@@ -7,7 +7,7 @@
 goog.provide('vs.plugins.canvas.ManhattanPlot');
 
 goog.require('vs.ui.canvas.CanvasVis');
-goog.require('vs.models.DataSource');
+goog.require('vs.models.DataRow');
 
 /**
  * @constructor
@@ -38,8 +38,9 @@ Object.defineProperties(vs.plugins.canvas.ManhattanPlot.prototype, {
 
 vs.plugins.canvas.ManhattanPlot.prototype.endDraw = function() {
   var self = this;
+  var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, arguments)
+    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, args)
       .then(function() {
         /** @type {vs.models.DataSource} */
         var data = self.data;

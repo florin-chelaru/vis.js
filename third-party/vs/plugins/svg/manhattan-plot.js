@@ -6,73 +6,86 @@
 
 goog.provide('vs.plugins.svg.ManhattanPlot');
 
-goog.require('vs.plugins.svg.ManhattanPlotOptions');
-goog.require('vs.ui.svg.SvgVisualization');
-goog.require('vs.models.DataSource');
-goog.require('vs.models.RowDataItemWrapper');
-goog.require('vs.models.Boundaries');
-goog.require('vs.models.Margins');
-
-goog.require('goog.array');
+goog.require('vs.ui.svg.SvgVis');
+goog.require('vs.models.DataRow');
 
 /**
  * @constructor
- * @extends vs.ui.svg.SvgVisualization
+ * @extends vs.ui.svg.SvgVis
  */
 vs.plugins.svg.ManhattanPlot = function() {
-  vs.ui.svg.SvgVisualization.apply(this, arguments);
+  vs.ui.svg.SvgVis.apply(this, arguments);
 };
 
-goog.inherits(vs.plugins.svg.ManhattanPlot, vs.ui.svg.SvgVisualization);
+goog.inherits(vs.plugins.svg.ManhattanPlot, vs.ui.svg.SvgVis);
 
-vs.plugins.svg.ManhattanPlot.prototype.beginDraw = function() {
-  vs.ui.svg.SvgVisualization.prototype.beginDraw.apply(this, arguments);
-};
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.plugins.svg.ManhattanPlot.Settings = u.extend({}, vs.ui.VisHandler.Settings, {
+  'rows': vs.ui.Setting.PredefinedSettings['rows'],
+  'vals': vs.ui.Setting.PredefinedSettings['vals'],
+  'xBoundaries': new vs.ui.Setting({key:'xBoundaries', type:'vs.models.Boundaries', defaultValue:vs.ui.Setting.rowBoundaries, label:'x boundaries', template:'_boundaries.html'}),
+  'yBoundaries': vs.ui.Setting.PredefinedSettings['yBoundaries'],
+  'xScale': vs.ui.Setting.PredefinedSettings['xScale'],
+  'yScale': vs.ui.Setting.PredefinedSettings['yScale'],
+  'cols': vs.ui.Setting.PredefinedSettings['cols']
+});
+
+Object.defineProperties(vs.plugins.svg.ManhattanPlot.prototype, {
+  settings: { get: /** @type {function (this:vs.plugins.svg.ManhattanPlot)} */ (function() { return vs.plugins.svg.ManhattanPlot.Settings; })}
+});
 
 /**
  * @override
  */
-vs.plugins.svg.ManhattanPlot.prototype.draw = function() {
-  vs.ui.svg.SvgVisualization.prototype.draw.apply(this, arguments);
+vs.plugins.svg.ManhattanPlot.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.svg.SvgVis.prototype.draw.apply(self, args)
+      .then(function() {
+        /** @type {vs.models.DataSource} */
+        var data = self.data;
 
-  /** @type {vs.models.DataSource} */
-  var data = this.data;
+        // Nothing to draw
+        if (!data.nrows) { return; }
 
-  // Nothing to draw
-  if (!data.nrows) { return; }
+        var margins = self.optionValue('margins');
+        var xScale = self.optionValue('xScale');
+        var yScale = self.optionValue('yScale');
+        var cols = self.optionValue('cols');
+        var row = self.optionValue('rows')[0];
+        var valsLabel = self.optionValue('vals');
 
-  var options = this.options;
+        var svg = d3.select(self.$element[0]).select('svg');
 
-  var margins = options.margins;
-  var xScale = options.scales.x;
-  var yScale = options.scales.y;
-  var cols = options.colsFilter;
+        var viewport = svg.select('.viewport');
+        if (viewport.empty()) {
+          viewport = svg.append('g')
+            .attr('class', 'viewport');
+        }
+        viewport
+          .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
 
-  var svg = d3.select(this.element[0]).select('svg');
+        var items = goog.array.range(data.nrows).map(function(i) {
+          return new vs.models.DataRow(data, i);
+        });
+        var selection = viewport.selectAll('circle').data(items);
 
-  var viewport = svg.select('.viewport');
-  if (viewport.empty()) {
-    viewport = svg.append('g')
-      .attr('class', 'viewport');
-  }
-  viewport
-    .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')');
+        selection.enter()
+          .append('circle');
 
-  var items = goog.array.range(data.nrows).map(function(i) {
-    return new vs.models.RowDataItemWrapper(data, i, options);
+        selection
+          .attr('r', 3)
+          .attr('cx', function(d) { return xScale(parseFloat(d.info(row))); })
+          .attr('cy', function(d) { return yScale(d.val(cols[0], valsLabel)); })
+          .attr('fill', '#1e60d4');
+
+        selection.exit()
+          .remove();
+
+        resolve();
+      }, reject);
   });
-  var selection = viewport.selectAll('circle').data(items);
-
-  selection.enter()
-    .append('circle');
-
-  selection
-    .attr('r', 3)
-    .attr('cx', function(d) { return xScale(d.row(options.rowsOrderBy)); })
-    .attr('cy', function(d) { return yScale(d.vals[cols[0]]); })
-    .attr('fill', '#1e60d4');
-
-  selection.exit()
-    .remove();
 };
-

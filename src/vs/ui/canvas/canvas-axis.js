@@ -18,92 +18,101 @@ vs.ui.canvas.CanvasAxis = function() {
 
 goog.inherits(vs.ui.canvas.CanvasAxis, vs.ui.decorators.Axis);
 
+/**
+ * @returns {Promise}
+ */
 vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
-  vs.ui.decorators.Axis.prototype.endDraw.apply(this, arguments);
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
+      .then(function() {
+        if (!self.target.data.isReady) { resolve(); return; }
 
-  if (!this.target.data.isReady) { return; }
+        var target = self.target;
+        var type = self.type;
+        var minYMargin = 25;
+        var offset = {top:0, bottom:0, left:0, right:0};
 
-  //console.log('axis.endDraw');
+        if (type == 'x' && target.margins.bottom < minYMargin) { offset.bottom = minYMargin - target.margins.bottom; }
 
-  var target = this.target;
-  var type = this.type;
-  var minYMargin = 25;
-  var offset = {top:0, bottom:0, left:0, right:0};
+        if (offset.top + offset.bottom + offset.left + offset.right > 0) {
+          target.margins = target.margins.add(offset);
+          target.scheduleRedraw();
+          resolve();
+          return;
+        }
 
-  if (type == 'x' && target.margins.bottom < minYMargin) { offset.bottom = minYMargin - target.margins.bottom; }
+        var height = target.height;
+        var width = target.width;
+        var margins = target.margins;
+        var intCoords = vs.models.Transformer.intCoords();
+        var translate = vs.models.Transformer.translate({x: margins.left, y: margins.top}).combine(intCoords);
 
-  if (offset.top + offset.bottom + offset.left + offset.right > 0) {
-    target.margins = target.margins.add(offset);
-    target.scheduleRedraw();
-    return;
-  }
+        var context = target.pendingCanvas[0].getContext('2d');
+        var moveTo = context.__proto__.moveTo;
+        var lineTo = context.__proto__.lineTo;
 
-  var height = target.height;
-  var width = target.width;
-  var margins = target.margins;
-  var intCoords = vs.models.Transformer.intCoords();
-  var translate = vs.models.Transformer.translate({x: margins.left, y: margins.top}).combine(intCoords);
+        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
 
-  var context = target.pendingCanvas[0].getContext('2d');
-  var moveTo = context.__proto__.moveTo;
-  var lineTo = context.__proto__.lineTo;
+        context.strokeStyle = '#000000';
+        context.lineWidth = 1;
+        context.font = '17px Times New Roman';
+        context.fillStyle = '#000000';
 
-  var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-  if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
+        var ticks = scale.ticks(self.ticks);
+        var units = ticks.map(scale.tickFormat(self.ticks, self.format));
 
-  context.strokeStyle = '#000000';
-  context.lineWidth = 1;
-  context.font = '17px Times New Roman';
-  context.fillStyle = '#000000';
+        var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
 
-  var ticks = scale.ticks(this.ticks);
-  var units = ticks.map(scale.tickFormat(this.ticks, this.format));
+        var minXMargin = maxTextSize + 11;
+        if (type == 'y' && margins.left < minXMargin) {
+          offset.left = minXMargin - margins.left;
+          target.margins = margins.add(offset);
+          target.scheduleRedraw();
+          resolve();
+          return;
+        }
 
-  var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
+        var origins = {x: margins.left, y: height - margins.bottom};
 
-  var minXMargin = maxTextSize + 11;
-  if (type == 'y' && margins.left < minXMargin) {
-    offset.left = minXMargin - margins.left;
-    target.margins = margins.add(offset);
-    target.scheduleRedraw();
-    return;
-  }
+        // Draw main line
+        context.beginPath();
+        moveTo.apply(context, intCoords.calcArr(origins));
+        switch (type) {
+          case 'x': lineTo.apply(context, intCoords.calcArr({x: width - margins.right, y: origins.y})); break;
+          case 'y': lineTo.apply(context, intCoords.calcArr({x: origins.x, y: margins.top})); break;
+        }
 
-  var origins = {x: margins.left, y: height - margins.bottom};
+        // Draw ticks
+        var x1 = type == 'x' ? scale : function() { return 0; };
+        var x2 = type == 'x' ? scale : function() { return -6; };
+        var y1 = type == 'y' ? scale : function() { return height - margins.top - margins.bottom; };
+        var y2 = type == 'y' ? scale : function() { return height - margins.top - margins.bottom + 6; };
 
-  // Draw main line
-  context.beginPath();
-  moveTo.apply(context, intCoords.calcArr(origins));
-  switch (type) {
-    case 'x': lineTo.apply(context, intCoords.calcArr({x: width - margins.right, y: origins.y})); break;
-    case 'y': lineTo.apply(context, intCoords.calcArr({x: origins.x, y: margins.top})); break;
-  }
+        ticks.forEach(function(tick) {
+          moveTo.apply(context, translate.calcArr({x: x1(tick), y: y1(tick)}));
+          lineTo.apply(context, translate.calcArr({x: x2(tick), y: y2(tick)}));
+        });
 
-  // Draw ticks
-  var x1 = type == 'x' ? scale : function() { return 0; };
-  var x2 = type == 'x' ? scale : function() { return -6; };
-  var y1 = type == 'y' ? scale : function() { return height - margins.top - margins.bottom; };
-  var y2 = type == 'y' ? scale : function() { return height - margins.top - margins.bottom + 6; };
+        context.stroke();
 
-  ticks.forEach(function(tick) {
-    moveTo.apply(context, translate.calcArr({x: x1(tick), y: y1(tick)}));
-    lineTo.apply(context, translate.calcArr({x: x2(tick), y: y2(tick)}));
-  });
+        // Draw units
+        if (type == 'x') {
+          context.textAlign = 'center';
+          context.textBaseline = 'top';
+        } else {
+          context.textAlign = 'right';
+          context.textBaseline = 'middle';
+          translate = translate.combine(vs.models.Transformer.translate({x: -5, y: 0}));
+        }
 
-  context.stroke();
-
-  // Draw units
-  if (type == 'x') {
-    context.textAlign = 'center';
-    context.textBaseline = 'top';
-  } else {
-    context.textAlign = 'right';
-    context.textBaseline = 'middle';
-    translate = translate.combine(vs.models.Transformer.translate({x: -5, y: 0}));
-  }
-
-  units.forEach(function(unit, i) {
-    var p = translate.calc({x: x2(ticks[i]), y: y2(ticks[i])});
-    context.fillText(unit, p.x, p.y);
+        units.forEach(function(unit, i) {
+          var p = translate.calc({x: x2(ticks[i]), y: y2(ticks[i])});
+          context.fillText(unit, p.x, p.y);
+        });
+        resolve();
+      }, reject);
   });
 };
