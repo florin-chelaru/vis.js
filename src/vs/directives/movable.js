@@ -54,9 +54,6 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
 
     // Prevent default dragging of selected content
     event.preventDefault();
-    //var windowRect = $window[0].getBoundingClientRect();
-    //x = windowRect.left;
-    //y = windowRect.top;
     var childOffset = $window.position();
     x = childOffset.left;
     y = childOffset.top;
