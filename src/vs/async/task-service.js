@@ -28,7 +28,7 @@ vs.async.TaskService = function($timeout) {
 };
 
 /**
- * @param {function} func
+ * @param {function():Promise} func
  * @param {Object} [thisArg]
  */
 vs.async.TaskService.prototype.createTask = function(func, thisArg) {
@@ -38,8 +38,8 @@ vs.async.TaskService.prototype.createTask = function(func, thisArg) {
 };
 
 /**
- * @param {vs.async.Task|function} t1
- * @param {vs.async.Task|function} t2
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
  * @returns {vs.async.Task}
  */
 vs.async.TaskService.prototype.chain = function(t1, t2) {
@@ -66,7 +66,7 @@ vs.async.TaskService.prototype.chain = function(t1, t2) {
  * TODO: test!
  * @param {vs.async.Task} task
  * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {goog.async.Deferred}
+ * @returns {Promise}
  */
 vs.async.TaskService.prototype.runChain = function(task, sequential) {
   // TODO: test!
@@ -86,9 +86,10 @@ vs.async.TaskService.prototype.runChain = function(task, sequential) {
   }
 
   return u.async.each(tasks, function(task) {
-    return new Promise(function(resolve, reject) {
+    return task.func.apply(task.thisArg);
+    /*return new Promise(function(resolve, reject) {
       task.func.apply(task.thisArg);
       resolve();
-    });
+    });*/
   }, true);
 };

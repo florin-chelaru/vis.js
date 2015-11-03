@@ -11,6 +11,7 @@
   <link href="../res/css/axis.css" rel="stylesheet" />
   <link href="../res/css/window.css" rel="stylesheet" />
   <link href="../res/css/resizable.css" rel="stylesheet" />
+  <link href="../res/css/data-context.css" rel="stylesheet" />
 
   <script src="../bower_components/jquery/dist/jquery.js"></script>
   <script src="../bower_components/angular/angular.js"></script>
@@ -41,7 +42,7 @@
 <body ng-app="main">
   <div ng-include="'nav.html'"></div>
   <div ng-controller="vs.MainController as main">
-    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context" ng-include="dataContext.template"></div>
+    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context vs-window vs-resizable vs-movable" style="width: 500px; height: 500px;" ng-include="dataContext.template"></div>
   </div>
   <!--<div class="vs-window vs-movable vs-resizable">
     <div style="width: 100px; height: 100px;"></div>

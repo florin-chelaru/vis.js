@@ -56,13 +56,13 @@ vs.ui.Decorator = function($ng, $targetElement, target, options) {
    * @type {vs.async.Task}
    * @private
    */
-  this._beginDrawTask = $ng.taskService.createTask(function() { this.beginDraw(); }, this);
+  this._beginDrawTask = $ng.taskService.createTask(this.beginDraw, this);
 
   /**
    * @type {vs.async.Task}
    * @private
    */
-  this._endDrawTask = $ng.taskService.createTask(function() { this.endDraw(); }, this);
+  this._endDrawTask = $ng.taskService.createTask(this.endDraw, this);
 
   /**
    * @type {Object.<string, *>}
@@ -145,6 +145,6 @@ vs.ui.Decorator.prototype.optionValue = function(optionKey) {
   return this.settings[optionKey].getValue(this.options, this.$attrs, this.data, this.settings);
 };
 
-vs.ui.Decorator.prototype.beginDraw = function() { console.log('Decorator.beginDraw'); };
+vs.ui.Decorator.prototype.beginDraw = function() { /*console.log('Decorator.beginDraw'); */return Promise.resolve(); };
 
-vs.ui.Decorator.prototype.endDraw = function() { console.log('Decorator.endDraw'); };
+vs.ui.Decorator.prototype.endDraw = function() { /*console.log('Decorator.endDraw'); */return Promise.resolve(); };

@@ -36,33 +36,39 @@ Object.defineProperties(vs.plugins.canvas.ScatterPlot.prototype, {
 });
 
 vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
-  vs.ui.canvas.CanvasVis.prototype.endDraw.apply(this, arguments);
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, arguments)
+      .then(function() {
+        var data = self.data;
+        if (!self.data.isReady) { return; }
 
-  var data = this.data;
-  if (!this.data.isReady) { return; }
+        // Nothing to draw
+        if (!data.nrows) { return; }
 
-  // Nothing to draw
-  if (!data.nrows) { return; }
+        var margins = self.optionValue('margins');
+        var xScale = self.optionValue('xScale');
+        var yScale = self.optionValue('yScale');
+        var cols = self.optionValue('cols');
+        var xCol = cols[0];
+        var yCol = cols[1];
+        var valsLabel = self.optionValue('vals');
 
-  var margins = this.optionValue('margins');
-  var xScale = this.optionValue('xScale');
-  var yScale = this.optionValue('yScale');
-  var cols = this.optionValue('cols');
-  var xCol = cols[0];
-  var yCol = cols[1];
-  var valsLabel = this.optionValue('vals');
+        var context = self.pendingCanvas[0].getContext('2d');
 
-  var context = this.pendingCanvas[0].getContext('2d');
+        var transform =
+          vs.models.Transformer.scale(xScale, yScale)
+            .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
+        var items = u.array.range(data.nrows).map(function(i) {
+          return new vs.models.DataRow(data, i);
+        });
 
-  var transform =
-    vs.models.Transformer.scale(xScale, yScale)
-      .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
-  var items = u.array.range(data.nrows).map(function(i) {
-    return new vs.models.DataRow(data, i);
-  });
+        items.forEach(function(d) {
+          var point = transform.calc({x: d.val(xCol, valsLabel), y: d.val(yCol, valsLabel)});
+          vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 10, '#ff6520');
+        });
 
-  items.forEach(function(d) {
-    var point = transform.calc({x: d.val(xCol, valsLabel), y: d.val(yCol, valsLabel)});
-    vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 10, '#ff6520');
+        resolve();
+      }, reject);
   });
 };

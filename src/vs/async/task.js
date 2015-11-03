@@ -9,7 +9,7 @@ goog.provide('vs.async.Task');
 goog.require('goog.async.Deferred');
 
 /**
- * @param {function} func
+ * @param {function():Promise} func
  * @param {Object} [thisArg]
  * @constructor
  */
@@ -21,7 +21,7 @@ vs.async.Task = function(func, thisArg) {
   this._id = vs.async.Task.nextId();
 
   /**
-   * @type {Function}
+   * @type {function(): Promise}
    * @private
    */
   this._func = func;
@@ -77,7 +77,6 @@ Object.defineProperties(vs.async.Task.prototype, {
     get: function() { return this._last; },
     set: function(value) { this._last = value; }
   }
-
 });
 
 /**

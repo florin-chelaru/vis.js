@@ -69,39 +69,44 @@ Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
 });
 
 /**
- * @override
+ * @returns {Promise}
  */
 vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
-  vs.ui.VisHandler.prototype.beginDraw.apply(this, arguments);
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    vs.ui.VisHandler.prototype.beginDraw.apply(self, arguments)
+      .then(
+      function() {
+        // console.log('Canvas.beginDraw');
 
+        var pendingCanvas = self.pendingCanvas;
+        if (self.pendingCanvas.length == 0) {
+          var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', self.options.width, self.options.height);
+          $(goog.string.format(format, 'block') + (self.doubleBuffer ? goog.string.format(format, 'none') : '')).appendTo(self.$element);
+          pendingCanvas = self.pendingCanvas;
+        }
 
-  // console.log('Canvas.beginDraw');
+        pendingCanvas
+          .attr('width', self.options.width)
+          .attr('height', self.options.height);
 
-  var pendingCanvas = this.pendingCanvas;
-  if (this.pendingCanvas.length == 0) {
-    var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', this.options.width, this.options.height);
-    $(goog.string.format(format, 'block') + (this.doubleBuffer ? goog.string.format(format, 'none') : '')).appendTo(this.$element);
-    pendingCanvas = this.pendingCanvas;
-  }
+        var context = pendingCanvas[0].getContext('2d');
+        context.translate(0.5,0.5);
+        context.rect(0, 0, self.options.width, self.options.height);
+        context.fillStyle = '#ffffff';
+        context.fill();
 
-  pendingCanvas
-    .attr('width', this.options.width)
-    .attr('height', this.options.height);
-
-  var context = pendingCanvas[0].getContext('2d');
-  context.translate(0.5,0.5);
-  context.rect(0, 0, this.options.width, this.options.height);
-  context.fillStyle = '#ffffff';
-  context.fill();
-
-  //console.log('canvas.beginDraw');
+        //console.log('canvas.beginDraw');
+        resolve();
+      }, reject);
+  });
 };
 
 /**
- * @override
+ * @returns {Promise}
  */
 vs.ui.canvas.CanvasVis.prototype.endDraw = function () {
-  vs.ui.VisHandler.prototype.endDraw.apply(this, arguments);
+  return vs.ui.VisHandler.prototype.endDraw.apply(this, arguments);
 
   // console.log('Canvas.draw');
 };
@@ -130,8 +135,9 @@ vs.ui.canvas.CanvasVis.prototype.draw = function() {
     .then(function() { self.finalizeDraw(); });*/
 
   // Older
-  vs.ui.VisHandler.prototype.draw.apply(this, arguments);
-  this.finalizeDraw();
+  var self = this;
+  return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
+    .then(function() { self.finalizeDraw(); });
 };
 
 /**

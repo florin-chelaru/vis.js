@@ -22,6 +22,14 @@ vs.directives.Movable = function($scope, $document) {
    * @private
    */
   this._document = $document;
+
+  // Adjust the following to match window.css
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._windowMargin = 12;
 };
 
 goog.inherits(vs.directives.Movable, vs.directives.Directive);
@@ -38,6 +46,7 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
   $window.css({ cursor: 'move' });
 
   var startX = 0, startY = 0, x, y;
+  var windowMargin = this._windowMargin;
 
   var $document = this._document;
   function mousedown(event) {
@@ -45,9 +54,12 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
 
     // Prevent default dragging of selected content
     event.preventDefault();
-    var windowRect = $window[0].getBoundingClientRect();
-    x = windowRect.left;
-    y = windowRect.top;
+    //var windowRect = $window[0].getBoundingClientRect();
+    //x = windowRect.left;
+    //y = windowRect.top;
+    var childOffset = $window.position();
+    x = childOffset.left;
+    y = childOffset.top;
     startX = event.pageX - x;
     startY = event.pageY - y;
     $document.on('mousemove', mousemove);

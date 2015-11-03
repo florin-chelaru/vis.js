@@ -216,12 +216,14 @@ vs.ui.VisHandler.prototype.optionValue = function(optionKey) {
 };
 
 /**
+ * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.beginDraw = function() { console.log('Vis.beginDraw'); };
+vs.ui.VisHandler.prototype.beginDraw = function() { /*console.log('Vis.beginDraw'); */return Promise.resolve(); };
 
 /**
+ * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.endDraw = function() { console.log('Vis.endDraw'); };
+vs.ui.VisHandler.prototype.endDraw = function() { /*console.log('Vis.endDraw'); */return Promise.resolve(); };
 
 /**
  * @returns {Promise}
@@ -243,10 +245,11 @@ vs.ui.VisHandler.prototype.draw = function() {
      .then(function() { return taskService.runChain(self.endDrawTask); })
      .then(resolve);*/
 
-    taskService.runChain(self.beginDrawTask, true);
-    taskService.runChain(self.endDrawTask, true);
-    self._lastDrawFired = true;
-    resolve();
+    Promise.resolve()
+      .then(function() { taskService.runChain(self.beginDrawTask, true); })
+      .then(function() { taskService.runChain(self.endDrawTask, true); })
+      .then(function() { self._lastDrawFired = true; })
+      .then(resolve, reject);
   });
   this._lastDraw = promise;
   return promise;

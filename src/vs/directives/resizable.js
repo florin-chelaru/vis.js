@@ -50,6 +50,7 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
   var self = this;
   function mousedown(event) {
     // Prevent default dragging of selected content
+    event.stopPropagation();
     event.preventDefault();
     box = new vs.directives.Resizable.BoundingBox($window);
     target = box.getHandler($(this));
@@ -60,6 +61,10 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
   }
 
   function mousemove(event) {
+
+    event.stopPropagation();
+    event.preventDefault();
+
     var newY = event.pageY - startY;
     var newX = event.pageX - startX;
 
@@ -67,17 +72,17 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     target.left = newX;
 
     box.update(target);
-
+    
     $window.css({
-      top: box.top + 'px',
-      left: box.left + 'px',
+      top: (box.top) + 'px',
+      left: (box.left) + 'px',
       width: box.width + 'px',
       height: box.height + 'px'
     });
 
     $element.css({
-      top: box.top + 'px',
-      left: box.left + 'px',
+      top: (box.top) + 'px',
+      left: (box.left) + 'px',
       width: box.width + 'px',
       height: box.height + 'px'
     });
@@ -87,11 +92,13 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
   }
 
   function mouseup() {
+    event.preventDefault();
+    event.stopPropagation();
     self._document.off('mousemove', mousemove);
     self._document.off('mouseup', mouseup);
   }
 
-  $window.find('.vs-resize-grab').on('mousedown', mousedown);
+  $window.find('> .vs-resize-grab').on('mousedown', mousedown);
 };
 
 /**
@@ -102,8 +109,9 @@ vs.directives.Resizable.ResizeHandler = function($elem) {
   /** @type {jQuery} */
   this.$elem = $elem;
   var rect = $elem[0].getBoundingClientRect();
-  this.top = rect.top;
-  this.left = rect.left;
+  var pos = {left:$elem.position().left + $elem.parent().position().left + 1, top:$elem.position().top + $elem.parent().position().top + 1};
+  this.top = pos.top;
+  this.left = pos.left;
   this.width = rect.width;
   this.height = rect.height;
 };
@@ -113,7 +121,7 @@ vs.directives.Resizable.ResizeHandler = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-top-left'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-left'));
 };
 
 /**
@@ -121,7 +129,7 @@ vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.topRight = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-top-right'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-right'));
 };
 
 /**
@@ -129,7 +137,7 @@ vs.directives.Resizable.ResizeHandler.topRight = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-bottom-left'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-left'));
 };
 
 /**
@@ -137,7 +145,7 @@ vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-bottom-right'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-right'));
 };
 
 /**
@@ -145,7 +153,7 @@ vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.left = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-left'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-left'));
 };
 
 /**
@@ -153,7 +161,7 @@ vs.directives.Resizable.ResizeHandler.left = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.right = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-right'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-right'));
 };
 
 /**
@@ -161,7 +169,7 @@ vs.directives.Resizable.ResizeHandler.right = function($elem) {
  * @returns {vs.directives.Resizable.ResizeHandler}
  */
 vs.directives.Resizable.ResizeHandler.bottom = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('.vs-grab-bottom'));
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom'));
 };
 
 /**
@@ -169,6 +177,7 @@ vs.directives.Resizable.ResizeHandler.bottom = function($elem) {
  * @constructor
  */
 vs.directives.Resizable.BoundingBox = function($element) {
+  this.offset = $element.position();
   this.topLeft = vs.directives.Resizable.ResizeHandler.topLeft($element);
   this.topRight = vs.directives.Resizable.ResizeHandler.topRight($element);
   this.bottomLeft = vs.directives.Resizable.ResizeHandler.bottomLeft($element);

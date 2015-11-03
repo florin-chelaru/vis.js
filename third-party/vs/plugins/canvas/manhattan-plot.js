@@ -37,34 +37,40 @@ Object.defineProperties(vs.plugins.canvas.ManhattanPlot.prototype, {
 });
 
 vs.plugins.canvas.ManhattanPlot.prototype.endDraw = function() {
-  vs.ui.canvas.CanvasVis.prototype.endDraw.apply(this, arguments);
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    vs.ui.canvas.CanvasVis.prototype.endDraw.apply(self, arguments)
+      .then(function() {
+        /** @type {vs.models.DataSource} */
+        var data = self.data;
+        if (!self.data.isReady) { return; }
 
-  /** @type {vs.models.DataSource} */
-  var data = this.data;
-  if (!this.data.isReady) { return; }
+        // Nothing to draw
+        if (!data.nrows) { return; }
 
-  // Nothing to draw
-  if (!data.nrows) { return; }
+        var margins = self.optionValue('margins');
+        var xScale = self.optionValue('xScale');
+        var yScale = self.optionValue('yScale');
+        var cols = self.optionValue('cols');
+        var row = self.optionValue('rows')[0];
+        var valsLabel = self.optionValue('vals');
 
-  var margins = this.optionValue('margins');
-  var xScale = this.optionValue('xScale');
-  var yScale = this.optionValue('yScale');
-  var cols = this.optionValue('cols');
-  var row = this.optionValue('rows')[0];
-  var valsLabel = this.optionValue('vals');
+        var context = self.pendingCanvas[0].getContext('2d');
 
-  var context = this.pendingCanvas[0].getContext('2d');
+        var transform =
+          vs.models.Transformer.scale(xScale, yScale)
+            .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
+        var items = u.array.range(data.nrows).map(function(i) {
+          return new vs.models.DataRow(data, i);
+        });
 
-  var transform =
-    vs.models.Transformer.scale(xScale, yScale)
-      .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
-  var items = u.array.range(data.nrows).map(function(i) {
-    return new vs.models.DataRow(data, i);
-  });
+        items.forEach(function(d) {
+          var point = transform.calc({x: parseFloat(d.info(row)), y: d.val(cols[0], valsLabel)});
+          vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 3, '#1e60d4');
+        });
 
-  items.forEach(function(d) {
-    var point = transform.calc({x: parseFloat(d.info(row)), y: d.val(cols[0], valsLabel)});
-    vs.ui.canvas.CanvasVis.circle(context, point.x, point.y, 3, '#1e60d4');
+        resolve();
+      }, reject);
   });
 };
 
