@@ -18,7 +18,8 @@ vs.directives.Directive = function($scope) {
 };
 
 Object.defineProperties(vs.directives.Directive.prototype, {
-  $scope: { get: function() { return this._$scope; } }
+  $scope: { get: function() { return this._$scope; }},
+  template: { get: function() { return undefined; }}
 });
 
 vs.directives.Directive.prototype.link = function($scope, $element, $attrs) {};

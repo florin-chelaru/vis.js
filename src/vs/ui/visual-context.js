@@ -6,8 +6,6 @@
 
 goog.provide('vs.ui.VisualContext');
 
-goog.require('vs.ui.FactoryOptions');
-
 /**
  * @param {{render: string, type: string}} construct
  * @param {Object.<string, *>} [options]

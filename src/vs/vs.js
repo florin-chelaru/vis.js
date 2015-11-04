@@ -26,6 +26,7 @@ goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
 goog.require('vs.directives.Resizable');
 goog.require('vs.directives.Navbar');
+goog.require('vs.directives.DataContext');
 
 
 vs.main = angular.module('vs', []);
@@ -46,6 +47,10 @@ vs.main.factory('visualizationFactory', ['configuration', 'taskService', '$timeo
 
 vs.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
   return vs.directives.Directive.createNew('visualization', vs.directives.Visualization, [visualizationFactory, taskService], {restrict: 'C'});
+}]);
+
+vs.main.directive('vsDataContext', ['$templateCache', function($templateCache) {
+  return vs.directives.Directive.createNew('vsDataContext', vs.directives.DataContext, [$templateCache], {restrict: 'C'});
 }]);
 
 vs.main.directive('vsWindow', function() {

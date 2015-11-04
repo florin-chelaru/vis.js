@@ -199,11 +199,11 @@ main.controller('vs.MainControllerOld', ['$scope', function($scope) {
 main.controller('vs.MainController', ['$scope', '$templateCache', function($scope, $templateCache) {
   this.controller = {
     dataContexts: [
-      {
+      u.reflection.wrap({
         name: 'Genetic Variants',
         children: [],
         dataChanged: new u.Event(),
-        visualContexts: [
+        visualizations: [
           {
             construct: {
               render: 'canvas',
@@ -486,25 +486,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
             }
           ]
         }, vs.models.DataSource)*/
-      }
+      }, vs.ui.DataHandler)
     ]
   };
-
-  var visCtxtFmt = '<div vs-context="dataContext.visualContexts[%s]" vs-data="dataContext.data" class="visualization %s"></div>';
-  var decoratorFmt = '<div class="%s" vs-options="dataContext.visualContexts[%s].decorators.elem[%s].options"></div>';
-
-  // TODO: Put this in dataContext class
-  this.controller.dataContexts.forEach(function(dataContext) {
-    var t = $('<div></div>');
-    dataContext.visualContexts.forEach(function(visContext, i) {
-      var v = $(goog.string.format(visCtxtFmt, i, visContext.decorators.cls.join(' '))).appendTo(t);
-      visContext.decorators.elem.forEach(function(decorator, j) {
-        var d = $(goog.string.format(decoratorFmt, decorator.cls, i, j)).appendTo(v);
-      });
-    });
-    var template = t.html();
-    var templateId = u.generatePseudoGUID(10);
-    $templateCache.put(templateId, template);
-    dataContext.template = templateId;
-  });
 }]);

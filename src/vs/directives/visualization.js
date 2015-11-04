@@ -7,8 +7,7 @@
 goog.provide('vs.directives.Visualization');
 
 goog.require('vs.directives.Directive');
-// TODO: Restore
-//goog.require('vs.ui.VisualizationFactory');
+goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.async.TaskService');
 
 /**
@@ -37,7 +36,7 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
    * @type {vs.ui.VisualizationFactory}
    * @private
    */
-  this._handlerualizationFactory = visualizationFactory;
+  this._visualizationFactory = visualizationFactory;
 };
 
 goog.inherits(vs.directives.Visualization, vs.directives.Directive);
@@ -68,7 +67,7 @@ Object.defineProperties(vs.directives.Visualization.prototype, {
  */
 vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
-    this._handler = this._handlerualizationFactory.createNew($scope, $element, $attrs);
+    this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
     $element.css({
       top: (this._handler.options.y || 0) + 'px',
       left: (this._handler.options.x || 0) + 'px',
