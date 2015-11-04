@@ -17,10 +17,6 @@ goog.require('vs.ui.VisHandler');
 
 goog.require('vs.ui.svg.SvgVis');
 goog.require('vs.ui.canvas.CanvasVis');
-/*
-goog.require('vs.ui.TrackVisualizationOptions');
-*/
-
 
 goog.require('vs.directives.Visualization');
 goog.require('vs.directives.Axis');
@@ -29,6 +25,7 @@ goog.require('vs.directives.Grid');
 goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
 goog.require('vs.directives.Resizable');
+goog.require('vs.directives.Navbar');
 
 
 vs.main = angular.module('vs', []);
@@ -61,6 +58,10 @@ vs.main.directive('vsMovable', ['$document', function($document) {
 
 vs.main.directive('vsResizable', ['$document', function($document) {
   return vs.directives.Directive.createNew('vsResizable', vs.directives.Resizable, [$document], {restrict: 'C', require: 'vsWindow'});
+}]);
+
+vs.main.directive('vsNavbar', [function() {
+  return vs.directives.Directive.createNew('vsNavbar', vs.directives.Navbar, null, {restrict: 'C', require: 'vsWindow'});
 }]);
 
 

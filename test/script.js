@@ -213,7 +213,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               doubleBuffer: true,
               axisBoundaries: {},
               x: 10,
-              y: 10,
+              y: 60,
               width: 200,
               height: 200,
               margins: {
@@ -270,7 +270,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               doubleBuffer: false,
               axisBoundaries: {},
               x: 220,
-              y: 10,
+              y: 60,
               width: 200,
               height: 200,
               margins: {
@@ -328,7 +328,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               xBoundries: {min: 1000, max: 100000},
               yBoundaries: {min: 0, max: 0.5},
               x: 430,
-              y: 10,
+              y: 60,
               width: 400,
               height: 200,
               margins: {
@@ -386,7 +386,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
               xBoundries: {min: 1000, max: 100000},
               yBoundaries: {min: 0, max: 0.5},
               x: 430,
-              y: 240,
+              y: 290,
               width: 400,
               height: 200,
               margins: {

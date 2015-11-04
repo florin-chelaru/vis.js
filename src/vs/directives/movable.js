@@ -22,14 +22,6 @@ vs.directives.Movable = function($scope, $document) {
    * @private
    */
   this._document = $document;
-
-  // Adjust the following to match window.css
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._windowMargin = 12;
 };
 
 goog.inherits(vs.directives.Movable, vs.directives.Directive);
@@ -46,7 +38,6 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
   $window.css({ cursor: 'move' });
 
   var startX = 0, startY = 0, x, y;
-  var windowMargin = this._windowMargin;
 
   var $document = this._document;
   function mousedown(event) {

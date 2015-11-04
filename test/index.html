@@ -45,7 +45,7 @@
 <body ng-app="main">
   <div ng-include="'nav.html'"></div>
   <div ng-controller="vs.MainController as main">
-    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context vs-window vs-resizable vs-movable" style="width: 1000px; height: 500px;" ng-include="dataContext.template"></div>
+    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context vs-window vs-resizable vs-movable vs-navbar" style="width: 1000px; height: 600px;" ng-include="dataContext.template"></div>
   </div>
   <!--<div class="vs-window vs-movable vs-resizable">
     <div style="width: 100px; height: 100px;"></div>
