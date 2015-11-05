@@ -14,9 +14,25 @@ goog.require('vs.directives.Directive');
  */
 vs.directives.Window = function() {
   vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$window = null;
 };
 
 goog.inherits(vs.directives.Window, vs.directives.Directive);
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Window#$window
+ */
+vs.directives.Window.prototype.$window;
+
+Object.defineProperties(vs.directives.Window.prototype, {
+  $window: { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
+});
 
 /**
  * @param $scope
@@ -27,6 +43,7 @@ goog.inherits(vs.directives.Window, vs.directives.Directive);
  */
 vs.directives.Window.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
+    vs.directives.Directive.prototype.link.pre.apply(this, arguments);
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
 
     $window.css({
@@ -47,6 +64,9 @@ vs.directives.Window.prototype.link = {
 
     // Bring to front when selected
     $window.on('mousedown', function() {
-      $window.parent().append($window);
+      $window.siblings().css('zIndex', 0);
+      $window.css('zIndex', 1);
     });
+
+    this._$window = $window;
 }};

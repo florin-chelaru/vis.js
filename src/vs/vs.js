@@ -25,6 +25,7 @@ goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
 goog.require('vs.directives.Resizable');
 goog.require('vs.directives.Navbar');
+goog.require('vs.directives.NavLocation');
 goog.require('vs.directives.DataContext');
 
 
@@ -53,7 +54,7 @@ vs.main.directive('visualization', ['visualizationFactory', 'taskService', funct
 }]);
 
 vs.main.directive('vsDataContext', ['$templateCache', function($templateCache) {
-  return vs.directives.Directive.createNew('vsDataContext', vs.directives.DataContext, [$templateCache], {restrict: 'C', template: '<div ng-include="vsDataContext.handler.template"></div>'});
+  return vs.directives.Directive.createNew('vsDataContext', vs.directives.DataContext, [$templateCache], {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.handler.template"></div>'});
 }]);
 
 vs.main.directive('vsWindow', function() {
@@ -69,7 +70,11 @@ vs.main.directive('vsResizable', ['$document', function($document) {
 }]);
 
 vs.main.directive('vsNavbar', [function() {
-  return vs.directives.Directive.createNew('vsNavbar', vs.directives.Navbar, null, {restrict: 'C', require: 'vsWindow'});
+  return vs.directives.Directive.createNew('vsNavbar', vs.directives.Navbar, null, {restrict: 'C', require: ['vsWindow', 'vsDataContext']});
+}]);
+
+vs.main.directive('vsNavLocation', [function() {
+  return vs.directives.Directive.createNew('vsNavLocation', vs.directives.NavLocation, null, {restrict: 'C', require: ['vsNavbar', 'vsDataContext']});
 }]);
 
 

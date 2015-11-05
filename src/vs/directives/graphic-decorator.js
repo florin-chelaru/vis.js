@@ -54,6 +54,8 @@ Object.defineProperties(vs.directives.GraphicDecorator.prototype, {
  * @override
  */
 vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+
   /** @type {vs.directives.Visualization} */
   var vis = $scope.visualization.handler;
   var options = $attrs.vsOptions ? $scope.$eval($attrs['vsOptions']) : {};

@@ -81,12 +81,3 @@ Object.defineProperties(vs.directives.DataContext.prototype, {
   handler: { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
   template: { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
 });
-
-/**
- * @param $scope
- * @param $element
- * @param $attrs
- * @param controller
- * @override
- */
-vs.directives.DataContext.prototype.link = function($scope, $element, $attrs, controller) {};

@@ -494,3 +494,28 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
     ]
   };
 }]);
+
+main.controller('vs.DataContextController', ['$scope', function($scope) {
+  /** @type {vs.ui.DataHandler} */
+  var dataHandler = $scope['vsDataContext'].handler.handler;
+  var data = dataHandler.data;
+  var range = vs.models.GenomicRangeQuery.extract(data.query);
+  $scope.name = dataHandler.name;
+  $scope.location = goog.string.format('%s:%s-%s', range.chr, range.start, range.end);
+
+  var regex = /^\s*([a-zA-Z0-9]+)\s*\:\s*([0-9]+)\s*\-\s*([0-9]+)\s*$/;
+
+  $scope.query = function() {
+    var matches = $scope.location.match(regex);
+    if (!matches || matches.length < 4) { throw new Error('Invalid location'); }
+
+    var chr = matches[1];
+    var start = parseInt(matches[2]);
+    var end = parseInt(matches[3]);
+
+    var q = new vs.models.GenomicRangeQuery(chr, start, end);
+
+    data.applyQuery(q.query);
+
+  };
+}]);

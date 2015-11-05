@@ -34,7 +34,8 @@ goog.inherits(vs.directives.Movable, vs.directives.Directive);
  * @override
  */
 vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  var $window = $element.parent();
+  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+  var $window = $scope['vsWindow'].handler.$window;
   $window.css({ cursor: 'move' });
 
   var startX = 0, startY = 0, x, y;

@@ -46,7 +46,8 @@ goog.inherits(vs.directives.Resizable, vs.directives.Directive);
  * @override
  */
 vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
-  var $window = $element.parent();
+  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+  var $window = $scope['vsWindow'].handler.$window;
   $window
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-left"></div>')
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-right"></div>')

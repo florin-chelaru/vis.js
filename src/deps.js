@@ -10,7 +10,8 @@ goog.addDependency('../../../../src/vs/directives/directive.js', ['vs.directives
 goog.addDependency('../../../../src/vs/directives/graphic-decorator.js', ['vs.directives.GraphicDecorator'], ['vs.async.TaskService', 'vs.directives.Visualization', 'vs.ui.Decorator', 'vs.ui.VisHandler'], false);
 goog.addDependency('../../../../src/vs/directives/grid.js', ['vs.directives.Grid'], ['vs.directives.GraphicDecorator', 'vs.directives.Visualization', 'vs.ui.canvas.CanvasGrid', 'vs.ui.svg.SvgGrid'], false);
 goog.addDependency('../../../../src/vs/directives/movable.js', ['vs.directives.Movable'], ['vs.directives.Directive'], false);
-goog.addDependency('../../../../src/vs/directives/navbar.js', ['vs.directives.Navbar'], [], false);
+goog.addDependency('../../../../src/vs/directives/nav-location.js', ['vs.directives.NavLocation'], ['vs.directives.Directive'], false);
+goog.addDependency('../../../../src/vs/directives/navbar.js', ['vs.directives.Navbar'], ['vs.directives.Directive'], false);
 goog.addDependency('../../../../src/vs/directives/resizable.js', ['vs.directives.Resizable'], ['vs.directives.Directive'], false);
 goog.addDependency('../../../../src/vs/directives/visualization.js', ['vs.directives.Visualization'], ['vs.async.TaskService', 'vs.directives.Directive', 'vs.ui.VisualizationFactory'], false);
 goog.addDependency('../../../../src/vs/directives/window.js', ['vs.directives.Window'], ['vs.directives.Directive'], false);
@@ -19,6 +20,7 @@ goog.addDependency('../../../../src/vs/models/data-array.js', ['vs.models.DataAr
 goog.addDependency('../../../../src/vs/models/data-item.js', ['vs.models.DataItem'], [], false);
 goog.addDependency('../../../../src/vs/models/data-row.js', ['vs.models.DataRow'], ['vs.models.DataSource'], false);
 goog.addDependency('../../../../src/vs/models/data-source.js', ['vs.models.DataSource'], ['u.AbstractMethodException', 'vs.models.DataArray', 'vs.models.Query'], false);
+goog.addDependency('../../../../src/vs/models/genomic-range-query.js', ['vs.models.GenomicRangeQuery'], ['vs.models.ModelsException', 'vs.models.Query'], false);
 goog.addDependency('../../../../src/vs/models/margins.js', ['vs.models.Margins'], [], false);
 goog.addDependency('../../../../src/vs/models/models-exception.js', ['vs.models.ModelsException'], [], false);
 goog.addDependency('../../../../src/vs/models/point.js', ['vs.models.Point'], [], false);
@@ -39,4 +41,4 @@ goog.addDependency('../../../../src/vs/ui/ui-exception.js', ['vs.ui.UiException'
 goog.addDependency('../../../../src/vs/ui/vis-handler.js', ['vs.ui.VisHandler'], ['vs.async.Task', 'vs.async.TaskService', 'vs.models.DataSource', 'vs.ui.Setting'], false);
 goog.addDependency('../../../../src/vs/ui/visual-context.js', ['vs.ui.VisualContext'], [], false);
 goog.addDependency('../../../../src/vs/ui/visualization-factory.js', ['vs.ui.VisualizationFactory'], ['u.reflection', 'vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.models.DataSource', 'vs.ui.UiException', 'vs.ui.VisHandler'], false);
-goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.directives.Axis', 'vs.directives.DataContext', 'vs.directives.Grid', 'vs.directives.Movable', 'vs.directives.Navbar', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis', 'vs.ui.svg.SvgVis'], false);
+goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.directives.Axis', 'vs.directives.DataContext', 'vs.directives.Grid', 'vs.directives.Movable', 'vs.directives.NavLocation', 'vs.directives.Navbar', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis', 'vs.ui.svg.SvgVis'], false);

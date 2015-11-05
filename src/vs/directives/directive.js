@@ -15,14 +15,54 @@ vs.directives.Directive = function($scope) {
    * @private
    */
   this._$scope = $scope;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$element = null;
+
+  /**
+   * @private
+   */
+  this._$attrs = null;
 };
 
+/**
+ * @name vs.directives.Directive#$scope
+ */
+vs.directives.Directive.prototype.$scope;
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Directive#$element
+ */
+vs.directives.Directive.prototype.$element;
+
+/**
+ * @name vs.directives.Directive#$attrs
+ */
+vs.directives.Directive.prototype.$attrs;
+
 Object.defineProperties(vs.directives.Directive.prototype, {
-  $scope: { get: function() { return this._$scope; }},
-  template: { get: function() { return undefined; }}
+  $scope: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
+  $element: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
+  $attrs: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
 });
 
-vs.directives.Directive.prototype.link = function($scope, $element, $attrs) {};
+/**
+ * @type {{pre: Function, post: Function}|Function}
+ */
+vs.directives.Directive.prototype.link = {
+  pre: function($scope, $element, $attrs) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  },
+  post: function($scope, $element, $attrs) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  }
+};
 
 /**
  * @param {string} name

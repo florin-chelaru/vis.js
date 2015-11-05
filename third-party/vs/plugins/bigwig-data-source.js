@@ -8,7 +8,7 @@ goog.provide('vs.plugins.BigwigDataSource');
 
 goog.require('vs.models.DataSource');
 goog.require('vs.models.Query');
-goog.require('vs.models.ModelsException');
+goog.require('vs.models.GenomicRangeQuery');
 
 /**
  * TODO: Add option to load additional col metadata (metadata about each file/track),
@@ -87,57 +87,7 @@ vs.plugins.BigwigDataSource = function(bigwigURIs, options) {
       label: bigwigURIs.map(function(uri) { return uri.substr(Math.max(uri.lastIndexOf('/'), 0)).replace('.bigwig', '').replace('.bw', ''); })
     };
 
-    var rowLabels = ['chr', 'start', 'end'];
-    var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
-    var bpValidTests = ['<', '>='];
-
-    var rowQueries = self.query.filter(function(q) {
-      if (q.target != vs.models.Query.Target.ROWS) { return false; }
-      if (rowLabels.indexOf(q.targetLabel) < 0) {
-        console.warn('The row label ' + q.targetLabel + ' is not valid. Valid options for row labels are: ' + JSON.stringify(rowLabels));
-        return false;
-      }
-      if (q.targetLabel == 'chr' && chrValidTests.indexOf(q.test) < 0) {
-        console.warn('The ' + q.test + ' operation is not yet supported for chromosomes by the bigwig library; supported operations are: ' + JSON.stringify(chrValidTests));
-        return false;
-      }
-      if ((q.targetLabel == 'start' || q.targetLabel == 'end') && bpValidTests.indexOf(q.test) < 0) {
-        console.warn('The ' + q.test + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
-        return false;
-      }
-      if (q.targetLabel == 'start' && (q.test == '>=' || (q.test == '<' && q.negate))) {
-        console.warn('The only supported test for "start" is "<"');
-        return false;
-      }
-      if (q.targetLabel == 'end' && (q.test == '<'|| (q.test == '>=' && q.negate))) {
-        console.warn('The only supported test for "end" is ">="');
-        return false;
-      }
-
-      return q.target == vs.models.Query.Target.ROWS;
-    });
-
-    var chrQueries = rowQueries.filter(function(q) { return q.targetLabel == 'chr' && !q.negate; });
-    var startEndQueries = rowQueries.filter(function(q) { return q.targetLabel == 'start' || q.targetLabel == 'end' });
-    var greaterThanQueries = startEndQueries.filter(function(q) { return q.test == '>=' || (q.negate && q.test == '<'); });
-    var lessThanQueries = startEndQueries.filter(function(q) { return q.test == '<' || (q.negate && q.test == '>='); });
-
-    if (rowQueries.length > 0 && chrQueries.length != 1) {
-      throw new vs.models.ModelsException('Bigwig valid queries must either be empty, or contain exactly one "chr == " test');
-    }
-    if (rowQueries.length > 0 && startEndQueries.length < 2) {
-      throw new vs.models.ModelsException('Bigwig valid queries must either be empty, or contain at least two "start/end < or >= " tests');
-    }
-    if (rowQueries.length > 0 && (lessThanQueries.length < 1 || greaterThanQueries.length < 1)) {
-      throw new vs.models.ModelsException('Bigwig valid queries must either be empty, or contain a finite start/end range');
-    }
-
-    var range = rowQueries.length == 0 ? undefined : {
-      chr: chrQueries[0].testArgs,
-      end: startEndQueries.filter(function(q) { return q.targetLabel == 'start'; }).map(function(q) { return q.testArgs; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
-      start: startEndQueries.filter(function(q) { return q.targetLabel == 'end'; }).map(function(q) { return q.testArgs; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
-    };
-
+    var range = vs.models.GenomicRangeQuery.extract(self.query);
 
     var bwFiles = bigwigURIs.map(function(uri) { return new bigwig.BigwigFile(uri, self._proxyURI, 256); });
 
@@ -183,45 +133,6 @@ vs.plugins.BigwigDataSource = function(bigwigURIs, options) {
         self._isReady = true;
         resolve(self);
       });
-
-    /*setTimeout(function () {
-      u.extend(self, {
-        query: [
-          new vs.models.Query({target: 'rows', targetLabel: 'chr', test: '==', testArgs: 'chr1'}),
-          new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: 20}),
-          new vs.models.Query({target: 'rows', targetLabel: 'end', test: '>', testArgs: 10})
-        ],
-        nrows: 4,
-        ncols: 2,
-        cols: [
-          {label: 'name', d: ['florin', 'suze', 'wouter', 'apas']},
-          {label: 'id', d: [1, 2, 3, 4]},
-          {label: 'age', d: [30, 24, 35, 22]},
-          {label: 'sex', d: ['m', 'f', 'm', 'm']}
-        ],
-        rows: [
-          {label: 'name', d: ['gene1', 'gene2']},
-          {label: 'id', d: [1, 2]},
-          {label: 'start', d: [10, 12]},
-          {label: 'end', d: [15, 16]},
-          {label: 'chr', d: ['chr1', 'chr1']}
-        ],
-        vals: [
-          {
-            label: 'gene expression',
-            d: [0.67, 0.309, 0.737, 0.688, 0.011, 0.303, 0.937, 0.06],
-            boundaries: {min: 0, max: 1}
-          },
-          {
-            label: 'dna methylation',
-            d: [0.625, 0.998, 0.66, 0.595, 0.254, 0.849, 0.374, 0.701],
-            boundaries: {min: 0, max: 1}
-          }
-        ]
-      });
-      self._isReady = true;
-      resolve(self);
-    }, 2000);*/
   });
 };
 
