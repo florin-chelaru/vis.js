@@ -25,6 +25,7 @@
   ],
   "dependencies": {
     "utils.js": "git://github.com/florin-chelaru/utils.js.git",
+    "threadpool.js": "git://github.com/florin-chelaru/threadpool.js.git",
 
     "angular": "1.4.4",
     "d3": "3.5.6",

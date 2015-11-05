@@ -9,12 +9,11 @@ goog.provide('vs');
 goog.require('vs.Configuration');
 
 goog.require('vs.async.TaskService');
-
-goog.require('vs.models.Transformer');
+goog.require('vs.async.ThreadPoolService');
 
 goog.require('vs.ui.VisualizationFactory');
-goog.require('vs.ui.VisHandler');
 
+goog.require('vs.ui.VisHandler');
 goog.require('vs.ui.svg.SvgVis');
 goog.require('vs.ui.canvas.CanvasVis');
 
@@ -41,8 +40,12 @@ vs.main.factory('taskService', ['$timeout', '$q', function($timeout, $q) {
   return new vs.async.TaskService($timeout, $q);
 }]);
 
-vs.main.factory('visualizationFactory', ['configuration', 'taskService', '$timeout', function(configuration, taskService, $timeout) {
-  return new vs.ui.VisualizationFactory(configuration, taskService, $timeout);
+vs.main.factory('threadPool', ['configuration', function(config) {
+  return new vs.async.ThreadPoolService(config);
+}]);
+
+vs.main.factory('visualizationFactory', ['configuration', 'taskService', '$timeout', 'threadPool', function(configuration, taskService, $timeout, threadPool) {
+  return new vs.ui.VisualizationFactory(configuration, taskService, $timeout, threadPool);
 }]);
 
 vs.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {

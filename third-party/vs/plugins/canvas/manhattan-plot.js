@@ -8,6 +8,7 @@ goog.provide('vs.plugins.canvas.ManhattanPlot');
 
 goog.require('vs.ui.canvas.CanvasVis');
 goog.require('vs.models.DataRow');
+goog.require('vs.models.Transformer');
 
 /**
  * @constructor

@@ -24,6 +24,10 @@ main.config(['configurationProvider', function(configuration) {
         canvas: 'vs.plugins.canvas.ManhattanPlot',
         default: 'svg'
       }
+    },
+    parallel: {
+      nthreads: 16,
+      worker: '/vis/test/worker.js'
     }
   })
 }]);

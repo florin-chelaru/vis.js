@@ -11,6 +11,7 @@ goog.require('vs.ui.VisHandler');
 goog.require('vs.ui.UiException');
 goog.require('vs.models.DataSource');
 goog.require('vs.async.TaskService');
+goog.require('vs.async.ThreadPoolService');
 
 goog.require('u.reflection');
 
@@ -19,9 +20,10 @@ goog.require('u.reflection');
  * @param {vs.Configuration} config
  * @param {vs.async.TaskService} taskService
  * @param {Function} $timeout
+ * @param {vs.async.ThreadPoolService} threadPool
  * @constructor
  */
-vs.ui.VisualizationFactory = function(config, taskService, $timeout) {
+vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {
   /**
    * visualization alias -> rendering type -> fully qualified type
    * @type {Object.<string, Object.<string, string>>}
@@ -40,6 +42,12 @@ vs.ui.VisualizationFactory = function(config, taskService, $timeout) {
    * @private
    */
   this._$timeout = $timeout;
+
+  /**
+   * @type {vs.async.ThreadPoolService}
+   * @private
+   */
+  this._threadPool = threadPool;
 };
 
 /**
@@ -68,5 +76,7 @@ vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $att
   var data = $scope.$eval($attrs.vsData);
   if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
 
-  return u.reflection.applyConstructor(visCtor, [{$scope:$scope, $element:$element, $attrs:$attrs, taskService:this._taskService, $timeout: this._$timeout}, visualContext.options, data]);
+  return u.reflection.applyConstructor(visCtor, [
+    {$scope:$scope, $element:$element, $attrs:$attrs, taskService:this._taskService, $timeout: this._$timeout, threadPool: this._threadPool.pool},
+    visualContext.options, data]);
 };

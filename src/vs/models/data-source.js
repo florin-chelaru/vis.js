@@ -388,3 +388,18 @@ vs.models.DataSource.prototype._calcRowsMap = function() {
     this._rowsIndexMap = map;
   }
 };
+
+/**
+ * @returns {{query: *, nrows: *, ncols: *, rows: *, cols: *, vals: *, isReady: *}}
+ */
+vs.models.DataSource.prototype.raw = function() {
+  return {
+    query: this.query,
+    nrows: this.nrows,
+    ncols: this.ncols,
+    rows: this.rows,
+    cols: this.cols,
+    vals: this.vals,
+    isReady: this.isReady
+  };
+};

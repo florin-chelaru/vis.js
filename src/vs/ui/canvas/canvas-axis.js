@@ -7,6 +7,7 @@
 goog.provide('vs.ui.canvas.CanvasAxis');
 
 goog.require('vs.ui.decorators.Axis');
+goog.require('vs.models.Transformer');
 
 /**
  * @constructor

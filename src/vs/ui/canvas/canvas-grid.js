@@ -7,6 +7,7 @@
 goog.provide('vs.ui.canvas.CanvasGrid');
 
 goog.require('vs.ui.decorators.Grid');
+goog.require('vs.models.Transformer');
 
 /**
  * @constructor

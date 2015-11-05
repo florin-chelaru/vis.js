@@ -8,14 +8,12 @@ goog.provide('vs.ui.VisHandler');
 
 goog.require('vs.models.DataSource');
 goog.require('vs.ui.Setting');
-// goog.require('vs.ui.VisOptions');
 
 goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
-//goog.require('goog.async.Deferred');
 
 /**
- * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService}} $ng
+ * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService, threadPool: parallel.ThreadPool}} $ng
  * @param {Object.<string, *>} options
  * @param {vs.models.DataSource} data
  * @constructor
@@ -47,6 +45,12 @@ vs.ui.VisHandler = function($ng, options, data) {
    * @private
    */
   this._taskService = $ng.taskService;
+
+  /**
+   * @type {parallel.ThreadPool}
+   * @private
+   */
+  this._threadPool = $ng.threadPool;
 
   /**
    * @type {Object.<string, *>}
@@ -84,9 +88,38 @@ vs.ui.VisHandler = function($ng, options, data) {
    */
   this._lastDrawFired = true;
 
+  /**
+   * @type {parallel.ThreadProxy}
+   * @private
+   */
+  this._thread = null;
+
+  /**
+   * @type {parallel.SharedObject.<vs.models.DataSource>}
+   * @private
+   */
+  this._sharedData = null;
+
   // Redraw if:
 
   // Data changed
+  /*var self = this;
+  var onDataChanged = function() {
+    self._threadPool.queue(function(thread) {
+      self._thread = thread;
+      return thread.swap(self._data.raw(), 'vs.models.DataSource')
+        .then(function(d) {
+          self._sharedData = d;
+        });
+    }).then(function() {
+      self.draw();
+    });
+  };
+  this._data.changed.addListener(onDataChanged);
+
+  // Data ready for the first time
+  this._data.ready.then(onDataChanged);*/
+
   this._data.changed.addListener(this.draw, this);
 
   // Data ready for the first time
@@ -152,6 +185,18 @@ vs.ui.VisHandler.prototype.options;
 vs.ui.VisHandler.prototype.data;
 
 /**
+ * @type {parallel.SharedObject.<vs.models.DataSource>}
+ * @name vs.ui.VisHandler#sharedData
+ */
+vs.ui.VisHandler.prototype.sharedData;
+
+/**
+ * @type {parallel.ThreadProxy}
+ * @name vs.ui.VisHandler#thread
+ */
+vs.ui.VisHandler.prototype.thread;
+
+/**
  * @type {vs.async.Task}
  * @name vs.ui.VisHandler#beginDrawTask
  */
@@ -188,6 +233,10 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
   $attrs: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$attrs; })},
   options: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._options; })},
   data: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._data; })},
+
+  sharedData: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._sharedData; })},
+  thread: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._thread; })},
+
   beginDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._beginDrawTask; })},
   endDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._endDrawTask; })},
 
