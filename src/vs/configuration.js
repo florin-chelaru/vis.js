@@ -18,13 +18,19 @@ vs.Configuration = function() {
   this._options = {};
 };
 
+/**
+ * @type {Object.<string, *>}
+ * @name vs.Configuration#options
+ */
+vs.Configuration.prototype.options;
+
 Object.defineProperties(vs.Configuration.prototype, {
-  options: { get: function () { return this._options; }}
+  'options': { get: /** @type {function (this:vs.Configuration)} */ (function () { return this._options; })}
 });
 
 /**
  * @param {Object.<string, *>} options
  */
 vs.Configuration.prototype.customize = function(options) {
-  angular.extend(this._options, options);
+  u.extend(this._options, options);
 };

@@ -7,10 +7,9 @@
 goog.provide('vs.async.TaskService');
 
 goog.require('vs.async.Task');
-goog.require('goog.async.Deferred');
 
 /**
- * @param {function(function, number)} $timeout Angular timeout service
+ * @param {function(Function, number)} $timeout Angular timeout service
  * @constructor
  */
 vs.async.TaskService = function($timeout) {
@@ -33,7 +32,7 @@ vs.async.TaskService = function($timeout) {
  */
 vs.async.TaskService.prototype.createTask = function(func, thisArg) {
   var ret = new vs.async.Task(func, thisArg);
-  this._tasks[ret.id] = ret;
+  this._tasks[ret['id']] = ret;
   return ret;
 };
 
@@ -51,15 +50,15 @@ vs.async.TaskService.prototype.chain = function(t1, t2) {
     return this.chain(t1, new vs.async.Task(t2));
   }
 
-  t1.next = t1.next || t2.first;
-  t1.last.next = t2.first;
-  t1.last = t2.last;
+  t1['next'] = t1['next'] || t2['first'];
+  t1['last']['next'] = t2['first'];
+  t1['last'] = t2['last'];
 
-  t2.prev = t2.prev || t1.last;
-  t2.first.prev = t1.last;
-  t2.first = t1.first;
+  t2['prev'] = t2['prev'] || t1['last'];
+  t2['first']['prev'] = t1['last'];
+  t2['first'] = t1['first'];
 
-  return t1.first;
+  return t1['first'];
 };
 
 /**
@@ -70,26 +69,22 @@ vs.async.TaskService.prototype.chain = function(t1, t2) {
  */
 vs.async.TaskService.prototype.runChain = function(task, sequential) {
   // TODO: test!
-  var current = task.first;
+  var current = task['first'];
   if (sequential) {
     return new Promise(function(resolve, reject) {
-      for (; !!current; current = current.next) {
-        current.func.apply(current.thisArg);
+      for (; !!current; current = current['next']) {
+        current['func'].apply(current['thisArg']);
       }
       resolve();
     });
   }
 
   var tasks = [];
-  for (; !!current; current = current.next) {
+  for (; !!current; current = current['next']) {
     tasks.push(current);
   }
 
   return u.async.each(tasks, function(task) {
-    return task.func.apply(task.thisArg);
-    /*return new Promise(function(resolve, reject) {
-      task.func.apply(task.thisArg);
-      resolve();
-    });*/
+    return task['func'].apply(task['thisArg']);
   }, true);
 };

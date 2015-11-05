@@ -6,7 +6,6 @@
 
 goog.provide('vs.models.DataSource');
 
-goog.require('u.AbstractMethodException');
 goog.require('vs.models.DataArray');
 goog.require('vs.models.Query');
 

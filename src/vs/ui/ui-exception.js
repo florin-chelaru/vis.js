@@ -6,8 +6,6 @@
 
 goog.provide('vs.ui.UiException');
 
-goog.require('u.Exception');
-
 /**
  * @param {string} message
  * @param {Error} [innerException]

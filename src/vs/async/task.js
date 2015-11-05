@@ -6,8 +6,6 @@
 
 goog.provide('vs.async.Task');
 
-goog.require('goog.async.Deferred');
-
 /**
  * @param {function():Promise} func
  * @param {Object} [thisArg]
@@ -57,25 +55,67 @@ vs.async.Task = function(func, thisArg) {
   this._last = this;
 };
 
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+
 Object.defineProperties(vs.async.Task.prototype, {
-  id: { get: function() { return this._id; } },
-  thisArg: { get: function() { return this._thisArg; } },
-  func: { get: function() { return this._func; } },
-  prev: {
-    get: function() { return this._prev; },
-    set: function(value) { this._prev = value; }
+  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
+  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
+  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
+  'prev': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
   },
-  next: {
-    get: function() { return this._next; },
-    set: function(value) { this._next = value; }
+  'next': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
   },
-  first: {
-    get: function() { return this._first; },
-    set: function(value) { this._first = value; }
+  'first': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
   },
-  last: {
-    get: function() { return this._last; },
-    set: function(value) { this._last = value; }
+  'last': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
   }
 });
 

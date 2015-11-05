@@ -7,13 +7,14 @@
 goog.provide('vs.async.ThreadPoolService');
 
 goog.require('vs.Configuration');
+goog.require('vs.ui.UiException');
 
 /**
  * @param {vs.Configuration} config
  * @constructor
  */
 vs.async.ThreadPoolService = function(config) {
-  var settings = config.options['parallel'];
+  var settings = config['options']['parallel'];
   if (!settings) { throw new vs.ui.UiException('Parallel settings have not been configured. Make sure you call configuration.customize({parallel: ...})'); }
   var nthreads = settings['nthreads'] || 16;
   var worker = settings['worker'];
@@ -33,5 +34,5 @@ vs.async.ThreadPoolService = function(config) {
 vs.async.ThreadPoolService.prototype.pool;
 
 Object.defineProperties(vs.async.ThreadPoolService.prototype, {
-  pool: { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
+  'pool': { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
 });

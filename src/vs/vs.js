@@ -9,8 +9,9 @@ goog.provide('vs');
 goog.require('vs.Configuration');
 
 goog.require('vs.async.TaskService');
-goog.require('vs.async.ThreadPoolService');
 
+goog.require('vs.async.ThreadPoolService');
+/*
 goog.require('vs.ui.VisualizationFactory');
 
 goog.require('vs.ui.VisHandler');
@@ -87,7 +88,7 @@ vs.main.directive('vsGrid', ['taskService', '$timeout', function(taskService, $t
 }]);
 
 
-/*
+/!*
 // TODO: Later
 vs.main.directive('vs-input-data', function() {
   return {
@@ -115,7 +116,7 @@ vs.main.directive('vs-options', function() {
     }
   };
 });
-*/
+*!/
 
 vs.main
   .factory('$exceptionHandler', function() {
@@ -130,3 +131,4 @@ vs.main.run(['$timeout', function($timeout) {
 }]);
 
 
+*/
