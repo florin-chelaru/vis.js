@@ -22,6 +22,18 @@ vs.directives.Resizable = function($scope, $document) {
    * @private
    */
   this._document = $document;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._minWidth = 65;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._minHeight = 65;
 };
 
 goog.inherits(vs.directives.Resizable, vs.directives.Directive);
@@ -71,7 +83,7 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     target.top = newY;
     target.left = newX;
 
-    box.update(target);
+    box.update(target, self._minWidth, self._minHeight);
     
     $window.css({
       top: (box.top) + 'px',
@@ -222,34 +234,38 @@ vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {
 
 /**
  * @param {vs.directives.Resizable.ResizeHandler} handler
+ * @param {number} [minWidth]
+ * @param {number} [minHeight]
  */
-vs.directives.Resizable.BoundingBox.prototype.update = function(handler) {
+vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {
+  minWidth = minWidth || 0;
+  minHeight = minHeight || 0;
   switch (handler) {
     case this.topLeft:
-      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin);
-      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin);
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
       this.bottomLeft.left = handler.left;
       this.topRight.top = handler.top;
       this.leftHandler.left = handler.left;
       break;
     case this.bottomLeft:
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin);
-      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin);
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
       this.topLeft.left = handler.left;
       this.bottomRight.top = handler.top;
       this.leftHandler.left = handler.left;
       this.bottomHandler.top = handler.top;
       break;
     case this.topRight:
-      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin);
-      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin);
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
       this.topLeft.top = handler.top;
       this.bottomRight.left = handler.left;
       this.rightHandler.left = handler.left;
       break;
     case this.bottomRight:
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin);
-      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin);
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
       this.topRight.left = handler.left;
       this.bottomLeft.top = handler.top;
       this.rightHandler.left = handler.left;
@@ -257,7 +273,7 @@ vs.directives.Resizable.BoundingBox.prototype.update = function(handler) {
       break;
     case this.leftHandler:
       handler.top = this.topLeft.top;
-      handler.left = Math.min(handler.left, this.rightHandler.left - handler.width - 2 * this._margin);
+      handler.left = Math.min(handler.left, this.rightHandler.left - handler.width - 2 * this._margin - minWidth);
 
       this.topLeft.left = handler.left;
       this.bottomLeft.left = handler.left;
@@ -265,7 +281,7 @@ vs.directives.Resizable.BoundingBox.prototype.update = function(handler) {
       break;
     case this.rightHandler:
       handler.top = this.topLeft.top;
-      handler.left = Math.max(handler.left, this.leftHandler.left + this.leftHandler.width + 2 * this._margin);
+      handler.left = Math.max(handler.left, this.leftHandler.left + this.leftHandler.width + 2 * this._margin + minWidth);
 
       this.topRight.left = handler.left;
       this.bottomRight.left = handler.left;
@@ -273,7 +289,7 @@ vs.directives.Resizable.BoundingBox.prototype.update = function(handler) {
       break;
     case this.bottomHandler:
       handler.left = this.topLeft.left;
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin);
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
 
       this.bottomRight.top = handler.top;
       this.bottomLeft.top = handler.top;

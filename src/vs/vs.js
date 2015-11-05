@@ -53,7 +53,7 @@ vs.main.directive('visualization', ['visualizationFactory', 'taskService', funct
 }]);
 
 vs.main.directive('vsDataContext', ['$templateCache', function($templateCache) {
-  return vs.directives.Directive.createNew('vsDataContext', vs.directives.DataContext, [$templateCache], {restrict: 'C'});
+  return vs.directives.Directive.createNew('vsDataContext', vs.directives.DataContext, [$templateCache], {restrict: 'C', template: '<div ng-include="vsDataContext.handler.template"></div>'});
 }]);
 
 vs.main.directive('vsWindow', function() {
