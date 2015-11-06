@@ -28,8 +28,8 @@ vs.ui.svg.SvgVis.prototype.beginDraw = function () {
   return new Promise(function(resolve, reject) {
     vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
       .then(function() {
-        if (d3.select(self.$element[0]).select('svg').empty()) {
-          d3.select(self.$element[0])
+        if (d3.select(self['$element'][0]).select('svg').empty()) {
+          d3.select(self['$element'][0])
             .append('svg')
             .attr('width', '100%')
             .attr('height', '100%')

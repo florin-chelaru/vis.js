@@ -41,7 +41,7 @@ vs.models.DataRow.prototype.data;
 
 Object.defineProperties(vs.models.DataRow.prototype, {
   index: { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
-  data: { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
+  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
 });
 
 /**
@@ -53,11 +53,11 @@ vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
   /**
    * @type {vs.models.DataArray}
    */
-  var vals = valsLabel ? this.data.getVals(valsLabel) : this.data.vals[0];
+  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
 
-  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this.data.colIndex(colIndexOrLabel);
+  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
 
-  return vals.d[index * this.data.nrows + this.index];
+  return vals['d'][index * this['data']['nrows'] + this.index];
 };
 
 /**
@@ -65,7 +65,7 @@ vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
  * @returns {*}
  */
 vs.models.DataRow.prototype.info = function(label) {
-  var arr = this.data.getRow(label);
+  var arr = this['data'].getRow(label);
   if (!arr) { return undefined; }
-  return arr.d[this.index];
+  return arr['d'][this.index];
 };

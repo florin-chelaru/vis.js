@@ -15,10 +15,10 @@ vs.models.Point = function(x, y) {
   /**
    * @type {number}
    */
-  this.x = x;
+  this['x'] = x;
 
   /**
    * @type {number}
    */
-  this.y = y;
+  this['y'] = y;
 };

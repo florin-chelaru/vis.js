@@ -14,40 +14,40 @@ vs.models.Query = function(opts) {
   /**
    * @type {vs.models.Query.Target}
    */
-  this.target = opts.target;
+  this['target'] = opts['target'];
 
   /**
    * @type {string}
    */
-  this.targetLabel = opts.targetLabel;
+  this['targetLabel'] = opts['targetLabel'];
 
   /**
    * @type {vs.models.Query.Test}
    */
-  this.test = opts.test;
+  this['test'] = opts['test'];
 
   /**
    * @type {*}
    */
-  this.testArgs = opts.testArgs;
+  this['testArgs'] = opts['testArgs'];
 
   /**
    * @type {boolean}
    */
-  this.negate = !!opts.negate;
+  this['negate'] = !!opts['negate'];
 };
 
 /**
  * @returns {string}
  */
 vs.models.Query.prototype.toString = function() {
-  var argsStr = (this.testArgs === undefined) ? 'undefined' : JSON.stringify(this.testArgs);
+  var argsStr = (this['testArgs'] === undefined) ? 'undefined' : JSON.stringify(this['testArgs']);
   var ret =
-      this.target + '.' +
-      this.targetLabel + ' ' +
-      this.test + ' ' +
+      this['target'] + '.' +
+      this['targetLabel'] + ' ' +
+      this['test'] + ' ' +
       argsStr;
-  return this.negate ? 'not(' + ret + ')' : ret;
+  return this['negate'] ? 'not(' + ret + ')' : ret;
 };
 
 /**
@@ -64,20 +64,20 @@ vs.models.Query.prototype.equals = function(other) {
  * @enum {string}
  */
 vs.models.Query.Target = {
-  ROWS: 'rows',
-  COLS: 'cols',
-  VALS: 'vals'
+  'ROWS': 'rows',
+  'COLS': 'cols',
+  'VALS': 'vals'
 };
 
 /**
  * @enum {string}
  */
 vs.models.Query.Test = {
-  EQUALS: '==',
-  GREATER_THAN: '>',
-  LESS_THAN: '<',
-  GREATER_OR_EQUALS: '>=',
-  LESS_OR_EQUALS: '<=',
-  CONTAINS: 'contains',
-  IN: 'in'
+  'EQUALS': '==',
+  'GREATER_THAN': '>',
+  'LESS_THAN': '<',
+  'GREATER_OR_EQUALS': '>=',
+  'LESS_OR_EQUALS': '<=',
+  'CONTAINS': 'contains',
+  'IN': 'in'
 };

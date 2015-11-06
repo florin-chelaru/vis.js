@@ -69,17 +69,17 @@ vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
     this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
     $element.css({
-      top: (this._handler.options.y || 0) + 'px',
-      left: (this._handler.options.x || 0) + 'px',
-      width: this._handler.options.width + 'px',
-      height: this._handler.options.height + 'px'
+      'top': (this._handler['options']['y'] || 0) + 'px',
+      'left': (this._handler['options']['x'] || 0) + 'px',
+      'width': this._handler['options']['width'] + 'px',
+      'height': this._handler['options']['height'] + 'px'
     });
   },
   post: function($scope, $element, $attrs, controller) {
     var self = this;
     $element.resize(function(event) {
-      self._handler.options.width = event.width;
-      self._handler.options.height = event.height;
+      self._handler['options']['width'] = event.width;
+      self._handler['options']['height'] = event.height;
       if (!$scope.$$phase) { $scope.$apply(); }
     });
   }

@@ -19,7 +19,7 @@ vs.ui.DataHandler = function(options) {
    * @type {vs.models.DataSource}
    * @private
    */
-  this._data = options.data;
+  this._data = options['data'];
 
   /**
    * @type {Array.<vs.ui.VisualContext>}
@@ -73,12 +73,12 @@ vs.ui.DataHandler.prototype.visualizations;
 Object.defineProperties(vs.ui.DataHandler.prototype, {
   name: { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
 
-  data: {
+  'data': {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
     set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
   },
 
-  dataChanged: { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this.data.changed; })},
+  dataChanged: { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
 
   children: {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })

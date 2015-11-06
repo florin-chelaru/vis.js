@@ -24,9 +24,9 @@ goog.inherits(vs.ui.decorators.Axis, vs.ui.Decorator);
  * @type {Object.<string, vs.ui.Setting>}
  */
 vs.ui.decorators.Axis.Settings = {
-  'type': new vs.ui.Setting({key:'type', type: vs.ui.Setting.Type.CATEGORICAL, defaultValue: 'x', possibleValues: ['x', 'y']}),
-  'ticks': new vs.ui.Setting({key:'ticks', type: vs.ui.Setting.Type.NUMBER, defaultValue: 10}),
-  'format': new vs.ui.Setting({key:'format', type: vs.ui.Setting.Type.STRING, defaultValue: 's'})
+  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
+  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
+  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
 };
 
 /**
@@ -56,8 +56,8 @@ vs.ui.decorators.Axis.prototype.ticks;
 vs.ui.decorators.Axis.prototype.format;
 
 Object.defineProperties(vs.ui.decorators.Axis.prototype, {
-  settings: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return vs.ui.decorators.Axis.Settings; })},
-  type: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
+  'settings': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return vs.ui.decorators.Axis.Settings; })},
+  'type': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
   ticks: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
   format: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })}
 });

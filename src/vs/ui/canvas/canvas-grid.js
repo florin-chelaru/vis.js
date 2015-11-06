@@ -25,7 +25,7 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target.data.isReady) { resolve(); return; }
+        if (!self.target['data']['isReady']) { resolve(); return; }
 
         var target = self.target;
         var type = self.type;
@@ -33,7 +33,7 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
         var height = target.height;
         var width = target.width;
         var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer.translate({x: margins.left, y: margins.top}).combine(intCoords);
+        var translate = vs.models.Transformer.translate({'x': margins['left'], 'y': margins['top']}).combine(intCoords);
 
         var context = target.pendingCanvas[0].getContext('2d');
         var moveTo = context.__proto__.moveTo;
@@ -49,13 +49,13 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
 
         // Draw ticks
         var x1 = type == 'x' ? scale : function() { return 0; };
-        var x2 = type == 'x' ? scale : function() { return width - margins.left - margins.right; };
+        var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
         var y1 = type == 'y' ? scale : function() { return 0; };
-        var y2 = type == 'y' ? scale : function() { return height - margins.top - margins.bottom; };
+        var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
 
         ticks.forEach(function(tick) {
-          moveTo.apply(context, translate.calcArr({x: x1(tick), y: y1(tick)}));
-          lineTo.apply(context, translate.calcArr({x: x2(tick), y: y2(tick)}));
+          moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
+          lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
         });
 
 

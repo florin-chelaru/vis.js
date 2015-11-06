@@ -27,10 +27,10 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target.data.isReady) { resolve(); return; }
+        if (!self.target['data']['isReady']) { resolve(); return; }
 
         var target = self.target;
-        var svg = d3.select(target.$element[0]).select('svg');
+        var svg = d3.select(target['$element'][0]).select('svg');
         var type = self.type;
         var className = 'vs-axis-' + type;
         var axis = svg.select('.' + className);
@@ -42,7 +42,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
         var height = target.height;
         var width = target.width;
         var margins = target.margins;
-        var origins = {x: margins.left, y: height - margins.bottom};
+        var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
         var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
         if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
@@ -59,33 +59,33 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
         axis.call(axisFn);
 
         var axisBox = axis[0][0].getBBox();
-        var axisLocation = type == 'x' ? origins : {x: margins.left, y: margins.top};
-        axisBox = { x: axisBox.x + axisLocation.x, y: axisBox.y + axisLocation.y, width: axisBox.width, height: axisBox.height};
+        var axisLocation = type == 'x' ? origins : {'x': margins['left'], 'y': margins['top']};
+        axisBox = { 'x': axisBox['x'] + axisLocation['x'], 'y': axisBox['y'] + axisLocation['y'], 'width': axisBox['width'], 'height': axisBox['height']};
 
-        var offset = {top:0, bottom:0, left:0, right:0};
+        var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
 
         var dif;
-        if (axisBox.height > height) {
-          dif = (axisBox.height - height);
-          offset.top += 0.5 * dif;
-          offset.bottom += 0.5 * dif;
+        if (axisBox['height'] > height) {
+          dif = (axisBox['height'] - height);
+          offset['top'] += 0.5 * dif;
+          offset['bottom'] += 0.5 * dif;
         }
 
-        if (axisBox.width > width) {
-          dif = (axisBox.width - width);
-          offset.left += 0.5 * dif;
-          offset.right += 0.5 * dif;
+        if (axisBox['width'] > width) {
+          dif = (axisBox['width'] - width);
+          offset['left'] += 0.5 * dif;
+          offset['right'] += 0.5 * dif;
         }
 
-        if (axisBox.x < 0) { offset.left += -axisBox.x; }
-        if (axisBox.y < 0) { offset.top += -axisBox.y; }
-        if (axisBox.x + axisBox.width > width) { offset.right += axisBox.x + axisBox.width - width; }
-        if (axisBox.y + axisBox.height > height) { offset.bottom += axisBox.y + axisBox.height - height; }
+        if (axisBox['x'] < 0) { offset['left'] += -axisBox['x']; }
+        if (axisBox['y'] < 0) { offset['top'] += -axisBox['y']; }
+        if (axisBox['x'] + axisBox['width'] > width) { offset['right'] += axisBox['x'] + axisBox['width'] - width; }
+        if (axisBox['y'] + axisBox['height'] > height) { offset['bottom'] += axisBox['y'] + axisBox['height'] - height; }
 
         target.margins = target.margins.add(offset);
         target.scheduleRedraw();
 
-        axis.attr('transform', 'translate(' + axisLocation.x + ', ' + axisLocation.y + ')');
+        axis.attr('transform', 'translate(' + axisLocation['x'] + ', ' + axisLocation['y'] + ')');
         resolve();
       }, reject);
   });

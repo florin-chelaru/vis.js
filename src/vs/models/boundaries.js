@@ -15,10 +15,10 @@ vs.models.Boundaries = function(min, max) {
   /**
    * @type {number}
    */
-  this.min = min;
+  this['min'] = min;
 
   /**
    * @type {number}
    */
-  this.max = max;
+  this['max'] = max;
 };

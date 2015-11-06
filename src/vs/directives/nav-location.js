@@ -53,9 +53,9 @@ vs.directives.NavLocation.prototype.link = function($scope, $element, $attrs, co
   var $navbarLeft = $scope['vsNavbar'].handler.$left;
   /** @type {vs.ui.DataHandler} */
   var dataHandler = $scope['vsDataContext'].handler.handler;
-  var data = dataHandler.data;
+  var data = dataHandler['data'];
 
-  var range = vs.models.GenomicRangeQuery.extract(data.query);
+  var range = vs.models.GenomicRangeQuery.extract(data['query']);
 
   this._$textbox = $(
     '<li class="navbar-form navbar-left">' +

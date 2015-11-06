@@ -105,19 +105,19 @@ vs.models.DataSource.prototype.isReady;
 vs.models.DataSource.prototype.changed;
 
 Object.defineProperties(vs.models.DataSource.prototype, {
-  changed: {
+  'changed': {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._changed) { this._changed = new u.Event(); }
       return this._changed;
     })
   },
-  ready: {
+  'ready': {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._ready) { this._ready = Promise.resolve(this); }
       return this._ready;
     })
   },
-  isReady: { get: /** @type {function (this:vs.models.DataSource)} */ (function() { return (this._isReady == undefined) ? true : this._isReady; })}
+  'isReady': { get: /** @type {function (this:vs.models.DataSource)} */ (function() { return (this._isReady == undefined) ? true : this._isReady; })}
 });
 
 /**
@@ -154,45 +154,45 @@ vs.models.DataSource.singleQuery = function(data, q) {
        * @type {vs.models.DataArray}
        */
       var targetArr = null;
-      switch (q.target) {
-        case vs.models.Query.Target.VALS:
-          targetArr = ret.getVals(q.targetLabel);
+      switch (q['target']) {
+        case vs.models.Query.Target['VALS']:
+          targetArr = ret.getVals(q['targetLabel']);
           break;
-        case vs.models.Query.Target.ROWS:
-          targetArr = ret.getRow(q.targetLabel);
+        case vs.models.Query.Target['ROWS']:
+          targetArr = ret.getRow(q['targetLabel']);
           break;
-        case vs.models.Query.Target.COLS:
-          targetArr = ret.getCol(q.targetLabel);
+        case vs.models.Query.Target['COLS']:
+          targetArr = ret.getCol(q['targetLabel']);
           break;
       }
 
-      var indices = u.array.range(targetArr.d.length)
+      var indices = u.array.range(targetArr['d'].length)
         .filter(function (i) {
           var test = true;
-          var item = targetArr.d[i];
+          var item = targetArr['d'][i];
 
           try {
-            switch (q.test) {
-              case vs.models.Query.Test.EQUALS:
-                test = (item == q.testArgs);
+            switch (q['test']) {
+              case vs.models.Query.Test['EQUALS']:
+                test = (item == q['testArgs']);
                 break;
-              case vs.models.Query.Test.GREATER_OR_EQUALS:
-                test = (item >= q.testArgs);
+              case vs.models.Query.Test['GREATER_OR_EQUALS']:
+                test = (item >= q['testArgs']);
                 break;
-              case vs.models.Query.Test.GREATER_THAN:
-                test = (item > q.testArgs);
+              case vs.models.Query.Test['GREATER_THAN']:
+                test = (item > q['testArgs']);
                 break;
-              case vs.models.Query.Test.LESS_OR_EQUALS:
-                test = (item <= q.testArgs);
+              case vs.models.Query.Test['LESS_OR_EQUALS']:
+                test = (item <= q['testArgs']);
                 break;
-              case vs.models.Query.Test.LESS_THAN:
-                test = (item < q.testArgs);
+              case vs.models.Query.Test['LESS_THAN']:
+                test = (item < q['testArgs']);
                 break;
-              case vs.models.Query.Test.CONTAINS:
-                test = (item.indexOf(q.testArgs) >= 0);
+              case vs.models.Query.Test['CONTAINS']:
+                test = (item.indexOf(q['testArgs']) >= 0);
                 break;
-              case vs.models.Query.Test.IN:
-                test = (item in q.testArgs);
+              case vs.models.Query.Test['IN']:
+                test = (item in q['testArgs']);
                 break;
               default:
                 test = false;
@@ -202,32 +202,32 @@ vs.models.DataSource.singleQuery = function(data, q) {
             test = false;
           }
 
-          return (!q.negate && test) || (q.negate && !test);
+          return (!q['negate'] && test) || (q['negate'] && !test);
         });
 
-      switch (q.target) {
-        case vs.models.Query.Target.ROWS:
+      switch (q['target']) {
+        case vs.models.Query.Target['ROWS']:
           ret = u.reflection.wrap({
-            query: ret.query.concat([q]),
+            query: ret['query'].concat([q]),
             nrows: indices.length,
-            ncols: ret.ncols,
-            rows: ret.rows.map(function (arr) {
+            ncols: ret['ncols'],
+            rows: ret['rows'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr.label,
-                boundaries: arr.boundaries,
+                label: arr['label'],
+                boundaries: arr['boundaries'],
                 d: indices.map(function (i) {
-                  return arr.d[i]
+                  return arr['d'][i]
                 })
               }, vs.models.DataArray);
             }),
-            cols: ret.cols,
-            vals: ret.vals.map(function (arr) {
+            cols: ret['cols'],
+            vals: ret['vals'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr.label,
-                boundaries: arr.boundaries,
-                d: ret.cols.map(function (col, j) {
+                label: arr['label'],
+                boundaries: arr['boundaries'],
+                d: ret['cols'].map(function (col, j) {
                   return indices.map(function (i) {
-                    return arr.d[j * ret.nrows + i];
+                    return arr['d'][j * ret['nrows'] + i];
                   })
                 }).reduce(function (arr1, arr2) {
                   return arr1.concat(arr2);
@@ -237,27 +237,27 @@ vs.models.DataSource.singleQuery = function(data, q) {
           }, vs.models.DataSource);
           break;
 
-        case vs.models.Query.Target.COLS:
+        case vs.models.Query.Target['COLS']:
           ret = u.reflection.wrap({
-            query: ret.query.concat([q]),
-            nrows: ret.nrows,
+            query: ret['query'].concat([q]),
+            nrows: ret['nrows'],
             ncols: indices.length,
-            rows: ret.rows,
-            cols: ret.cols.map(function (arr) {
+            rows: ret['rows'],
+            cols: ret['cols'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr.label,
-                boundaries: arr.boundaries,
+                label: arr['label'],
+                boundaries: arr['boundaries'],
                 d: indices.map(function (i) {
-                  return arr.d[i]
+                  return arr['d'][i]
                 })
               }, vs.models.DataArray);
             }),
-            vals: ret.vals.map(function (arr) {
+            vals: ret['vals'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr.label,
-                boundaries: arr.boundaries,
+                label: arr['label'],
+                boundaries: arr['boundaries'],
                 d: indices.map(function (i) {
-                  return arr.d.slice(i * ret.nrows, (i + 1) * ret.nrows);
+                  return arr['d'].slice(i * ret['nrows'], (i + 1) * ret['nrows']);
                 }).reduce(function (arr1, arr2) {
                   return arr1.concat(arr2);
                 })
@@ -266,21 +266,21 @@ vs.models.DataSource.singleQuery = function(data, q) {
           }, vs.models.DataSource);
           break;
 
-        case vs.models.Query.Target.VALS:
+        case vs.models.Query.Target['VALS']:
           ret = u.reflection.wrap({
-            query: ret.query.concat([q]),
-            nrows: ret.nrows,
-            ncols: ret.ncols,
-            rows: ret.rows,
-            cols: ret.cols,
-            vals: ret.vals.map(function (arr) {
-              var filtered = u.array.fill(arr.d.length, undefined);
+            query: ret['query'].concat([q]),
+            nrows: ret['nrows'],
+            ncols: ret['ncols'],
+            rows: ret['rows'],
+            cols: ret['cols'],
+            vals: ret['vals'].map(function (arr) {
+              var filtered = u.array.fill(arr['d'].length, undefined);
               indices.forEach(function (i) {
-                filtered[i] = arr.d[i];
+                filtered[i] = arr['d'][i];
               });
               return u.reflection.wrap({
-                label: arr.label,
-                boundaries: arr.boundaries,
+                label: arr['label'],
+                boundaries: arr['boundaries'],
                 d: filtered
               }, vs.models.DataArray);
             })
@@ -301,7 +301,7 @@ vs.models.DataSource.singleQuery = function(data, q) {
  */
 vs.models.DataSource.prototype.getVals = function(label) {
   this._calcValsMap();
-  return this.vals[this._valsIndexMap[label]];
+  return this['vals'][this._valsIndexMap[label]];
 };
 
 /**
@@ -310,7 +310,7 @@ vs.models.DataSource.prototype.getVals = function(label) {
  */
 vs.models.DataSource.prototype.getRow = function(label) {
   this._calcRowsMap();
-  return this.rows[this._rowsIndexMap[label]];
+  return this['rows'][this._rowsIndexMap[label]];
 };
 
 /**
@@ -319,7 +319,7 @@ vs.models.DataSource.prototype.getRow = function(label) {
  */
 vs.models.DataSource.prototype.getCol = function(label) {
   this._calcColsMap();
-  return this.cols[this._colsIndexMap[label]];
+  return this['cols'][this._colsIndexMap[label]];
 };
 
 /**
@@ -355,8 +355,8 @@ vs.models.DataSource.prototype.rowIndex = function(label) {
 vs.models.DataSource.prototype._calcValsMap = function() {
   if (!this._valsIndexMap) {
     var map = {};
-    this.vals.forEach(function(d, i) {
-      map[d.label] = i;
+    this['vals'].forEach(function(d, i) {
+      map[d['label']] = i;
     });
     this._valsIndexMap = map;
   }
@@ -368,8 +368,8 @@ vs.models.DataSource.prototype._calcValsMap = function() {
 vs.models.DataSource.prototype._calcColsMap = function() {
   if (!this._colsIndexMap) {
     var map = {};
-    this.cols.forEach(function(d, i) {
-      map[d.label] = i;
+    this['cols'].forEach(function(d, i) {
+      map[d['label']] = i;
     });
     this._colsIndexMap = map;
   }
@@ -381,8 +381,8 @@ vs.models.DataSource.prototype._calcColsMap = function() {
 vs.models.DataSource.prototype._calcRowsMap = function() {
   if (!this._rowsIndexMap) {
     var map = {};
-    this.rows.forEach(function(d, i) {
-      map[d.label] = i;
+    this['rows'].forEach(function(d, i) {
+      map[d['label']] = i;
     });
     this._rowsIndexMap = map;
   }
@@ -393,12 +393,12 @@ vs.models.DataSource.prototype._calcRowsMap = function() {
  */
 vs.models.DataSource.prototype.raw = function() {
   return {
-    query: this.query,
-    nrows: this.nrows,
-    ncols: this.ncols,
-    rows: this.rows,
-    cols: this.cols,
-    vals: this.vals,
-    isReady: this.isReady
+    'query': this['query'],
+    'nrows': this['nrows'],
+    'ncols': this['ncols'],
+    'rows': this['rows'],
+    'cols': this['cols'],
+    'vals': this['vals'],
+    'isReady': this['isReady']
   };
 };

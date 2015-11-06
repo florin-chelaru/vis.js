@@ -23,9 +23,9 @@ goog.inherits(vs.ui.decorators.Grid, vs.ui.Decorator);
  * @type {Object.<string, vs.ui.Setting>}
  */
 vs.ui.decorators.Grid.Settings = {
-  'type': new vs.ui.Setting({key:'type', type: vs.ui.Setting.Type.CATEGORICAL, defaultValue: 'x', possibleValues: ['x', 'y']}),
-  'ticks': new vs.ui.Setting({key:'ticks', type: vs.ui.Setting.Type.NUMBER, defaultValue: 10}),
-  'format': new vs.ui.Setting({key:'format', type: vs.ui.Setting.Type.STRING, defaultValue: 's'})
+  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
+  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
+  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
 };
 
 /**
@@ -47,8 +47,8 @@ vs.ui.decorators.Grid.prototype.ticks;
 vs.ui.decorators.Grid.prototype.format;
 
 Object.defineProperties(vs.ui.decorators.Grid.prototype, {
-  settings: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return vs.ui.decorators.Grid.Settings; })},
-  type: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('type'); })},
+  'settings': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return vs.ui.decorators.Grid.Settings; })},
+  'type': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('type'); })},
   ticks: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
   format: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
 });

@@ -139,4 +139,17 @@ vs.plugins.BigwigDataSource = function(bigwigURIs, options) {
 goog.inherits(vs.plugins.BigwigDataSource, vs.models.DataSource);
 
 Object.defineProperties(vs.plugins.BigwigDataSource.prototype, {
+  changed: {
+    get: /** @type {function (this:vs.plugins.BigwigDataSource)} */ (function() {
+      if (!this._changed) { this._changed = new u.Event(); }
+      return this._changed;
+    })
+  },
+  ready: {
+    get: /** @type {function (this:vs.plugins.BigwigDataSource)} */ (function() {
+      if (!this._ready) { this._ready = Promise.resolve(this); }
+      return this._ready;
+    })
+  },
+  isReady: { get: /** @type {function (this:vs.plugins.BigwigDataSource)} */ (function() { return (this._isReady == undefined) ? true : this._isReady; })}
 });

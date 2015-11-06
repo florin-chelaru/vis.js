@@ -11,13 +11,14 @@ goog.require('vs.Configuration');
 goog.require('vs.async.TaskService');
 
 goog.require('vs.async.ThreadPoolService');
-/*
+
 goog.require('vs.ui.VisualizationFactory');
 
 goog.require('vs.ui.VisHandler');
+/*
 goog.require('vs.ui.svg.SvgVis');
 goog.require('vs.ui.canvas.CanvasVis');
-
+/*
 goog.require('vs.directives.Visualization');
 goog.require('vs.directives.Axis');
 goog.require('vs.directives.Grid');

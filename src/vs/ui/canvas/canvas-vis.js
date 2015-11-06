@@ -47,13 +47,13 @@ vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
 
 Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
   render: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
-  settings: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
+  'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
   doubleBuffer: {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
-    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this.options['doubleBuffer'] = value; })
+    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this['options']['doubleBuffer'] = value; })
   },
-  pendingCanvas: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.doubleBuffer ? this.$element.find('canvas').filter(':hidden') : this.$element.find('canvas'); })},
-  activeCanvas: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.doubleBuffer ? this.$element.find('canvas').filter(':visible') : this.$element.find('canvas'); })}
+  pendingCanvas: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.doubleBuffer ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas'); })},
+  activeCanvas: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.doubleBuffer ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas'); })}
 });
 
 /**
@@ -68,18 +68,18 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
       function() {
         var pendingCanvas = self.pendingCanvas;
         if (self.pendingCanvas.length == 0) {
-          var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', self.options.width, self.options.height);
-          $(goog.string.format(format, 'block') + (self.doubleBuffer ? goog.string.format(format, 'none') : '')).appendTo(self.$element);
+          var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>', self.optionValue('width'), self.optionValue('height'));
+          $(goog.string.format(format, 'block') + (self.doubleBuffer ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
           pendingCanvas = self.pendingCanvas;
         }
 
         pendingCanvas
-          .attr('width', self.options.width)
-          .attr('height', self.options.height);
+          .attr('width', self.optionValue('width'))
+          .attr('height', self.optionValue('height'));
 
         var context = pendingCanvas[0].getContext('2d');
         context.translate(0.5,0.5);
-        context.rect(0, 0, self.options.width, self.options.height);
+        context.rect(0, 0, self.optionValue('width'), self.optionValue('height'));
         context.fillStyle = '#ffffff';
         context.fill();
         resolve();
@@ -91,8 +91,8 @@ vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
   if (!this.doubleBuffer) { return; }
   var activeCanvas = this.activeCanvas;
   var pendingCanvas = this.pendingCanvas;
-  activeCanvas.css({ display: 'none' });
-  pendingCanvas.css({ display: 'block' });
+  activeCanvas.css({ 'display': 'none' });
+  pendingCanvas.css({ 'display': 'block' });
 };
 
 /**

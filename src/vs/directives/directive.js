@@ -45,9 +45,9 @@ vs.directives.Directive.prototype.$element;
 vs.directives.Directive.prototype.$attrs;
 
 Object.defineProperties(vs.directives.Directive.prototype, {
-  $scope: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
-  $element: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
-  $attrs: { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
+  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
+  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
+  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
 });
 
 /**

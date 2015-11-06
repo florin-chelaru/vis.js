@@ -76,12 +76,12 @@ vs.models.Margins.prototype.x;
 vs.models.Margins.prototype.y;
 
 Object.defineProperties(vs.models.Margins.prototype, {
-  top: { get: function() { return this._top; } },
-  left: { get: function() { return this._left; } },
-  bottom: { get: function() { return this._bottom; } },
-  right: { get: function() { return this._right; } },
-  x: { get: function() { return [this.left, this.right]; } },
-  y: { get: function() { return [this.top, this.bottom]; } }
+  'top': { get: function() { return this._top; } },
+  'left': { get: function() { return this._left; } },
+  'bottom': { get: function() { return this._bottom; } },
+  'right': { get: function() { return this._right; } },
+  'x': { get: function() { return [this['left'], this['right']]; } },
+  'y': { get: function() { return [this['top'], this['bottom']]; } }
 });
 
 /**
@@ -89,10 +89,10 @@ Object.defineProperties(vs.models.Margins.prototype, {
  */
 vs.models.Margins.prototype.add = function(offset) {
   return new vs.models.Margins(
-    this.top + offset.top,
-    this.left + offset.left,
-    this.bottom + offset.bottom,
-    this.right + offset.right);
+    this['top'] + offset['top'],
+    this['left'] + offset['left'],
+    this['bottom'] + offset['bottom'],
+    this['right'] + offset['right']);
 };
 
 /**
@@ -100,5 +100,5 @@ vs.models.Margins.prototype.add = function(offset) {
  * @returns {boolean}
  */
 vs.models.Margins.prototype.equals = function(other) {
-  return (!!other && this.top == other.top && this.left == other.left && this.bottom == other.bottom && this.right == other.right);
+  return (!!other && this['top'] == other['top'] && this['left'] == other['left'] && this['bottom'] == other['bottom'] && this['right'] == other['right']);
 };

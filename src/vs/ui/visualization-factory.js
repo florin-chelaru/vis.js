@@ -74,6 +74,6 @@ vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $att
   if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
 
   return u.reflection.applyConstructor(visCtor, [
-    {$scope:$scope, $element:$element, $attrs:$attrs, taskService:this._taskService, $timeout: this._$timeout, threadPool: this._threadPool['pool']},
-    visualContext.options, data]);
+    {'$scope':$scope, '$element':$element, '$attrs':$attrs, taskService:this._taskService, $timeout: this._$timeout, threadPool: this._threadPool['pool']},
+    visualContext['options'], data]);
 };

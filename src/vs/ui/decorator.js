@@ -21,24 +21,24 @@ vs.ui.Decorator = function($ng, $targetElement, target, options) {
   /**
    * @private
    */
-  this._$scope = $ng.$scope;
+  this._$scope = $ng['$scope'];
 
   /**
    * @type {jQuery}
    * @private
    */
-  this._$element = $ng.$element;
+  this._$element = $ng['$element'];
 
   /**
    * @private
    */
-  this._$attrs = $ng.$attrs;
+  this._$attrs = $ng['$attrs'];
 
   /**
    * @type {Function}
    * @private
    */
-  this._$timeout = $ng.$timeout;
+  this._$timeout = $ng['$timeout'];
 
   /**
    * @type {jQuery}
@@ -56,13 +56,13 @@ vs.ui.Decorator = function($ng, $targetElement, target, options) {
    * @type {vs.async.Task}
    * @private
    */
-  this._beginDrawTask = $ng.taskService.createTask(this.beginDraw, this);
+  this._beginDrawTask = $ng['taskService'].createTask(this.beginDraw, this);
 
   /**
    * @type {vs.async.Task}
    * @private
    */
-  this._endDrawTask = $ng.taskService.createTask(this.endDraw, this);
+  this._endDrawTask = $ng['taskService'].createTask(this.endDraw, this);
 
   /**
    * @type {Object.<string, *>}
@@ -112,6 +112,12 @@ vs.ui.Decorator.prototype.target;
 vs.ui.Decorator.prototype.options;
 
 /**
+ * @type {Object.<string, vs.ui.Setting>}
+ * @name vs.ui.Decorator#settings
+ */
+vs.ui.Decorator.prototype.settings;
+
+/**
  * @type {vs.async.Task}
  * @name vs.ui.Decorator#beginDrawTask
  */
@@ -124,14 +130,14 @@ vs.ui.Decorator.prototype.beginDrawTask;
 vs.ui.Decorator.prototype.endDrawTask;
 
 Object.defineProperties(vs.ui.Decorator.prototype, {
-  $scope: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$scope; })},
-  $element: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$element; })},
-  $attrs: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$attrs; })},
+  '$scope': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$scope; })},
+  '$element': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$element; })},
+  '$attrs': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$attrs; })},
   $targetElement: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$targetElement; })},
-  data: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target.data; })},
+  'data': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target['data']; })},
   target: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target; })},
-  options: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._options; })},
-  settings: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return {}; })},
+  'options': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._options; })},
+  'settings': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return {}; })},
   beginDrawTask: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._beginDrawTask; })},
   endDrawTask: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._endDrawTask; })}
 });
@@ -141,8 +147,8 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
  * @returns {*}
  */
 vs.ui.Decorator.prototype.optionValue = function(optionKey) {
-  if (!(optionKey in this.settings)) { return null; }
-  return this.settings[optionKey].getValue(this.options, this.$attrs, this.data, this.settings);
+  if (!(optionKey in this['settings'])) { return null; }
+  return this['settings'][optionKey].getValue(this['options'], this['$attrs'], this['data'], this['settings']);
 };
 
 vs.ui.Decorator.prototype.beginDraw = function() { /*console.log('Decorator.beginDraw'); */return Promise.resolve(); };

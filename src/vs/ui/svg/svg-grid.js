@@ -27,10 +27,10 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target.data.isReady) { resolve(); return; }
+        if (!self.target['data']['isReady']) { resolve(); return; }
 
         var target = self.target;
-        var svg = d3.select(target.$element[0]).select('svg');
+        var svg = d3.select(target['$element'][0]).select('svg');
 
         var type = self.type;
         var className = 'grid-' + type;
@@ -43,7 +43,7 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
         var height = target.height;
         var width = target.width;
         var margins = target.margins;
-        var origins = {x: margins.left, y: height - margins.bottom};
+        var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
         var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
         if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
@@ -57,12 +57,12 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
           .attr('class', 'grid-line');
 
         var x1 = type == 'x' ? scale : 0;
-        var x2 = type == 'x' ? scale : width - margins.left - margins.right;
+        var x2 = type == 'x' ? scale : width - margins['left'] - margins['right'];
         var y1 = type == 'y' ? scale : 0;
-        var y2 = type == 'y' ? scale : height - margins.top - margins.bottom;
+        var y2 = type == 'y' ? scale : height - margins['top'] - margins['bottom'];
 
         gridLines
-          .attr('transform', 'translate(' + margins.left + ', ' + margins.top + ')')
+          .attr('transform', 'translate(' + margins['left'] + ', ' + margins['top'] + ')')
           .attr('x1', x1)
           .attr('x2', x2)
           .attr('y1', y1)

@@ -52,7 +52,7 @@ vs.models.DataArray.prototype.d;
 vs.models.DataArray.prototype.boundaries;
 
 Object.defineProperties(vs.models.DataArray.prototype, {
-  label: { get: /** @type {function (this:vs.models.DataArray)} */ (function () { return this._label; })},
-  d: { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._d; })},
-  boundaries: { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._boundaries; })}
+  'label': { get: /** @type {function (this:vs.models.DataArray)} */ (function () { return this._label; })},
+  'd': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._d; })},
+  'boundaries': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._boundaries; })}
 });
