@@ -43,8 +43,14 @@ vs.directives.GraphicDecorator = function($scope, taskService, $timeout) {
 
 goog.inherits(vs.directives.GraphicDecorator, vs.directives.Directive);
 
+/**
+ * @type {vs.ui.Decorator}
+ * @name vs.directives.GraphicDecorator#handler
+ */
+vs.directives.GraphicDecorator.prototype.handler;
+
 Object.defineProperties(vs.directives.GraphicDecorator.prototype, {
-  handler: { get: function() { return this._handler; }}
+  'handler': { get: /** @type {function (this:vs.directives.GraphicDecorator)} */ (function() { return this._handler; })}
 });
 
 /**
@@ -55,16 +61,16 @@ Object.defineProperties(vs.directives.GraphicDecorator.prototype, {
  * @override
  */
 vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
 
   /** @type {vs.directives.Visualization} */
   var vis = $scope['visualization']['handler'];
   var options = $attrs['vsOptions'] ? $scope.$eval($attrs['vsOptions']) : {};
 
-  this._handler = this.createDecorator({'$scope':$scope, '$element':$element, '$attrs':$attrs, taskService:this._taskService, $timeout:this._$timeout}, $element.parent(), vis.handler, options);
+  this._handler = this.createDecorator({'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout':this._$timeout}, $element.parent(), vis['handler'], options);
 
-  this._taskService.chain(this._handler['endDrawTask'], vis.handler['endDrawTask']);
-  this._taskService.chain(vis.handler['beginDrawTask'], this._handler['beginDrawTask']);
+  this._taskService.chain(this._handler['endDrawTask'], vis['handler']['endDrawTask']);
+  this._taskService.chain(vis['handler']['beginDrawTask'], this._handler['beginDrawTask']);
 };
 
 /**

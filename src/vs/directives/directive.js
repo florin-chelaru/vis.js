@@ -54,14 +54,16 @@ Object.defineProperties(vs.directives.Directive.prototype, {
 });
 
 /**
- * @type {{pre: function(angular.Scope, jQuery, angular.Attributes), post: function(angular.Scope, jQuery, angular.Attributes)}|function(angular.Scope, jQuery, angular.Attributes)}
+ * @type {{pre: function(angular.Scope, jQuery, angular.Attributes, (*|undefined)), post: function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
 vs.directives.Directive.prototype.link = {
-  pre: function($scope, $element, $attrs) {
+
+  'pre': function($scope, $element, $attrs, controller) {
     this._$element = $element;
     this._$attrs = $attrs;
   },
-  post: function($scope, $element, $attrs) {
+
+  'post': function($scope, $element, $attrs, controller) {
     this._$element = $element;
     this._$attrs = $attrs;
   }
@@ -72,7 +74,7 @@ vs.directives.Directive.prototype.link = {
  * @param {function(new: vs.directives.Directive)} controllerCtor
  * @param {Array} [args]
  * @param {Object.<string, *>} [options]
- * @returns {{controller: *[], link: Function, restrict: string, transclude: boolean, replace: boolean}}
+ * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
  */
 vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
   var controller = ['$scope', function($scope) {
@@ -80,29 +82,29 @@ vs.directives.Directive.createNew = function(name, controllerCtor, args, options
     params.unshift($scope);
 
     // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
-    this.handler = u.reflection.applyConstructor(controllerCtor, params);
+    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
   }];
   var link;
   if (typeof controllerCtor.prototype.link == 'function') {
     link = function ($scope, $element, $attrs) {
       var ctrl = $scope[name];
-      return ctrl.handler.link($scope, $element, $attrs, ctrl);
+      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
     };
   } else {
     link = {};
-    if (controllerCtor.prototype.link.pre) {
-      link.pre = function($scope, $element, $attrs) {
+    if ('pre' in controllerCtor.prototype.link) {
+      link['pre'] = function($scope, $element, $attrs) {
         var ctrl = $scope[name];
-        ctrl.handler.link.pre.call(ctrl.handler, $scope, $element, $attrs, ctrl);
+        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
       };
     }
-    if (controllerCtor.prototype.link.post) {
-      link.post = function($scope, $element, $attrs) {
+    if ('post' in controllerCtor.prototype.link) {
+      link['post'] = function($scope, $element, $attrs) {
         var ctrl = $scope[name];
-        ctrl.handler.link.post.call(ctrl.handler, $scope, $element, $attrs, ctrl);
+        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
       };
     }
   }
 
-  return angular.extend({}, options, { link: link, controller: controller, controllerAs: name });
+  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
 };

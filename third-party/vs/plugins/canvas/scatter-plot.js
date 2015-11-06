@@ -59,8 +59,9 @@ vs.plugins.canvas.ScatterPlot.prototype.endDraw = function() {
         var context = self.pendingCanvas[0].getContext('2d');
 
         var transform =
-          vs.models.Transformer.scale(xScale, yScale)
-            .combine(vs.models.Transformer.translate({x: margins.left, y: margins.top}));
+          vs.models.Transformer
+            .scale(xScale, yScale)
+            .translate({x: margins.left, y: margins.top});
         var items = u.array.range(data.nrows).map(function(i) {
           return new vs.models.DataRow(data, i);
         });

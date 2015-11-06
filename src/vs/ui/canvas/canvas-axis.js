@@ -48,9 +48,11 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
         var width = target['width'];
         var margins = target['margins'];
         var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer.translate({'x': margins['left'], 'y': margins['top']}).combine(intCoords);
+        var translate = vs.models.Transformer
+          .translate({'x': margins['left'], 'y': margins['top']})
+          .intCoords();
 
-        var context = target.pendingCanvas[0].getContext('2d');
+        var context = target['pendingCanvas'][0].getContext('2d');
         var moveTo = context.__proto__.moveTo;
         var lineTo = context.__proto__.lineTo;
 
@@ -106,7 +108,7 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
         } else {
           context.textAlign = 'right';
           context.textBaseline = 'middle';
-          translate = translate.combine(vs.models.Transformer.translate({'x': -5, 'y': 0}));
+          translate = translate.translate({'x': -5, 'y': 0});
         }
 
         units.forEach(function(unit, i) {

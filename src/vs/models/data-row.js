@@ -40,7 +40,7 @@ vs.models.DataRow.prototype.index;
 vs.models.DataRow.prototype.data;
 
 Object.defineProperties(vs.models.DataRow.prototype, {
-  index: { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
+  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
   'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
 });
 
@@ -57,7 +57,7 @@ vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
 
   var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
 
-  return vals['d'][index * this['data']['nrows'] + this.index];
+  return vals['d'][index * this['data']['nrows'] + this['index']];
 };
 
 /**
@@ -67,5 +67,5 @@ vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
 vs.models.DataRow.prototype.info = function(label) {
   var arr = this['data'].getRow(label);
   if (!arr) { return undefined; }
-  return arr['d'][this.index];
+  return arr['d'][this['index']];
 };

@@ -33,9 +33,11 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
         var height = target['height'];
         var width = target['width'];
         var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer.translate({'x': margins['left'], 'y': margins['top']}).combine(intCoords);
+        var translate = vs.models.Transformer
+          .translate({'x': margins['left'], 'y': margins['top']})
+          .intCoords();
 
-        var context = target.pendingCanvas[0].getContext('2d');
+        var context = target['pendingCanvas'][0].getContext('2d');
         var moveTo = context.__proto__.moveTo;
         var lineTo = context.__proto__.lineTo;
 

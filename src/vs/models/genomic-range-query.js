@@ -22,22 +22,22 @@ vs.models.GenomicRangeQuery = function(chr, start, end) {
    */
   this._query = [
     new vs.models.Query({
-      target: vs.models.Query.Target['ROWS'],
-      targetLabel: 'chr',
-      test: vs.models.Query.Test['EQUALS'],
-      testArgs: chr
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'chr',
+      'test': vs.models.Query.Test['EQUALS'],
+      'testArgs': chr
     }),
     new vs.models.Query({
-      target: vs.models.Query.Target['ROWS'],
-      targetLabel: 'start',
-      test: vs.models.Query.Test['LESS_THAN'],
-      testArgs: end
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'start',
+      'test': vs.models.Query.Test['LESS_THAN'],
+      'testArgs': end
     }),
     new vs.models.Query({
-      target: vs.models.Query.Target['ROWS'],
-      targetLabel: 'end',
-      test: vs.models.Query.Test['GREATER_OR_EQUALS'],
-      testArgs: start
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'end',
+      'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
+      'testArgs': start
     })
   ];
 
@@ -60,11 +60,35 @@ vs.models.GenomicRangeQuery = function(chr, start, end) {
   this._end = end;
 };
 
+/**
+ * @type {string}
+ * @name vs.models.GenomicRangeQuery#chr
+ */
+vs.models.GenomicRangeQuery.prototype.chr;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#start
+ */
+vs.models.GenomicRangeQuery.prototype.start;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#end
+ */
+vs.models.GenomicRangeQuery.prototype.end;
+
+/**
+ * @type {Array.<vs.models.Query>}
+ * @name vs.models.GenomicRangeQuery#query
+ */
+vs.models.GenomicRangeQuery.prototype.query;
+
 Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
-  chr: { get: function() { return this._chr; }},
-  start: { get: function() { return this._start; }},
-  end: { get: function() { return this._end; }},
-  query: { get: function() { return this._query; }}
+  'chr': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._chr; })},
+  'start': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._start; })},
+  'end': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._end; })},
+  'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
 });
 
 vs.models.GenomicRangeQuery.extract = function(query) {

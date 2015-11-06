@@ -55,15 +55,16 @@ vs.directives.Visualization.prototype.taskService;
 vs.directives.Visualization.prototype.handler;
 
 Object.defineProperties(vs.directives.Visualization.prototype, {
-  taskService: { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._taskService; })},
-  handler: { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._handler; })}
+  'taskService': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._taskService; })},
+  'handler': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._handler; })}
 });
 
 /**
- * @type {{pre: function(angular.Scope, jQuery, angular.Attributes), post: function(angular.Scope, jQuery, angular.Attributes)}}
+ * @type {{pre: function(angular.Scope, jQuery, angular.Attributes, (*|undefined)), post: function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
 vs.directives.Visualization.prototype.link = {
-  pre: function($scope, $element, $attrs, controller) {
+
+  'pre': function($scope, $element, $attrs, controller) {
     this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
     $element.css({
       'top': (this._handler['options']['y'] || 0) + 'px',
@@ -72,7 +73,8 @@ vs.directives.Visualization.prototype.link = {
       'height': this._handler['options']['height'] + 'px'
     });
   },
-  post: function($scope, $element, $attrs, controller) {
+
+  'post': function($scope, $element, $attrs, controller) {
     var self = this;
     $element.resize(function(event) {
       self._handler['options']['width'] = event['width'];

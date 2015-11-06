@@ -94,7 +94,7 @@ Object.defineProperties(vs.directives.Navbar.prototype, {
  * @override
  */
 vs.directives.Navbar.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
   var $window = $scope['vsWindow']['handler']['$window'];
 
   /** @type {vs.ui.DataHandler} */
@@ -102,7 +102,7 @@ vs.directives.Navbar.prototype.link = function($scope, $element, $attrs, control
 
   var $navbar = $('<div class="nav navbar navbar-default navbar-fixed-top" style="position: absolute;"></div>').appendTo($window);
   var $container = $('<div class="container-fluid"></div>').appendTo($navbar);
-  var $header = $('<div class="navbar-header"><a class="navbar-brand" href="#">' + dataHandler.name + '</a></div>').appendTo($container);
+  var $header = $('<div class="navbar-header"><a class="navbar-brand" href="#">' + dataHandler['name'] + '</a></div>').appendTo($container);
   var $left = $('<ul class="nav navbar-nav navbar-left"></ul>').appendTo($container);
   var $right = $('<ul class="nav navbar-nav navbar-right"></ul>').appendTo($container);
 

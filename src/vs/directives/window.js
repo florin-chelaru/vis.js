@@ -38,8 +38,8 @@ Object.defineProperties(vs.directives.Window.prototype, {
  * @type {{pre: function(angular.Scope, jQuery, angular.Attributes)}}
  */
 vs.directives.Window.prototype.link = {
-  pre: function($scope, $element, $attrs, controller) {
-    vs.directives.Directive.prototype.link.pre.apply(this, arguments);
+  'pre': function($scope, $element, $attrs, controller) {
+    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
 
     $window.css({

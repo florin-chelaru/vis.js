@@ -52,7 +52,7 @@ Object.defineProperties(vs.directives.NavLocation.prototype, {
  * @override
  */
 vs.directives.NavLocation.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link.post.apply(this, arguments);
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
   var $navbarLeft = $scope['vsNavbar']['handler']['$left'];
   /** @type {vs.ui.DataHandler} */
   var dataHandler = $scope['vsDataContext']['handler']['handler'];

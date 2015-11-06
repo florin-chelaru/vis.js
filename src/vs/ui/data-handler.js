@@ -25,19 +25,19 @@ vs.ui.DataHandler = function(options) {
    * @type {Array.<vs.ui.VisualContext>}
    * @private
    */
-  this._visualizations = options.visualizations || [];
+  this._visualizations = options['visualizations'] || [];
 
   /**
    * @type {Array.<vs.ui.DataHandler>}
    * @private
    */
-  this._children = options.children || [];
+  this._children = options['children'] || [];
 
   /**
    * @type {string}
    * @private
    */
-  this._name = options.name || '';
+  this._name = options['name'] || '';
 };
 
 /**
@@ -71,20 +71,20 @@ vs.ui.DataHandler.prototype.children;
 vs.ui.DataHandler.prototype.visualizations;
 
 Object.defineProperties(vs.ui.DataHandler.prototype, {
-  name: { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
+  'name': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
 
   'data': {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
     set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
   },
 
-  dataChanged: { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
+  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
 
-  children: {
+  'children': {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
   },
 
-  visualizations: {
+  'visualizations': {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
   }
 });

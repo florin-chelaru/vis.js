@@ -11,7 +11,7 @@ goog.require('vs.ui.DataHandler');
 
 /**
  * @param {angular.Scope} $scope
- * @param $templateCache
+ * @param {angular.$templateCache} $templateCache
  * @constructor
  * @extends {vs.directives.Directive}
  */
@@ -20,6 +20,7 @@ vs.directives.DataContext = function($scope, $templateCache) {
 
   /**
    * Angular template service
+   * @type {angular.$templateCache}
    * @private
    */
   this._$templateCache = $templateCache;
@@ -42,7 +43,7 @@ vs.directives.DataContext = function($scope, $templateCache) {
   $scope['dataHandler'] = this._handler;
 
   /**
-   * @type {string}
+   * @type {string|null}
    * @private
    */
   this._template = null;
@@ -51,10 +52,10 @@ vs.directives.DataContext = function($scope, $templateCache) {
   var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
 
   var t = $('<div></div>');
-  this._handler.visualizations.forEach(function(visContext, i) {
-    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators'].cls.join(' '))).appendTo(t);
-    visContext['decorators'].elem.forEach(function(decorator, j) {
-      var d = $(goog.string.format(decoratorFmt, decorator.cls, i, j)).appendTo(v);
+  this._handler['visualizations'].forEach(function(visContext, i) {
+    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
+    visContext['decorators']['elem'].forEach(function(decorator, j) {
+      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
     });
   });
   var template = t.html();
@@ -78,6 +79,6 @@ vs.directives.DataContext.prototype.handler;
 vs.directives.DataContext.prototype.template;
 
 Object.defineProperties(vs.directives.DataContext.prototype, {
-  handler: { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
-  template: { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
+  'handler': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
+  'template': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
 });

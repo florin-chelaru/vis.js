@@ -9,19 +9,19 @@ goog.provide('vs.models.Transformer');
 goog.require('vs.models.Point');
 
 /**
- * @param {function(vs.models.Point)} transformation
+ * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
  * @constructor
  */
 vs.models.Transformer = function(transformation) {
   /**
-   * @type {function(vs.models.Point|{x: number=, y: number=}): vs.models.Point}
+   * @type {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point}
    * @private
    */
   this._transformation = transformation;
 };
 
 /**
- * @param {vs.models.Point|{x: number=, y: number=}} point
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
  * @returns {vs.models.Point}
  */
 vs.models.Transformer.prototype.calc = function(point) {
@@ -29,12 +29,12 @@ vs.models.Transformer.prototype.calc = function(point) {
 };
 
 /**
- * @param {vs.models.Point|{x: number=, y: number=}} point
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
  * @returns {Array.<number>}
  */
 vs.models.Transformer.prototype.calcArr = function(point) {
   var t = this.calc(point);
-  return [t.x, t.y];
+  return [t['x'], t['y']];
 };
 
 /**
@@ -42,7 +42,7 @@ vs.models.Transformer.prototype.calcArr = function(point) {
  * @returns {number}
  */
 vs.models.Transformer.prototype.calcX = function(x) {
-  return this._transformation.call(null, {x: x}).x;
+  return this._transformation.call(null, {'x': x})['x'];
 };
 
 /**
@@ -50,11 +50,11 @@ vs.models.Transformer.prototype.calcX = function(x) {
  * @returns {number}
  */
 vs.models.Transformer.prototype.calcY = function(y) {
-  return this._transformation({y: y}).y;
+  return this._transformation({'y': y})['y'];
 };
 
 /**
- * @param {vs.models.Transformer|function(vs.models.Point|{x: number=, y: number=}): vs.models.Point} transformer
+ * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
  * @returns {vs.models.Transformer}
  */
 vs.models.Transformer.prototype.combine = function(transformer) {
@@ -67,19 +67,43 @@ vs.models.Transformer.prototype.combine = function(transformer) {
 
   // function
   return new vs.models.Transformer(function (point) {
-    return transformer(self.calc(point));
+    return transformer.call(null, self.calc(point));
   });
 };
 
 /**
- * @param {vs.models.Point|{x: number=, y: number=}} offset
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.translate = function(offset) {
+  return this.combine(vs.models.Transformer.translate(offset));
+};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.scale = function(xScale, yScale) {
+  return this.combine(vs.models.Transformer.scale(xScale, yScale));
+};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.intCoords = function() {
+  return this.combine(vs.models.Transformer.intCoords());
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
  * @returns {vs.models.Transformer}
  */
 vs.models.Transformer.translate = function(offset) {
   return new vs.models.Transformer(function(point) {
     return new vs.models.Point(
-      point.x != undefined ? point.x + offset.x : undefined,
-      point.y != undefined ? point.y + offset.y : undefined);
+      point['x'] != undefined ? point['x'] + offset['x'] : undefined,
+      point['y'] != undefined ? point['y'] + offset['y'] : undefined);
   });
 };
 
@@ -91,8 +115,8 @@ vs.models.Transformer.translate = function(offset) {
 vs.models.Transformer.scale = function(xScale, yScale) {
   return new vs.models.Transformer(function(point) {
     return new vs.models.Point(
-      point.x != undefined ? xScale(point.x) : undefined,
-      point.y != undefined ? yScale(point.y) : undefined);
+      point['x'] != undefined ? xScale(point['x']) : undefined,
+      point['y'] != undefined ? yScale(point['y']) : undefined);
   });
 };
 
@@ -101,6 +125,6 @@ vs.models.Transformer.scale = function(xScale, yScale) {
  */
 vs.models.Transformer.intCoords = function() {
   return new vs.models.Transformer(function(point) {
-    return { x: Math.floor(point.x), y: Math.floor(point.y) };
+    return new vs.models.Point(Math.floor(point['x']), Math.floor(point['y']));
   });
 };
