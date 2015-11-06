@@ -11,7 +11,7 @@ goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.async.TaskService');
 
 /**
- * @param $scope
+ * @param {angular.Scope} $scope
  * @param {vs.ui.VisualizationFactory} visualizationFactory
  * @param {vs.async.TaskService} taskService
  * @constructor
@@ -60,10 +60,7 @@ Object.defineProperties(vs.directives.Visualization.prototype, {
 });
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
- * @override
+ * @type {{pre: function(angular.Scope, jQuery, angular.Attributes), post: function(angular.Scope, jQuery, angular.Attributes)}}
  */
 vs.directives.Visualization.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {
@@ -78,8 +75,8 @@ vs.directives.Visualization.prototype.link = {
   post: function($scope, $element, $attrs, controller) {
     var self = this;
     $element.resize(function(event) {
-      self._handler['options']['width'] = event.width;
-      self._handler['options']['height'] = event.height;
+      self._handler['options']['width'] = event['width'];
+      self._handler['options']['height'] = event['height'];
       if (!$scope.$$phase) { $scope.$apply(); }
     });
   }

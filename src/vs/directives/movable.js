@@ -9,7 +9,7 @@ goog.provide('vs.directives.Movable');
 goog.require('vs.directives.Directive');
 
 /**
- * @param $scope
+ * @param {angular.Scope} $scope
  * @param $document
  * @constructor
  * @extends {vs.directives.Directive}
@@ -27,15 +27,15 @@ vs.directives.Movable = function($scope, $document) {
 goog.inherits(vs.directives.Movable, vs.directives.Directive);
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
  * @param controller
  * @override
  */
 vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
   vs.directives.Directive.prototype.link.post.apply(this, arguments);
-  var $window = $scope['vsWindow'].handler.$window;
+  var $window = $scope['vsWindow']['handler']['$window'];
   $window.css({ 'cursor': 'move' });
 
   var startX = 0, startY = 0, x, y;

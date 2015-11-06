@@ -46,7 +46,7 @@ vs.ui.Setting = function(args) { //key, type, defaultValue, label, template, hid
   this['label'] = args['label'] || this['key'];
 
   /**
-   * @type {Array|function(Object.<string, *>, *, vs.models.DataSource, Object.<string, vs.ui.Setting>)|null}
+   * @type {Array|function(Object.<string, *>, *, (vs.models.DataSource|undefined), (Object.<string, vs.ui.Setting>|undefined))|null}
    * @private
    */
   this._possibleValues = args['possibleValues'] || null;
@@ -244,7 +244,7 @@ vs.ui.Setting.valueBoundaries = function (options, $attrs, data, settings) {
 
   if (!settings || !('vals' in settings)) { throw new vs.ui.UiException('Missing dependency for "vals" in the "boundaries" defaultValue function'); }
 
-  var valsArr = data.getVals(settings['vals'].getValue(options, $attrs, data, settings));
+  var valsArr = data.getVals(/** @type {string} */ (settings['vals'].getValue(options, $attrs, data, settings)));
   boundaries = valsArr['boundaries'] || new vs.models.Boundaries(
       Math.min.apply(null, valsArr['d']),
       Math.max.apply(null, valsArr['d']));
@@ -335,9 +335,9 @@ vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
     }
   });
 
-  var xBoundaries = settings['xBoundaries'].getValue(options, $attrs, data, settings);
-  var width = settings['width'].getValue(options, $attrs, data, settings);
-  var margins = settings['margins'].getValue(options, $attrs, data, settings);
+  var xBoundaries = /** @type {vs.models.Boundaries} */ (settings['xBoundaries'].getValue(options, $attrs, data, settings));
+  var width = /** @type {number} */ (settings['width'].getValue(options, $attrs, data, settings));
+  var margins = /** @type {vs.models.Margins} */ (settings['margins'].getValue(options, $attrs, data, settings));
   return d3.scale.linear()
     .domain([xBoundaries['min'], xBoundaries['max']])
     .range([0, width - margins['left'] - margins['right']]);
@@ -359,9 +359,9 @@ vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
     }
   });
 
-  var yBoundaries = settings['yBoundaries'].getValue(options, $attrs, data, settings);
-  var height = settings['height'].getValue(options, $attrs, data, settings);
-  var margins = settings['margins'].getValue(options, $attrs, data, settings);
+  var yBoundaries = /** @type {vs.models.Boundaries} */ (settings['yBoundaries'].getValue(options, $attrs, data, settings));
+  var height = /** @type {number} */ (settings['height'].getValue(options, $attrs, data, settings));
+  var margins = /** @type {vs.models.Margins} */ (settings['margins'].getValue(options, $attrs, data, settings));
   return d3.scale.linear()
     .domain([yBoundaries['min'], yBoundaries['max']])
     .range([height - margins['top'] - margins['bottom'], 0]);

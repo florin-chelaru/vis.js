@@ -13,29 +13,32 @@ goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
 
 /**
- * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService, threadPool: parallel.ThreadPool}} $ng
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService, threadPool: parallel.ThreadPool}} $ng
  * @param {Object.<string, *>} options
  * @param {vs.models.DataSource} data
  * @constructor
  */
 vs.ui.VisHandler = function($ng, options, data) {
   /**
+   * @type {angular.Scope}
    * @private
    */
   this._$scope = $ng['$scope'];
 
   /**
+   * @type {jQuery}
    * @private
    */
   this._$element = $ng['$element'];
 
   /**
+   * @type {angular.Attributes}
    * @private
    */
   this._$attrs = $ng['$attrs'];
 
   /**
-   * @type {Function}
+   * @type {angular.$timeout}
    * @private
    */
   this._$timeout = $ng['$timeout'];
@@ -156,6 +159,7 @@ vs.ui.VisHandler.prototype.render;
 vs.ui.VisHandler.prototype.settings;
 
 /**
+ * @type {angular.Scope}
  * @name vs.ui.VisHandler#$scope
  */
 vs.ui.VisHandler.prototype.$scope;
@@ -167,6 +171,7 @@ vs.ui.VisHandler.prototype.$scope;
 vs.ui.VisHandler.prototype.$element;
 
 /**
+ * @type {angular.Attributes}
  * @name vs.ui.VisHandler#$attrs
  */
 vs.ui.VisHandler.prototype.$attrs;
@@ -227,6 +232,7 @@ vs.ui.VisHandler.prototype.width;
 vs.ui.VisHandler.prototype.height;
 
 Object.defineProperties(vs.ui.VisHandler.prototype, {
+  'render': { get: function() { throw new u.UnimplementedException('Property "render" does not exist in data source'); }},
   'settings': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return vs.ui.VisHandler.Settings; })},
   '$scope': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$scope; })},
   '$element': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$element; })},
@@ -234,24 +240,23 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
   'options': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._options; })},
   'data': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._data; })},
 
-  // TODO: Aici
-  sharedData: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._sharedData; })},
-  thread: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._thread; })},
+  'sharedData': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._sharedData; })},
+  'thread': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._thread; })},
 
-  beginDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._beginDrawTask; })},
-  endDrawTask: { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._endDrawTask; })},
+  'beginDrawTask': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._beginDrawTask; })},
+  'endDrawTask': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._endDrawTask; })},
 
-  margins: {
+  'margins': {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('margins'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['margins'] = value; })
   },
 
-  width: {
+  'width': {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('width'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['width'] = value; })
   },
 
-  height: {
+  'height': {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('height'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['height'] = value; })
   }
@@ -292,13 +297,13 @@ vs.ui.VisHandler.prototype.draw = function() {
     // The beginDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
     // TODO: Create an entirely new chain, containing both the beginDraw and draw tasks and run that instead.
     /*lastDraw
-     .then(function() { return taskService.runChain(self.beginDrawTask); })
-     .then(function() { return taskService.runChain(self.endDrawTask); })
+     .then(function() { return taskService.runChain(self['beginDrawTask']); })
+     .then(function() { return taskService.runChain(self['endDrawTask']); })
      .then(resolve);*/
 
     Promise.resolve()
-      .then(function() { taskService.runChain(self.beginDrawTask, true); })
-      .then(function() { taskService.runChain(self.endDrawTask, true); })
+      .then(function() { taskService.runChain(self['beginDrawTask'], true); })
+      .then(function() { taskService.runChain(self['endDrawTask'], true); })
       .then(function() { self._lastDrawFired = true; })
       .then(resolve, reject);
   });
@@ -306,6 +311,8 @@ vs.ui.VisHandler.prototype.draw = function() {
   return promise;
 };
 
+/**
+ */
 vs.ui.VisHandler.prototype.scheduleRedraw = function() {
   // This will trigger an asynchronous angular digest
   this._$timeout.call(null, function() {}, 0);

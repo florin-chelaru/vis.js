@@ -21,20 +21,20 @@ vs.models.DataArray = function(d, label, boundaries) {
   this._d = d;
 
   /**
-   * @type {string}
+   * @type {string|undefined}
    * @private
    */
   this._label = label;
 
   /**
-   * @type {vs.models.Boundaries}
+   * @type {vs.models.Boundaries|undefined}
    * @private
    */
   this._boundaries = boundaries;
 };
 
 /**
- * @type {string}
+ * @type {string|undefined}
  * @name vs.models.DataArray#label
  */
 vs.models.DataArray.prototype.label;
@@ -46,7 +46,7 @@ vs.models.DataArray.prototype.label;
 vs.models.DataArray.prototype.d;
 
 /**
- * @type {vs.models.Boundaries}
+ * @type {vs.models.Boundaries|undefined}
  * @name vs.models.DataArray#boundaries
  */
 vs.models.DataArray.prototype.boundaries;

@@ -10,7 +10,7 @@ goog.require('vs.directives.Directive');
 goog.require('vs.ui.DataHandler');
 
 /**
- * @param $scope
+ * @param {angular.Scope} $scope
  * @param $templateCache
  * @constructor
  * @extends {vs.directives.Directive}
@@ -39,7 +39,7 @@ vs.directives.DataContext = function($scope, $templateCache) {
   }
 
   if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
-  $scope.dataHandler = this._handler;
+  $scope['dataHandler'] = this._handler;
 
   /**
    * @type {string}
@@ -52,8 +52,8 @@ vs.directives.DataContext = function($scope, $templateCache) {
 
   var t = $('<div></div>');
   this._handler.visualizations.forEach(function(visContext, i) {
-    var v = $(goog.string.format(visCtxtFmt, i, visContext.decorators.cls.join(' '))).appendTo(t);
-    visContext.decorators.elem.forEach(function(decorator, j) {
+    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators'].cls.join(' '))).appendTo(t);
+    visContext['decorators'].elem.forEach(function(decorator, j) {
       var d = $(goog.string.format(decoratorFmt, decorator.cls, i, j)).appendTo(v);
     });
   });

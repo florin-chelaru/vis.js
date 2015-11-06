@@ -16,7 +16,7 @@ vs.ui.VisualContext = function(construct, options, decorators) {
   /**
    * @type {{render: string, type: string}}
    */
-  this.construct = construct;
+  this['construct'] = construct;
 
   /**
    * @type {Object.<string, *>}
@@ -26,5 +26,5 @@ vs.ui.VisualContext = function(construct, options, decorators) {
   /**
    * @type {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}|Array}
    */
-  this.decorators = decorators || [];
+  this['decorators'] = decorators || [];
 };

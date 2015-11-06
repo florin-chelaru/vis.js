@@ -40,9 +40,9 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
             .attr('class', className);
         }
 
-        var height = target.height;
-        var width = target.width;
-        var margins = target.margins;
+        var height = target['height'];
+        var width = target['width'];
+        var margins = target['margins'];
         var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
         var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');

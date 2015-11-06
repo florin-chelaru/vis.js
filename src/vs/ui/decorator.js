@@ -10,7 +10,7 @@ goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
 
 /**
- * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService}} $ng
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
  * @param {Object.<string, *>} options
@@ -19,6 +19,7 @@ goog.require('vs.async.TaskService');
  */
 vs.ui.Decorator = function($ng, $targetElement, target, options) {
   /**
+   * @type {angular.Scope}
    * @private
    */
   this._$scope = $ng['$scope'];
@@ -30,12 +31,13 @@ vs.ui.Decorator = function($ng, $targetElement, target, options) {
   this._$element = $ng['$element'];
 
   /**
+   * @type {angular.Attributes}
    * @private
    */
   this._$attrs = $ng['$attrs'];
 
   /**
-   * @type {Function}
+   * @type {angular.$timeout}
    * @private
    */
   this._$timeout = $ng['$timeout'];
@@ -72,6 +74,7 @@ vs.ui.Decorator = function($ng, $targetElement, target, options) {
 };
 
 /**
+ * @type {angular.Scope}
  * @name vs.ui.Decorator#$scope
  */
 vs.ui.Decorator.prototype.$scope;
@@ -83,6 +86,7 @@ vs.ui.Decorator.prototype.$scope;
 vs.ui.Decorator.prototype.$element;
 
 /**
+ * @type {angular.Attributes}
  * @name vs.ui.Decorator#$attrs
  */
 vs.ui.Decorator.prototype.$attrs;
@@ -138,8 +142,8 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
   target: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target; })},
   'options': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._options; })},
   'settings': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return {}; })},
-  beginDrawTask: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._beginDrawTask; })},
-  endDrawTask: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._endDrawTask; })}
+  'beginDrawTask': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._beginDrawTask; })},
+  'endDrawTask': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._endDrawTask; })}
 });
 
 /**
@@ -151,6 +155,12 @@ vs.ui.Decorator.prototype.optionValue = function(optionKey) {
   return this['settings'][optionKey].getValue(this['options'], this['$attrs'], this['data'], this['settings']);
 };
 
-vs.ui.Decorator.prototype.beginDraw = function() { /*console.log('Decorator.beginDraw'); */return Promise.resolve(); };
+/**
+ * @returns {Promise}
+ */
+vs.ui.Decorator.prototype.beginDraw = function() { return Promise.resolve(); };
 
-vs.ui.Decorator.prototype.endDraw = function() { /*console.log('Decorator.endDraw'); */return Promise.resolve(); };
+/**
+ * @returns {Promise}
+ */
+vs.ui.Decorator.prototype.endDraw = function() { return Promise.resolve(); };

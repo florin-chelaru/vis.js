@@ -29,9 +29,9 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
 
         var target = self.target;
         var type = self.type;
-        var margins = target.margins;
-        var height = target.height;
-        var width = target.width;
+        var margins = target['margins'];
+        var height = target['height'];
+        var width = target['width'];
         var intCoords = vs.models.Transformer.intCoords();
         var translate = vs.models.Transformer.translate({'x': margins['left'], 'y': margins['top']}).combine(intCoords);
 

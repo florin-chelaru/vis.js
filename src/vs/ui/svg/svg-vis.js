@@ -19,7 +19,7 @@ vs.ui.svg.SvgVis = function () {
 goog.inherits(vs.ui.svg.SvgVis, vs.ui.VisHandler);
 
 Object.defineProperties(vs.ui.svg.SvgVis.prototype, {
-  render: { get: /** @type {function (this:vs.ui.svg.SvgVis)} */ (function() { return 'svg'; })}
+  'render': { get: /** @type {function (this:vs.ui.svg.SvgVis)} */ (function() { return 'svg'; })}
 });
 
 vs.ui.svg.SvgVis.prototype.beginDraw = function () {

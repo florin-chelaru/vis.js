@@ -35,11 +35,7 @@ Object.defineProperties(vs.directives.Window.prototype, {
 });
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
- * @param controller
- * @override
+ * @type {{pre: function(angular.Scope, jQuery, angular.Attributes)}}
  */
 vs.directives.Window.prototype.link = {
   pre: function($scope, $element, $attrs, controller) {

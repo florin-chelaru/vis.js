@@ -26,7 +26,7 @@ vs.directives.Axis = function() {
 goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
 
 /**
- * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService}} $ng
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: Function, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
  * @param {Object.<string, *>} options
@@ -34,7 +34,7 @@ goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
  * @override
  */
 vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {
-  switch (target.render) {
+  switch (target['render']) {
     case 'svg':
       return new vs.ui.svg.SvgAxis($ng, $targetElement, target, options);
     case 'canvas':

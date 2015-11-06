@@ -10,6 +10,8 @@ goog.require('vs.directives.Directive');
 goog.require('vs.models.GenomicRangeQuery');
 
 /**
+ * @param {angular.Scope} $scope
+ * @param {angular.$templateCache} $templateCache
  * @constructor
  * @extends {vs.directives.Directive}
  */
@@ -18,6 +20,7 @@ vs.directives.NavLocation = function($scope, $templateCache) {
 
   /**
    * Angular template service
+   * @type {angular.$templateCache}
    * @private
    */
   this._$templateCache = $templateCache;
@@ -42,17 +45,17 @@ Object.defineProperties(vs.directives.NavLocation.prototype, {
 });
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
  * @param controller
  * @override
  */
 vs.directives.NavLocation.prototype.link = function($scope, $element, $attrs, controller) {
   vs.directives.Directive.prototype.link.post.apply(this, arguments);
-  var $navbarLeft = $scope['vsNavbar'].handler.$left;
+  var $navbarLeft = $scope['vsNavbar']['handler']['$left'];
   /** @type {vs.ui.DataHandler} */
-  var dataHandler = $scope['vsDataContext'].handler.handler;
+  var dataHandler = $scope['vsDataContext']['handler']['handler'];
   var data = dataHandler['data'];
 
   var range = vs.models.GenomicRangeQuery.extract(data['query']);

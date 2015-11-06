@@ -76,12 +76,12 @@ vs.models.Margins.prototype.x;
 vs.models.Margins.prototype.y;
 
 Object.defineProperties(vs.models.Margins.prototype, {
-  'top': { get: function() { return this._top; } },
-  'left': { get: function() { return this._left; } },
-  'bottom': { get: function() { return this._bottom; } },
-  'right': { get: function() { return this._right; } },
-  'x': { get: function() { return [this['left'], this['right']]; } },
-  'y': { get: function() { return [this['top'], this['bottom']]; } }
+  'top': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._top; })},
+  'left': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._left; })},
+  'bottom': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._bottom; })},
+  'right': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._right; })},
+  'x': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['left'], this['right']]; })},
+  'y': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['top'], this['bottom']]; })}
 });
 
 /**

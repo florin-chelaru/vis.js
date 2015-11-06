@@ -46,7 +46,7 @@ vs.ui.canvas.CanvasVis.prototype.activeCanvas;
 vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
 
 Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
-  render: { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
+  'render': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
   'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
   doubleBuffer: {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),

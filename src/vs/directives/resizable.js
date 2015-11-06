@@ -9,7 +9,7 @@ goog.provide('vs.directives.Resizable');
 goog.require('vs.directives.Directive');
 
 /**
- * @param $scope
+ * @param {angular.Scope} $scope
  * @param $document
  * @constructor
  * @extends {vs.directives.Directive}
@@ -39,15 +39,15 @@ vs.directives.Resizable = function($scope, $document) {
 goog.inherits(vs.directives.Resizable, vs.directives.Directive);
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
  * @param controller
  * @override
  */
 vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
   vs.directives.Directive.prototype.link.post.apply(this, arguments);
-  var $window = $scope['vsWindow'].handler.$window;
+  var $window = $scope['vsWindow']['handler']['$window'];
   $window
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-left"></div>')
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-right"></div>')
@@ -100,8 +100,8 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
       'height': box.height + 'px'
     });
 
-    $window.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
-    $element.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
+    $window.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+    $element.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
   }
 
   function mouseup() {

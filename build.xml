@@ -11,7 +11,7 @@
   <property name="closurebuilder" value="${rootpath}/bower_components/google-closure-library/closure/bin/build/closurebuilder.py"/>
   <property name="depend" value="deps.js" />
   <property name="export" value="${rootpath}/export"/>
-  <property name="externs" value="${rootpath}/externs/externs.js"/>
+  <property name="externs" value="${rootpath}/externs"/>
 
   <property name="compiled" value="vis.js"/>
   <property name="compiledmin" value="vis.min.js"/>
@@ -77,7 +77,16 @@
     </concat>
   </target>
 
-  <target name="compile" depends="deps,concat" description="">
+  <target name="concat.externs" description="">
+    <concat destfile="${rootpath}/externs.js" fixlastline="yes" eol="lf">
+      <fileset dir="${externs}"/>
+      <filterchain>
+        <replaceregex pattern="\/\*((?!\*\/).)+Created by((?!\*\/).)+\*\/" replace="" flags="gs" byline="false"/>
+      </filterchain>
+    </concat>
+  </target>
+
+  <target name="compile" depends="deps,concat,concat.externs" description="">
     <local name="outfile"/>
     <property name="outfile" value="${compiledmin}"/>
     <java jar="${compiler}" fork="true" failonerror="true">
@@ -92,7 +101,7 @@
       <arg line="&#45;&#45;js_output_file=${outfile}"/>
       <arg line="&#45;&#45;create_source_map=${outfile}.map"/>
       <arg line="&#45;&#45;manage_closure_dependencies"/>
-      <arg line="&#45;&#45;externs=${externs}"/>
+      <arg line="&#45;&#45;externs=${rootpath}/externs.js"/>
       <arg line="${srcfiles}"/>
       <arg line="${exportfiles}"/>
     </java>

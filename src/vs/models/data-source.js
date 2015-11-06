@@ -44,7 +44,7 @@ vs.models.DataSource = function() {
   this._ready = null;
 
   /**
-   * @type {boolean|undefined}
+   * @type {boolean|null|undefined}
    * @private
    */
   this._isReady = null;
@@ -126,7 +126,7 @@ Object.defineProperties(vs.models.DataSource.prototype, {
  */
 vs.models.DataSource.prototype.applyQuery = function(queries) {
   if (queries instanceof vs.models.Query) { queries = [queries]; }
-  if (!queries || !queries.length) { return Promise.resolve(this); }
+  if (!queries || !queries.length) { return /** @type {Promise} */ (Promise.resolve(this)); }
 
   var ret = this;
   return new Promise(function(resolve, reject) {

@@ -39,9 +39,9 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
             .attr('class', className);
         }
 
-        var height = target.height;
-        var width = target.width;
-        var margins = target.margins;
+        var height = target['height'];
+        var width = target['width'];
+        var margins = target['margins'];
         var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
         var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
@@ -82,7 +82,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
         if (axisBox['x'] + axisBox['width'] > width) { offset['right'] += axisBox['x'] + axisBox['width'] - width; }
         if (axisBox['y'] + axisBox['height'] > height) { offset['bottom'] += axisBox['y'] + axisBox['height'] - height; }
 
-        target.margins = target.margins.add(offset);
+        target['margins'] = target['margins'].add(offset);
         target.scheduleRedraw();
 
         axis.attr('transform', 'translate(' + axisLocation['x'] + ', ' + axisLocation['y'] + ')');

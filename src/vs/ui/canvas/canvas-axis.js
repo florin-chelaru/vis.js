@@ -35,18 +35,18 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
         var minYMargin = 25;
         var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
 
-        if (type == 'x' && target.margins['bottom'] < minYMargin) { offset['bottom'] = minYMargin - target.margins['bottom']; }
+        if (type == 'x' && target['margins']['bottom'] < minYMargin) { offset['bottom'] = minYMargin - target['margins']['bottom']; }
 
         if (offset['top'] + offset['bottom'] + offset['left'] + offset['right'] > 0) {
-          target.margins = target.margins.add(offset);
+          target['margins'] = target['margins'].add(offset);
           target.scheduleRedraw();
           resolve();
           return;
         }
 
-        var height = target.height;
-        var width = target.width;
-        var margins = target.margins;
+        var height = target['height'];
+        var width = target['width'];
+        var margins = target['margins'];
         var intCoords = vs.models.Transformer.intCoords();
         var translate = vs.models.Transformer.translate({'x': margins['left'], 'y': margins['top']}).combine(intCoords);
 
@@ -70,7 +70,7 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
         var minXMargin = maxTextSize + 11;
         if (type == 'y' && margins['left'] < minXMargin) {
           offset['left'] = minXMargin - margins['left'];
-          target.margins = margins.add(offset);
+          target['margins'] = margins.add(offset);
           target.scheduleRedraw();
           resolve();
           return;

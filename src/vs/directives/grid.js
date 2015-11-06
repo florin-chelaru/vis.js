@@ -23,7 +23,7 @@ vs.directives.Grid = function() {
 goog.inherits(vs.directives.Grid, vs.directives.GraphicDecorator);
 
 /**
- * @param {{$scope: *, $element: jQuery, $attrs: *, $timeout: Function, taskService: vs.async.TaskService}} $ng
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
  * @param {Object.<string, *>} options
@@ -31,7 +31,7 @@ goog.inherits(vs.directives.Grid, vs.directives.GraphicDecorator);
  * @override
  */
 vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, target, options) {
-  switch (target.render) {
+  switch (target['render']) {
     case 'svg':
       return new vs.ui.svg.SvgGrid($ng, $targetElement, target, options);
     case 'canvas':

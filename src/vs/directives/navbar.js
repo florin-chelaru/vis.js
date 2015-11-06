@@ -87,18 +87,18 @@ Object.defineProperties(vs.directives.Navbar.prototype, {
 });
 
 /**
- * @param $scope
- * @param $element
- * @param $attrs
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
  * @param controller
  * @override
  */
 vs.directives.Navbar.prototype.link = function($scope, $element, $attrs, controller) {
   vs.directives.Directive.prototype.link.post.apply(this, arguments);
-  var $window = $scope['vsWindow'].handler.$window;
+  var $window = $scope['vsWindow']['handler']['$window'];
 
   /** @type {vs.ui.DataHandler} */
-  var dataHandler = $scope['vsDataContext'].handler.handler;
+  var dataHandler = $scope['vsDataContext']['handler']['handler'];
 
   var $navbar = $('<div class="nav navbar navbar-default navbar-fixed-top" style="position: absolute;"></div>').appendTo($window);
   var $container = $('<div class="container-fluid"></div>').appendTo($navbar);

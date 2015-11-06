@@ -7,11 +7,12 @@
 goog.provide('vs.directives.Directive');
 
 /**
- * @param $scope Angular scope
+ * @param {angular.Scope} $scope Angular scope
  * @constructor
  */
 vs.directives.Directive = function($scope) {
   /**
+   * @type {angular.Scope}
    * @private
    */
   this._$scope = $scope;
@@ -29,6 +30,7 @@ vs.directives.Directive = function($scope) {
 };
 
 /**
+ * @type {angular.Scope}
  * @name vs.directives.Directive#$scope
  */
 vs.directives.Directive.prototype.$scope;
@@ -40,6 +42,7 @@ vs.directives.Directive.prototype.$scope;
 vs.directives.Directive.prototype.$element;
 
 /**
+ * @type {angular.Attributes}
  * @name vs.directives.Directive#$attrs
  */
 vs.directives.Directive.prototype.$attrs;
@@ -51,7 +54,7 @@ Object.defineProperties(vs.directives.Directive.prototype, {
 });
 
 /**
- * @type {{pre: Function, post: Function}|Function}
+ * @type {{pre: function(angular.Scope, jQuery, angular.Attributes), post: function(angular.Scope, jQuery, angular.Attributes)}|function(angular.Scope, jQuery, angular.Attributes)}
  */
 vs.directives.Directive.prototype.link = {
   pre: function($scope, $element, $attrs) {
