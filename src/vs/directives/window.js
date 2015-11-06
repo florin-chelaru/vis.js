@@ -47,17 +47,17 @@ vs.directives.Window.prototype.link = {
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
 
     $window.css({
-      top: parseInt($element.css('top')) + parseInt($window.css('padding-top')) + 'px',
-      left: $element.css('left'),
-      bottom: $element.css('bottom'),
-      right: $element.css('right')
+      'top': parseInt($element.css('top')) + parseInt($window.css('padding-top')) + 'px',
+      'left': $element.css('left'),
+      'bottom': $element.css('bottom'),
+      'right': $element.css('right')
     });
 
     $element.css({
-      top: '',
-      left: '',
-      bottom: '',
-      right: ''
+      'top': '',
+      'left': '',
+      'bottom': '',
+      'right': ''
     });
 
     $window.append($element);

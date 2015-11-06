@@ -7,10 +7,9 @@
 goog.provide('vs.async.TaskService');
 
 goog.require('vs.async.Task');
-goog.require('goog.async.Deferred');
 
 /**
- * @param {function(function, number)} $timeout Angular timeout service
+ * @param {function(Function, number)} $timeout Angular timeout service
  * @constructor
  */
 vs.async.TaskService = function($timeout) {
@@ -87,9 +86,5 @@ vs.async.TaskService.prototype.runChain = function(task, sequential) {
 
   return u.async.each(tasks, function(task) {
     return task.func.apply(task.thisArg);
-    /*return new Promise(function(resolve, reject) {
-      task.func.apply(task.thisArg);
-      resolve();
-    });*/
   }, true);
 };

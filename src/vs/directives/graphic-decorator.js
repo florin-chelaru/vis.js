@@ -60,7 +60,7 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
   var vis = $scope.visualization.handler;
   var options = $attrs.vsOptions ? $scope.$eval($attrs['vsOptions']) : {};
 
-  this._handler = this.createDecorator({$scope:$scope, $element:$element, $attrs:$attrs, taskService:this._taskService, $timeout:this._$timeout}, $element.parent(), vis.handler, options);
+  this._handler = this.createDecorator({'$scope':$scope, '$element':$element, '$attrs':$attrs, taskService:this._taskService, $timeout:this._$timeout}, $element.parent(), vis.handler, options);
 
   this._taskService.chain(this._handler.endDrawTask, vis.handler.endDrawTask);
   this._taskService.chain(vis.handler.beginDrawTask, this._handler.beginDrawTask);

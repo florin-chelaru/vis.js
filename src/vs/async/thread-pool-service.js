@@ -7,6 +7,7 @@
 goog.provide('vs.async.ThreadPoolService');
 
 goog.require('vs.Configuration');
+goog.require('vs.ui.UiException');
 
 /**
  * @param {vs.Configuration} config

@@ -1,84 +1,102 @@
 <?xml version="1.0"?>
 <project>
-  <target name="concatenate" description="Concatenate css files">
-	<echo message="Generate concatenated stylesheet: vis.css" />
-    <concat destfile="vis.css">
-      <fileset dir="res/css" includes="*.css" excludes="*.min.css" />
-    </concat>
-  </target>
-  
-  <target name="compress" depends="concatenate" description="Compress vis.css to vis.min.css">
-	<echo message="Minify vis.css -> vis.min.css" />
-	<java jar="node_modules/yuicompressor/build/yuicompressor-2.4.8.jar" fork="true">
-        <arg value="vis.css" /> <!-- input path for CSS files -->
-        <!--<arg value="-v" />--> <!-- Turn on verbose -->
-        <arg value="-o" />
-        <arg value="vis.min.css" /> <!-- output path for CSS files -->
-    </java>
-	<delete file="vis.css"/>
-  </target>
-  
-  
   <property name="rootpath" value="."/>
   <property name="rootdir" location="${rootpath}"/>
-  <property name="bin" value="."/>
-  <property name="level" value="SIMPLE_OPTIMIZATIONS"/>
-  <property name="src" value="${rootpath}/third-party/bigwig/src"/>
-  <property name="vendor" value="${rootpath}/bower_components/closure-compiler/lib/vendor"/>
-  <property name="compiler" value="${vendor}/compiler.jar"/>
-  <property name="closure_primitives" value="${rootpath}/bower_components/google-closure-library/closure/goog/base.js"/>
+  <property name="level" value="ADVANCED_OPTIMIZATIONS"/>
+  <property name="src" value="${rootpath}/src"/>
+  <property name="compiler" value="${rootpath}/bower_components/closure-compiler/lib/vendor/compiler.jar"/>
+  <property name="closure_src" value="${rootpath}/bower_components/google-closure-library/closure/goog"/>
+  <property name="closure_tp_src" value="${rootpath}/bower_components/google-closure-library/third_party/closure/goog"/>
   <property name="depswriter" value="${rootpath}/bower_components/google-closure-library/closure/bin/build/depswriter.py"/>
-  <property name="depend" value="${rootpath}/deps.js"/>
-  <property name="export" value="${rootpath}/third-party/bigwig/export"/>
-  <property name="externs" value="${rootpath}/third-party/bigwig/externs/externs.js"/>
+  <property name="closurebuilder" value="${rootpath}/bower_components/google-closure-library/closure/bin/build/closurebuilder.py"/>
+  <property name="depend" value="deps.js" />
+  <property name="export" value="${rootpath}/export"/>
+  <property name="externs" value="${rootpath}/externs/externs.js"/>
 
-  <!-- -->
-  <!--<loadfile property="license" srcfile="../LICENSE_min"/>-->
+  <property name="compiled" value="vis.js"/>
+  <property name="compiledmin" value="vis.min.js"/>
 
-  <!--  -->
-  <target name="prebuild" description="">
-     <!--<mkdir dir="${bin}"/>-->
-  </target>
+  <loadfile property="license" srcfile="LICENSE"/>
 
-  <!--  -->
   <target name="deps" description="">
-    <exec executable="python" failonerror="true">
+    <exec executable="python" failonerror="false">
       <arg line="${depswriter}"/>
-      <arg line="--root_with_prefix=&quot;./ ../../../../third-party/bigwig/src&quot;"/>
+      <arg line="--root_with_prefix=&quot;${src}/vs ../../../../src/vs&quot;"/>
       <arg line="--output_file=${depend}"/>
     </exec>
 
-    <pathconvert property="srcfiles" pathsep=" ">
-      <map from="${rootdir}" to="--js ./"/>
-      <fileset dir="${src}" includes="*.js"/>
+    <pathconvert property="exportfiles" pathsep=" ">
+      <map from="${rootdir}" to="&#45;&#45;js ."/>
+      <fileset dir="${export}" includes="**/*.js"/>
     </pathconvert>
 
-    <pathconvert property="exportfiles" pathsep=" ">
-      <map from="${rootdir}" to="--js .."/>
-      <fileset dir="${export}" includes="*.js"/>
-    </pathconvert>
+    <exec executable="python" failonerror="false">
+      <arg line="${closurebuilder}"/>
+      <arg line="--root=&quot;${closure_src}&quot;"/>
+      <arg line="--root=&quot;${closure_tp_src}&quot;"/>
+      <arg line="--root=&quot;${src}/vs&quot;"/>
+      <arg line="--namespace=&quot;vs&quot;"/>
+      <redirector outputproperty="srcfiles" errorproperty="depserr">
+        <outputfilterchain>
+          <replacestring from="\" to="/"/>
+          <prefixlines prefix=" --js ./" />
+          <striplinebreaks />
+          <trim />
+        </outputfilterchain>
+      </redirector>
+    </exec>
+
+    <echo message="${depserr}" />
+
   </target>
 
-  <target name="bigwig" depends="deps" description="">
-    <local name="basename"/>
-    <property name="basename" value="bigwig.min.js"/>
+  <target name="concat" description="">
+    <exec executable="python" failonerror="true">
+      <arg line="${closurebuilder}"/>
+      <arg line="--root=&quot;${closure_src}&quot;"/>
+      <arg line="--root=&quot;${closure_tp_src}&quot;"/>
+      <arg line="--root=&quot;${src}/vs&quot;"/>
+      <arg line="--namespace=&quot;vs&quot;"/>
+      <redirector outputproperty="libfiles" errorproperty="depserr">
+        <outputfilterchain>
+          <linecontains negate="true">
+            <contains value="bower_components"/>
+          </linecontains>
+        </outputfilterchain>
+      </redirector>
+    </exec>
+
+    <echo message="${libfiles}"/>
+
+    <concat destfile="${compiled}" fixlastline="yes" eol="lf">
+      <header filtering="no" trimleading="yes">${license}</header>
+      <filelist files="${libfiles}"/>
+      <filterchain>
+        <replaceregex pattern="\/\*((?!\*\/).)+Created by((?!\*\/).)+\*\/" replace="" flags="gs" byline="false"/>
+      </filterchain>
+    </concat>
+  </target>
+
+  <target name="compile" depends="deps,concat" description="">
     <local name="outfile"/>
-    <property name="outfile" value="${basename}"/>
+    <property name="outfile" value="${compiledmin}"/>
     <java jar="${compiler}" fork="true" failonerror="true">
-      <arg line="--compilation_level=${level}"/>
-      <arg line="--warning_level=VERBOSE"/>
-      <arg line="--define=goog.DEBUG=false"/>
-      <arg line="--summary_detail_level=3"/>
-      <arg line="--language_in=ECMASCRIPT5_STRICT"/>
-      <arg line="--source_map_format=V3"/>
-      <arg line="--output_wrapper='/** LICENSE */(function() {%output%}).call(this); //@ sourceMappingURL=${basename}.map'"/>
-      <arg line="--js_output_file=${outfile}"/>
-      <arg line="--create_source_map=${outfile}.map"/>
-      <arg line="--manage_closure_dependencies"/>
-      <arg line="--js=${export}/bigwig.js"/>
-      <!--<arg line="-js=${closure_primitives}"/>-->
-	  <arg line="--externs=${externs}"/>
+      <arg line="&#45;&#45;compilation_level=${level}"/>
+      <arg line="&#45;&#45;warning_level=VERBOSE"/>
+      <arg line="&#45;&#45;define=goog.DEBUG=false"/>
+      <arg line="&#45;&#45;summary_detail_level=3"/>
+      <arg line="&#45;&#45;language_in=ECMASCRIPT5_STRICT"/>
+      <arg line="&#45;&#45;source_map_format=V3"/>
+      <arg line="--output_wrapper='(function(){%output%}).call(this); //# sourceMappingURL=${compiledmin}.map'"/>
+      <!--<arg line="&#45;&#45;output_wrapper='%output% //@ sourceMappingURL=${compiledmin}.map'"/>-->
+      <arg line="&#45;&#45;js_output_file=${outfile}"/>
+      <arg line="&#45;&#45;create_source_map=${outfile}.map"/>
+      <arg line="&#45;&#45;manage_closure_dependencies"/>
+      <arg line="&#45;&#45;externs=${externs}"/>
       <arg line="${srcfiles}"/>
+      <arg line="${exportfiles}"/>
     </java>
+    <loadfile srcfile="${compiledmin}" property="minimized"/>
+    <concat destfile="${compiledmin}" eol="lf"><header filtering="no" trimleading="yes">${license}</header>${minimized}</concat>
   </target>
 </project>

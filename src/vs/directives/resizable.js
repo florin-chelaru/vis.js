@@ -87,17 +87,17 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     box.update(target, self._minWidth, self._minHeight);
     
     $window.css({
-      top: (box.top) + 'px',
-      left: (box.left) + 'px',
-      width: box.width + 'px',
-      height: box.height + 'px'
+      'top': (box.top) + 'px',
+      'left': (box.left) + 'px',
+      'width': box.width + 'px',
+      'height': box.height + 'px'
     });
 
     $element.css({
-      top: (box.top) + 'px',
-      left: (box.left) + 'px',
-      width: box.width + 'px',
-      height: box.height + 'px'
+      'top': (box.top) + 'px',
+      'left': (box.left) + 'px',
+      'width': box.width + 'px',
+      'height': box.height + 'px'
     });
 
     $window.trigger($.Event('resize', {top: box.top, left: box.left, width: box.width, height: box.height}));
