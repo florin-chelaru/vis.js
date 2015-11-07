@@ -38,7 +38,7 @@
 <body ng-app="main">
   <div ng-include="'nav.html'"></div>
   <div ng-controller="vs.MainController as main">
-    <div ng-repeat="dataContext in main.controller.dataContexts" style="width: 1000px; height: 600px;"
+    <div ng-repeat="dataContext in main.controller.dataContexts" vs-style="{width: '900px', height: '600px', left: '10px', top: ($index * 600 + 70 + 'px')}"
          class="vs-data-context vs-window vs-movable vs-resizable">
 
       <div class="nav navbar navbar-default navbar-fixed-top" style="position: absolute; cursor: move;" ng-controller="vs.DataContextController" ng-mousedown="mousedown($event)">

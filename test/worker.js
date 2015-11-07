@@ -19,7 +19,7 @@ importScripts(
 
 u.log.VERBOSE = 'info';
 
-importScripts(DOMAIN_BASE_PATH + 'src/deps.js');
+importScripts(DOMAIN_BASE_PATH + 'deps.js');
 goog.require('vs.models.DataSource');
 
 importScripts(DOMAIN_BASE_PATH + 'bower_components/threadpool.js/parallel-worker.min.js');

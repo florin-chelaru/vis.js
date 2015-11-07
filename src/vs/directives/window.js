@@ -41,13 +41,24 @@ vs.directives.Window.prototype.link = {
   'pre': function($scope, $element, $attrs, controller) {
     vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
+    var style = $scope.$eval($attrs['vsStyle'] || '{}');
 
-    $window.css({
+    var box = {
+      'top': style['top'] || ($element.css('top') ? (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px' : undefined),
+      'left': style['left'] || $element.css('left') || undefined,
+      'bottom': style['bottom'] || $element.css('bottom') || undefined,
+      'right': style['right'] || $element.css('right') || undefined,
+      'width': style['width'] || ($element.width() + 'px'),
+      'height': style['height'] || ($element.height() + 'px')
+    };
+
+    /*$window.css({
       'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
       'left': $element.css('left'),
       'bottom': $element.css('bottom'),
       'right': $element.css('right')
-    });
+    });*/
+    $window.css(box);
 
     $element.css({
       'top': '',
