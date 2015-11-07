@@ -2,8 +2,7 @@
   "name": "vis.js",
   "version": "0.0.0",
   "authors": [
-    "Florin Chelaru <florinc@mit.edu>",
-    "Manolis Kellis <manoli@mit.edu>"
+    "Florin Chelaru <florinc@mit.edu>"
   ],
   "license": "MIT",
   "repository":{
