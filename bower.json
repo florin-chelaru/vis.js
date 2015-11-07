@@ -5,13 +5,12 @@
     "Florin Chelaru <florinc@mit.edu>"
   ],
   "description": "Data visualization library for Genomic and Epigenetic data",
-  "main": "js/vis.js",
+  "main": "vis.js",
   "moduleType": [
     "globals"
   ],
   "keywords": [
     "visualization",
-    "epigenomic",
     "epigenomic"
   ],
   "license": "MIT",
