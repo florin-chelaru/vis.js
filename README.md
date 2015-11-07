@@ -11,4 +11,4 @@ Visualization Library for Computational Biology
 
 Once these dependencies are installed, run `./install.sh` to restore library dependencies.
 
-To minify code, run `./compile.sh`.
+To minify code, run `ant compile`.
