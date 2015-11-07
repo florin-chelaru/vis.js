@@ -5,13 +5,10 @@
   <title></title>
 
   <link href="../bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+  <link href="../vis.min.css" rel="stylesheet" />
+
   <link href="../test/style.css" rel="stylesheet" />
-  <link href="../res/css/vs.css" rel="stylesheet" />
-  <link href="../res/css/visualization.css" rel="stylesheet" />
-  <link href="../res/css/axis.css" rel="stylesheet" />
-  <link href="../res/css/window.css" rel="stylesheet" />
-  <link href="../res/css/resizable.css" rel="stylesheet" />
-  <link href="../res/css/data-context.css" rel="stylesheet" />
+
 
   <script src="../bower_components/jquery/dist/jquery.js"></script>
   <script src="../bower_components/angular/angular.js"></script>
@@ -33,13 +30,6 @@
   <script src="../third-party/vs/plugins/svg/manhattan-plot.js"></script>
 
   <script src="../third-party/vs/plugins/bigwig-data-source.js"></script>
-  <!--<script src="../third-party/vs/plugins/svg/scatter-plot.js"></script>
-
-  <script src="../third-party/vs/plugins/svg/manhattan-plot-options.js"></script>
-  <script src="../third-party/vs/plugins/svg/manhattan-plot.js"></script>
-
-  <script src="../third-party/vs/plugins/canvas/manhattan-plot-options.js"></script>
-  -->
 
   <script src="../test/script.js"></script>
 </head>
@@ -105,117 +95,5 @@
 
     </div>
   </div>
-  <!--<div class="vs-window vs-movable vs-resizable">
-    <div style="width: 100px; height: 100px;"></div>
-  </div>-->
-  <!--<div ng-controller="vs.MainController as main">
-    <div ng-repeat="dataContext in main.controller.dataContexts" class="vs-data-context">
-      <div ng-repeat="v in dataContext.visualizations"
-           options="v"
-           input-data="dataContext.data"
-           visualization
-           vs-window
-           vs-resizable
-           vs-movable></div>
-    </div>
-  </div>-->
-  <!--<div ng-controller="PeopleGeneExpression">
-    <div visualization
-         type="scatterplot"
-         render="svg"
-         input-data="d"
-         axis-boundaries="{x: {min: -1, max: 2}, y: {min: -0.5, max: 1.5}}"
-         width="200"
-         height="200"
-         margins="{left:10, right: 10, top: 10, bottom: 10}"
-
-         cols-filter="[0,1]"
-         vals="gene expression"
-
-         vs-window
-         vs-resizable
-         vs-movable
-
-         style="top: 15px; left: 15px;">
-      <vs-axis type="x" ticks="10"></vs-axis>
-      <vs-axis type="y"></vs-axis>
-      <vs-grid type="x" ticks="10"></vs-grid>
-      <vs-grid type="y"></vs-grid>
-    </div>
-    <div visualization
-         options="canvasOptions"
-         vs-window
-         vs-resizable
-         vs-movable
-         style="top: 15px; left: 520px;">
-      <vs-axis type="x" ticks="10"></vs-axis>
-      <vs-axis type="y"></vs-axis>
-      <vs-grid type="x" ticks="10"></vs-grid>
-      <vs-grid type="y"></vs-grid>
-    </div>
-  </div>-->
-
-  <!--<div ng-controller="GeneticVariants">
-    <div visualization
-         type="manhattan"
-         render="svg"
-         input-data="data"
-         axis-boundaries="{y: {min: 0, max: 1}}"
-         width="1200"
-         height="200"
-         margins="{left:10, right: 10, top: 10, bottom: 10}"
-
-         cols-filter="[0,1]"
-         cols-label="name"
-         cols-order-by="name"
-
-         rows-filter="[0,1,2]"
-         rows-label="pos"
-         rows-order-by="pos"
-         rows-scale="true"
-
-         vals="gwasPval"
-
-         vs-window
-         vs-resizable
-         vs-movable
-
-         style="top: 235px; left: 15px;">
-      <vs-axis type="x" format="s" ticks="3"></vs-axis>
-      <vs-axis type="y"></vs-axis>
-      <vs-grid type="x" ticks="3"></vs-grid>
-      <vs-grid type="y"></vs-grid>
-    </div>
-    <div visualization
-         type="manhattan"
-         render="canvas"
-         input-data="data"
-         axis-boundaries="{y: {min: 0, max: 1}}"
-         width="1200"
-         height="200"
-         margins="{left:10, right: 10, top: 10, bottom: 10}"
-
-         cols-filter="[0,1]"
-         cols-label="name"
-         cols-order-by="name"
-
-         rows-filter="[0,1,2]"
-         rows-label="pos"
-         rows-order-by="pos"
-         rows-scale="true"
-
-         vals="gwasPval"
-
-         vs-window
-         vs-resizable
-         vs-movable
-
-         style="top: 455px; left: 15px;">
-      <vs-axis type="x" format="s" ticks="3"></vs-axis>
-      <vs-axis type="y"></vs-axis>
-      <vs-grid type="x" ticks="3"></vs-grid>
-      <vs-grid type="y"></vs-grid>
-    </div>
-  </div>-->
 </body>
 </html>

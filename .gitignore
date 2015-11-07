@@ -1,5 +1,5 @@
 .idea
 bower_components
 node_modules
-*.min.css
-*.min.js
+res/css/*.min.css
+externs.js
