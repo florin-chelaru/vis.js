@@ -1,5 +1,5 @@
 {
-  "name": "vis",
+  "name": "vis.js",
   "version": "0.0.0",
   "authors": [
     "Florin Chelaru <florinc@mit.edu>",
@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository":{
     "type" : "git",
-    "url" : "https://github.com/florin-chelaru/visualization-lib.git"
+    "url" : "https://github.com/florin-chelaru/vis.js.git"
   },
   "description": "Data visualization library for Genomic and Epigenetic data",
   "dependencies": {
