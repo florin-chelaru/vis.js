@@ -67,7 +67,11 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
   var vis = $scope['visualization']['handler'];
   var options = $attrs['vsOptions'] ? $scope.$eval($attrs['vsOptions']) : {};
 
-  this._handler = this.createDecorator({'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout':this._$timeout}, $element.parent(), vis['handler'], options);
+  this._handler = this.createDecorator(
+    {'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout':this._$timeout},
+    $element.parent(),
+    vis['handler'],
+    /** @type {Object.<string, *>} */ (options));
 
   this._taskService.chain(this._handler['endDrawTask'], vis['handler']['endDrawTask']);
   this._taskService.chain(vis['handler']['beginDrawTask'], this._handler['beginDrawTask']);
@@ -80,4 +84,4 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
  * @param {Object.<string, *>} options
  * @returns {vs.ui.Decorator}
  */
-vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) { throw new vs.AbstractMethodException(); };
+vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) { throw new u.AbstractMethodException(); };

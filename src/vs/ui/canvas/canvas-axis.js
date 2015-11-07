@@ -10,10 +10,14 @@ goog.require('vs.ui.decorators.Axis');
 goog.require('vs.models.Transformer');
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.decorators.Axis
  */
-vs.ui.canvas.CanvasAxis = function() {
+vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {
   vs.ui.decorators.Axis.apply(this, arguments);
 };
 
@@ -28,9 +32,9 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target['data']['isReady']) { resolve(); return; }
+        if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self.target;
+        var target = self['target'];
         var type = self.type;
         var minYMargin = 25;
         var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
@@ -64,8 +68,8 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
         context.font = '17px Times New Roman';
         context.fillStyle = '#000000';
 
-        var ticks = scale.ticks(self.ticks);
-        var units = ticks.map(scale.tickFormat(self.ticks, self.format));
+        var ticks = scale.ticks(self['ticks']);
+        var units = ticks.map(scale.tickFormat(self['ticks'], self['format']));
 
         var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
 

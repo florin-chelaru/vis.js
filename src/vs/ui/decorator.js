@@ -15,7 +15,6 @@ goog.require('vs.async.TaskService');
  * @param {vs.ui.VisHandler} target
  * @param {Object.<string, *>} options
  * @constructor
- * @abstract
  */
 vs.ui.Decorator = function($ng, $targetElement, target, options) {
   /**
@@ -137,9 +136,9 @@ Object.defineProperties(vs.ui.Decorator.prototype, {
   '$scope': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$scope; })},
   '$element': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$element; })},
   '$attrs': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$attrs; })},
-  $targetElement: { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$targetElement; })},
+  '$targetElement': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._$targetElement; })},
   'data': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target['data']; })},
-  target: { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target; })},
+  'target': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._target; })},
   'options': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return this._options; })},
   'settings': { get: /** @type {function (this:vs.ui.Decorator)} */ (function () { return {}; })},
   'beginDrawTask': { get: /** @type {function (this:vs.ui.Decorator)} */ (function() { return this._beginDrawTask; })},

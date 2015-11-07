@@ -9,10 +9,14 @@ goog.provide('vs.ui.svg.SvgGrid');
 goog.require('vs.ui.decorators.Grid');
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.decorators.Grid
  */
-vs.ui.svg.SvgGrid = function() {
+vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {
   vs.ui.decorators.Grid.apply(this, arguments);
 };
 
@@ -27,9 +31,9 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target['data']['isReady']) { resolve(); return; }
+        if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self.target;
+        var target = self['target'];
         var svg = d3.select(target['$element'][0]).select('svg');
 
         var type = self.type;
@@ -50,7 +54,7 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
 
         var gridLines = grid
           .selectAll('.grid-line')
-          .data(scale.ticks(self.ticks));
+          .data(scale.ticks(self['ticks']));
 
         gridLines
           .enter().append('line')

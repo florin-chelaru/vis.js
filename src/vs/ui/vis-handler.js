@@ -232,7 +232,7 @@ vs.ui.VisHandler.prototype.width;
 vs.ui.VisHandler.prototype.height;
 
 Object.defineProperties(vs.ui.VisHandler.prototype, {
-  'render': { get: function() { throw new u.UnimplementedException('Property "render" does not exist in data source'); }},
+  'render': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { throw new u.UnimplementedException('Property "render" does not exist in data source'); })},
   'settings': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return vs.ui.VisHandler.Settings; })},
   '$scope': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$scope; })},
   '$element': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$element; })},

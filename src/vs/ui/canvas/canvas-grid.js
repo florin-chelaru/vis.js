@@ -10,10 +10,14 @@ goog.require('vs.ui.decorators.Grid');
 goog.require('vs.models.Transformer');
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.decorators.Grid
  */
-vs.ui.canvas.CanvasGrid = function() {
+vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
   vs.ui.decorators.Grid.apply(this, arguments);
 };
 
@@ -25,9 +29,9 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target['data']['isReady']) { resolve(); return; }
+        if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self.target;
+        var target = self['target'];
         var type = self.type;
         var margins = target['margins'];
         var height = target['height'];
@@ -47,7 +51,7 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
         context.strokeStyle = '#eeeeee';
         context.lineWidth = 1;
 
-        var ticks = scale.ticks(self.ticks);
+        var ticks = scale.ticks(self['ticks']);
 
         // Draw ticks
         var x1 = type == 'x' ? scale : function() { return 0; };

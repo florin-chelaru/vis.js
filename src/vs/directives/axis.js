@@ -26,7 +26,7 @@ vs.directives.Axis = function() {
 goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: Function, taskService: vs.async.TaskService}} $ng
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
  * @param {Object.<string, *>} options

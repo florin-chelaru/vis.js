@@ -9,10 +9,14 @@ goog.provide('vs.ui.svg.SvgAxis');
 goog.require('vs.ui.decorators.Axis');
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.decorators.Axis
  */
-vs.ui.svg.SvgAxis = function() {
+vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {
   vs.ui.decorators.Axis.apply(this, arguments);
 };
 
@@ -27,9 +31,9 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
   return new Promise(function(resolve, reject) {
     vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
       .then(function() {
-        if (!self.target['data']['isReady']) { resolve(); return; }
+        if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self.target;
+        var target = self['target'];
         var svg = d3.select(target['$element'][0]).select('svg');
         var type = self.type;
         var className = 'vs-axis-' + type;
@@ -50,15 +54,15 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
         var axisFn = d3.svg.axis()
           .scale(scale)
           .orient(vs.ui.decorators.Axis.Orientation[type])
-          .ticks(self.ticks);
+          .ticks(self['ticks']);
 
-        if (self.format) {
-          axisFn = axisFn.tickFormat(d3.format(self.format));
+        if (self['format']) {
+          axisFn = axisFn.tickFormat(d3.format(self['format']));
         }
 
         axis.call(axisFn);
 
-        var axisBox = axis[0][0].getBBox();
+        var axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
         var axisLocation = type == 'x' ? origins : {'x': margins['left'], 'y': margins['top']};
         axisBox = { 'x': axisBox['x'] + axisLocation['x'], 'y': axisBox['y'] + axisLocation['y'], 'width': axisBox['width'], 'height': axisBox['height']};
 

@@ -11,10 +11,14 @@ goog.require('vs.ui.Setting');
 
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.Decorator
  */
-vs.ui.decorators.Axis = function() {
+vs.ui.decorators.Axis = function($ng, $targetElement, target, options) {
   vs.ui.Decorator.apply(this, arguments);
 };
 
@@ -33,8 +37,8 @@ vs.ui.decorators.Axis.Settings = {
  * @type {{x: string, y: string}}
  */
 vs.ui.decorators.Axis.Orientation = {
-  x: 'bottom',
-  y: 'left'
+  'x': 'bottom',
+  'y': 'left'
 };
 
 /**
@@ -58,6 +62,6 @@ vs.ui.decorators.Axis.prototype.format;
 Object.defineProperties(vs.ui.decorators.Axis.prototype, {
   'settings': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return vs.ui.decorators.Axis.Settings; })},
   'type': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
-  ticks: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
-  format: { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })}
+  'ticks': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
+  'format': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })}
 });

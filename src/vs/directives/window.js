@@ -31,11 +31,11 @@ goog.inherits(vs.directives.Window, vs.directives.Directive);
 vs.directives.Window.prototype.$window;
 
 Object.defineProperties(vs.directives.Window.prototype, {
-  $window: { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
+  '$window': { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
 });
 
 /**
- * @type {{pre: function(angular.Scope, jQuery, angular.Attributes)}}
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
 vs.directives.Window.prototype.link = {
   'pre': function($scope, $element, $attrs, controller) {
@@ -43,7 +43,7 @@ vs.directives.Window.prototype.link = {
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
 
     $window.css({
-      'top': parseInt($element.css('top')) + parseInt($window.css('padding-top')) + 'px',
+      'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
       'left': $element.css('left'),
       'bottom': $element.css('bottom'),
       'right': $element.css('right')
@@ -65,4 +65,6 @@ vs.directives.Window.prototype.link = {
     });
 
     this._$window = $window;
-}};
+  },
+  'post': vs.directives.Directive.prototype.link['post']
+};

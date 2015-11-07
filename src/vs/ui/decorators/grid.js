@@ -10,10 +10,14 @@ goog.require('vs.ui.Decorator');
 goog.require('vs.ui.Setting');
 
 /**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
  * @constructor
  * @extends vs.ui.Decorator
  */
-vs.ui.decorators.Grid = function() {
+vs.ui.decorators.Grid = function($ng, $targetElement, target, options) {
   vs.ui.Decorator.apply(this, arguments);
 };
 
@@ -49,6 +53,6 @@ vs.ui.decorators.Grid.prototype.format;
 Object.defineProperties(vs.ui.decorators.Grid.prototype, {
   'settings': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return vs.ui.decorators.Grid.Settings; })},
   'type': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('type'); })},
-  ticks: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
-  format: { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
+  'ticks': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
+  'format': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
 });

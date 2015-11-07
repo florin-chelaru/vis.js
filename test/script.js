@@ -498,6 +498,7 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
 main.controller('vs.DataContextController', ['$scope', function($scope) {
   /** @type {vs.ui.DataHandler} */
   var dataHandler = $scope['vsDataContext'].handler.handler;
+  var $window = $scope['vsWindow'].handler.$window;
   var data = dataHandler.data;
   var range = vs.models.GenomicRangeQuery.extract(data.query);
   $scope.name = dataHandler.name;
@@ -517,5 +518,9 @@ main.controller('vs.DataContextController', ['$scope', function($scope) {
 
     data.applyQuery(q.query);
 
+  };
+
+  $scope.mousedown = function(e) {
+    $window.trigger(new $.Event('mousedown', {target: $window[0], originalEvent: e, 'pageX': e.pageX, 'pageY': e.pageY}));
   };
 }]);

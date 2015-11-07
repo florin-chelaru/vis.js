@@ -54,7 +54,7 @@ Object.defineProperties(vs.directives.Directive.prototype, {
 });
 
 /**
- * @type {{pre: function(angular.Scope, jQuery, angular.Attributes, (*|undefined)), post: function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
 vs.directives.Directive.prototype.link = {
 

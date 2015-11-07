@@ -13,10 +13,13 @@ goog.require('vs.ui.svg.SvgGrid');
 goog.require('vs.ui.canvas.CanvasGrid');
 
 /**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
  * @constructor
  * @extends {vs.directives.GraphicDecorator}
  */
-vs.directives.Grid = function() {
+vs.directives.Grid = function($scope, taskService, $timeout) {
   vs.directives.GraphicDecorator.apply(this, arguments);
 };
 

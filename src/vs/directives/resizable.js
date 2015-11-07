@@ -104,7 +104,7 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     $element.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
   }
 
-  function mouseup() {
+  function mouseup(event) {
     event.preventDefault();
     event.stopPropagation();
     self._document.off('mousemove', mousemove);
@@ -298,21 +298,45 @@ vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidt
   }
 };
 
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#left
+ */
+vs.directives.Resizable.BoundingBox.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#top
+ */
+vs.directives.Resizable.BoundingBox.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#width
+ */
+vs.directives.Resizable.BoundingBox.prototype.width;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#height
+ */
+vs.directives.Resizable.BoundingBox.prototype.height;
+
 Object.defineProperties(vs.directives.Resizable.BoundingBox.prototype, {
   left: {
-    get: function() { return this.topLeft.left + this.topLeft.width + this._margin; }
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.left + this.topLeft.width + this._margin; })
   },
   top: {
-    get: function() { return this.topLeft.top + this.topLeft.height + this._margin; }
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.top + this.topLeft.height + this._margin; })
   },
   width: {
-    get: function() {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
       return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin - 2;
-    }
+    })
   },
   height: {
-    get: function() {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
       return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin - 1;
-    }
+    })
   }
 });
