@@ -1,3 +1,20 @@
+.vs {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+*[class^="vs-"],
+*[class*=" vs-"] {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+.visualization {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  cursor: auto;
+}
 .vs-axis-x path,
 .vs-axis-y path,
 .vs-axis-x line,
@@ -7,8 +24,15 @@
   shape-rendering: crispEdges;
   stroke-width: 1px;
 }
-.vs-data-context {
-  cursor: default;
+.vs-window-container {
+  position: absolute;
+  background-color: #b2b2b2;
+  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding-top: 12px;
+  overflow: hidden;
 }
 .vs-resize-box {
   border: 1px dashed #aaaaaa;
@@ -75,30 +99,6 @@
 .vs-resize-grab.vs-grab-horizontal.vs-grab-bottom {
   bottom: -12px;
 }
-.visualization {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-  cursor: auto;
-}
-.vs {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-*[class^="vs-"],
-*[class*=" vs-"] {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
-.vs-window-container {
-  position: absolute;
-  background-color: #b2b2b2;
-  -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-  -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  padding-top: 12px;
-  overflow: hidden;
+.vs-data-context {
+  cursor: default;
 }
