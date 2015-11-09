@@ -91,6 +91,10 @@ Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
   'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
 });
 
+/**
+ * @param {Array.<vs.models.Query>} query
+ * @returns {vs.models.GenomicRangeQuery}
+ */
 vs.models.GenomicRangeQuery.extract = function(query) {
   var rowLabels = ['chr', 'start', 'end'];
   var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree

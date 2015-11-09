@@ -18,365 +18,127 @@
 */
 
 
-goog.provide('vs.models.Point');
+goog.provide('vs.directives.Directive');
 
 /**
- * @param {number} [x]
- * @param {number} [y]
+ * @param {angular.Scope} $scope Angular scope
  * @constructor
  */
-vs.models.Point = function(x, y) {
+vs.directives.Directive = function($scope) {
   /**
-   * @type {number}
-   */
-  this['x'] = x;
-
-  /**
-   * @type {number}
-   */
-  this['y'] = y;
-};
-
-
-goog.provide('vs.models.Transformer');
-
-goog.require('vs.models.Point');
-
-/**
- * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
- * @constructor
- */
-vs.models.Transformer = function(transformation) {
-  /**
-   * @type {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point}
+   * @type {angular.Scope}
    * @private
    */
-  this._transformation = transformation;
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {vs.models.Point}
- */
-vs.models.Transformer.prototype.calc = function(point) {
-  return this._transformation.call(null, point);
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {Array.<number>}
- */
-vs.models.Transformer.prototype.calcArr = function(point) {
-  var t = this.calc(point);
-  return [t['x'], t['y']];
-};
-
-/**
- * @param {number} x
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcX = function(x) {
-  return this._transformation.call(null, {'x': x})['x'];
-};
-
-/**
- * @param {number} y
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcY = function(y) {
-  return this._transformation({'y': y})['y'];
-};
-
-/**
- * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.combine = function(transformer) {
-  var self = this;
-  if (transformer instanceof vs.models.Transformer) {
-    return new vs.models.Transformer(function (point) {
-      return transformer.calc(self.calc(point));
-    });
-  }
-
-  // function
-  return new vs.models.Transformer(function (point) {
-    return transformer.call(null, self.calc(point));
-  });
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.translate = function(offset) {
-  return this.combine(vs.models.Transformer.translate(offset));
-};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.scale = function(xScale, yScale) {
-  return this.combine(vs.models.Transformer.scale(xScale, yScale));
-};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.intCoords = function() {
-  return this.combine(vs.models.Transformer.intCoords());
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.translate = function(offset) {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(
-      point['x'] != undefined ? point['x'] + offset['x'] : undefined,
-      point['y'] != undefined ? point['y'] + offset['y'] : undefined);
-  });
-};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.scale = function(xScale, yScale) {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(
-      point['x'] != undefined ? xScale(point['x']) : undefined,
-      point['y'] != undefined ? yScale(point['y']) : undefined);
-  });
-};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.intCoords = function() {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(Math.floor(point['x']), Math.floor(point['y']));
-  });
-};
-
-
-goog.provide('vs.async.Task');
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- * @constructor
- */
-vs.async.Task = function(func, thisArg) {
-  /**
-   * @type {number}
-   * @private
-   */
-  this._id = vs.async.Task.nextId();
+  this._$scope = $scope;
 
   /**
-   * @type {function(): Promise}
+   * @type {jQuery}
    * @private
    */
-  this._func = func;
+  this._$element = null;
 
   /**
-   * @type {Object|undefined}
    * @private
    */
-  this._thisArg = thisArg;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._prev = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._next = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._first = this;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._last = this;
+  this._$attrs = null;
 };
 
 /**
- * @type {number}
- * @name vs.async.Task#id
+ * @type {angular.Scope}
+ * @name vs.directives.Directive#$scope
  */
-vs.async.Task.prototype.id;
+vs.directives.Directive.prototype.$scope;
 
 /**
- * @type {Object|undefined}
- * @name vs.async.Task#thisArg
+ * @type {jQuery}
+ * @name vs.directives.Directive#$element
  */
-vs.async.Task.prototype.thisArg;
+vs.directives.Directive.prototype.$element;
 
 /**
- * @type {function():Promise}
- * @name vs.async.Task#func
+ * @type {angular.Attributes}
+ * @name vs.directives.Directive#$attrs
  */
-vs.async.Task.prototype.func;
+vs.directives.Directive.prototype.$attrs;
 
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#prev
- */
-vs.async.Task.prototype.prev;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#next
- */
-vs.async.Task.prototype.next;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#first
- */
-vs.async.Task.prototype.first;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#last
- */
-vs.async.Task.prototype.last;
-
-Object.defineProperties(vs.async.Task.prototype, {
-  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
-  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
-  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
-  'prev': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
-  },
-  'next': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
-  },
-  'first': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
-  },
-  'last': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
-  }
+Object.defineProperties(vs.directives.Directive.prototype, {
+  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
+  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
+  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
 });
 
 /**
- * @type {number}
- * @private
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
-vs.async.Task._nextId = 0;
+vs.directives.Directive.prototype.link = {
+
+  'pre': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  },
+
+  'post': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  }
+};
 
 /**
- * @returns {number}
+ * @param {string} name
+ * @param {function(new: vs.directives.Directive)} controllerCtor
+ * @param {Array} [args]
+ * @param {Object.<string, *>} [options]
+ * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
  */
-vs.async.Task.nextId = function() {
-  return vs.async.Task._nextId++;
+vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
+  var controller = ['$scope', function($scope) {
+    var params = [].concat(args || []);
+    params.unshift($scope);
+
+    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
+    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
+  }];
+  var link;
+  if (typeof controllerCtor.prototype.link == 'function') {
+    link = function ($scope, $element, $attrs) {
+      var ctrl = $scope[name];
+      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
+    };
+  } else {
+    link = {};
+    if ('pre' in controllerCtor.prototype.link) {
+      link['pre'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+    if ('post' in controllerCtor.prototype.link) {
+      link['post'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+  }
+
+  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
 };
 
 
-goog.provide('vs.async.TaskService');
-
-goog.require('vs.async.Task');
+goog.provide('vs.ui.UiException');
 
 /**
- * @param {function(Function, number)} $timeout Angular timeout service
+ * @param {string} message
+ * @param {Error} [innerException]
  * @constructor
+ * @extends u.Exception
  */
-vs.async.TaskService = function($timeout) {
-  /**
-   * @type {function(Function, number)}
-   * @private
-   */
-  this._timeout = $timeout || setTimeout;
+vs.ui.UiException = function(message, innerException) {
+  u.Exception.apply(this, arguments);
 
-  /**
-   * @type {Object.<number, vs.async.Task>}
-   * @private
-   */
-  this._tasks = {};
+  this.name = 'UiException';
 };
 
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- */
-vs.async.TaskService.prototype.createTask = function(func, thisArg) {
-  var ret = new vs.async.Task(func, thisArg);
-  this._tasks[ret['id']] = ret;
-  return ret;
-};
-
-/**
- * @param {vs.async.Task|function():Promise} t1
- * @param {vs.async.Task|function():Promise} t2
- * @returns {vs.async.Task}
- */
-vs.async.TaskService.prototype.chain = function(t1, t2) {
-  if (typeof t1 == 'function') {
-    return this.chain(new vs.async.Task(t1), t2);
-  }
-
-  if (typeof t2 == 'function') {
-    return this.chain(t1, new vs.async.Task(t2));
-  }
-
-  t1['next'] = t1['next'] || t2['first'];
-  t1['last']['next'] = t2['first'];
-  t1['last'] = t2['last'];
-
-  t2['prev'] = t2['prev'] || t1['last'];
-  t2['first']['prev'] = t1['last'];
-  t2['first'] = t1['first'];
-
-  return t1['first'];
-};
-
-/**
- * TODO: test!
- * @param {vs.async.Task} task
- * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {Promise}
- */
-vs.async.TaskService.prototype.runChain = function(task, sequential) {
-  // TODO: test!
-  var current = task['first'];
-  if (sequential) {
-    return new Promise(function(resolve, reject) {
-      for (; !!current; current = current['next']) {
-        current['func'].apply(current['thisArg']);
-      }
-      resolve();
-    });
-  }
-
-  var tasks = [];
-  for (; !!current; current = current['next']) {
-    tasks.push(current);
-  }
-
-  return u.async.each(tasks, function(task) {
-    return task['func'].apply(task['thisArg']);
-  }, true);
-};
+goog.inherits(vs.ui.UiException, u.Exception);
 
 
 goog.provide('vs.models.Boundaries');
@@ -396,106 +158,6 @@ vs.models.Boundaries = function(min, max) {
    * @type {number}
    */
   this['max'] = max;
-};
-
-
-goog.provide('vs.models.Margins');
-
-/**
- * @param {number} top
- * @param {number} left
- * @param {number} bottom
- * @param {number} right
- * @constructor
- */
-vs.models.Margins = function(top, left, bottom, right) {
-  /**
-   * @type {number}
-   * @private
-   */
-  this._top = top;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._left = left;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._bottom = bottom;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._right = right;
-};
-
-/**
- * @type {number}
- * @name vs.models.Margins#top
- */
-vs.models.Margins.prototype.top;
-
-/**
- * @type {number}
- * @name vs.models.Margins#left
- */
-vs.models.Margins.prototype.left;
-
-/**
- * @type {number}
- * @name vs.models.Margins#bottom
- */
-vs.models.Margins.prototype.bottom;
-
-/**
- * @type {number}
- * @name vs.models.Margins#right
- */
-vs.models.Margins.prototype.right;
-
-/**
- * @type {Array.<number>}
- * @name vs.models.Margins#x
- */
-vs.models.Margins.prototype.x;
-
-/**
- * @type {Array.<number>}
- * @name vs.models.Margins#y
- */
-vs.models.Margins.prototype.y;
-
-Object.defineProperties(vs.models.Margins.prototype, {
-  'top': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._top; })},
-  'left': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._left; })},
-  'bottom': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._bottom; })},
-  'right': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._right; })},
-  'x': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['left'], this['right']]; })},
-  'y': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['top'], this['bottom']]; })}
-});
-
-/**
- * @param {vs.models.Margins|{top: number, left: number, bottom: number, right: number}} offset
- */
-vs.models.Margins.prototype.add = function(offset) {
-  return new vs.models.Margins(
-    this['top'] + offset['top'],
-    this['left'] + offset['left'],
-    this['bottom'] + offset['bottom'],
-    this['right'] + offset['right']);
-};
-
-/**
- * @param {*} other
- * @returns {boolean}
- */
-vs.models.Margins.prototype.equals = function(other) {
-  return (!!other && this['top'] == other['top'] && this['left'] == other['left'] && this['bottom'] == other['bottom'] && this['right'] == other['right']);
 };
 
 
@@ -1032,6 +694,106 @@ vs.models.DataSource.prototype.raw = function() {
 };
 
 
+goog.provide('vs.models.Margins');
+
+/**
+ * @param {number} top
+ * @param {number} left
+ * @param {number} bottom
+ * @param {number} right
+ * @constructor
+ */
+vs.models.Margins = function(top, left, bottom, right) {
+  /**
+   * @type {number}
+   * @private
+   */
+  this._top = top;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._left = left;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._bottom = bottom;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._right = right;
+};
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#top
+ */
+vs.models.Margins.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#left
+ */
+vs.models.Margins.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#bottom
+ */
+vs.models.Margins.prototype.bottom;
+
+/**
+ * @type {number}
+ * @name vs.models.Margins#right
+ */
+vs.models.Margins.prototype.right;
+
+/**
+ * @type {Array.<number>}
+ * @name vs.models.Margins#x
+ */
+vs.models.Margins.prototype.x;
+
+/**
+ * @type {Array.<number>}
+ * @name vs.models.Margins#y
+ */
+vs.models.Margins.prototype.y;
+
+Object.defineProperties(vs.models.Margins.prototype, {
+  'top': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._top; })},
+  'left': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._left; })},
+  'bottom': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._bottom; })},
+  'right': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._right; })},
+  'x': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['left'], this['right']]; })},
+  'y': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['top'], this['bottom']]; })}
+});
+
+/**
+ * @param {vs.models.Margins|{top: number, left: number, bottom: number, right: number}} offset
+ */
+vs.models.Margins.prototype.add = function(offset) {
+  return new vs.models.Margins(
+    this['top'] + offset['top'],
+    this['left'] + offset['left'],
+    this['bottom'] + offset['bottom'],
+    this['right'] + offset['right']);
+};
+
+/**
+ * @param {*} other
+ * @returns {boolean}
+ */
+vs.models.Margins.prototype.equals = function(other) {
+  return (!!other && this['top'] == other['top'] && this['left'] == other['left'] && this['bottom'] == other['bottom'] && this['right'] == other['right']);
+};
+
+
 goog.provide('vs.ui.Setting');
 
 goog.require('vs.models.DataSource');
@@ -1424,6 +1186,221 @@ vs.ui.Setting.PredefinedSettings = {
 };
 
 
+goog.provide('vs.async.Task');
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ * @constructor
+ */
+vs.async.Task = function(func, thisArg) {
+  /**
+   * @type {number}
+   * @private
+   */
+  this._id = vs.async.Task.nextId();
+
+  /**
+   * @type {function(): Promise}
+   * @private
+   */
+  this._func = func;
+
+  /**
+   * @type {Object|undefined}
+   * @private
+   */
+  this._thisArg = thisArg;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._prev = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._next = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._first = this;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._last = this;
+};
+
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+
+Object.defineProperties(vs.async.Task.prototype, {
+  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
+  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
+  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
+  'prev': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
+  },
+  'next': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
+  },
+  'first': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
+  },
+  'last': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
+  }
+});
+
+/**
+ * @type {number}
+ * @private
+ */
+vs.async.Task._nextId = 0;
+
+/**
+ * @returns {number}
+ */
+vs.async.Task.nextId = function() {
+  return vs.async.Task._nextId++;
+};
+
+
+goog.provide('vs.async.TaskService');
+
+goog.require('vs.async.Task');
+
+/**
+ * @param {function(Function, number)} $timeout Angular timeout service
+ * @constructor
+ */
+vs.async.TaskService = function($timeout) {
+  /**
+   * @type {function(Function, number)}
+   * @private
+   */
+  this._timeout = $timeout || setTimeout;
+
+  /**
+   * @type {Object.<number, vs.async.Task>}
+   * @private
+   */
+  this._tasks = {};
+};
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ */
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {
+  var ret = new vs.async.Task(func, thisArg);
+  this._tasks[ret['id']] = ret;
+  return ret;
+};
+
+/**
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
+ * @returns {vs.async.Task}
+ */
+vs.async.TaskService.prototype.chain = function(t1, t2) {
+  if (typeof t1 == 'function') {
+    return this.chain(new vs.async.Task(t1), t2);
+  }
+
+  if (typeof t2 == 'function') {
+    return this.chain(t1, new vs.async.Task(t2));
+  }
+
+  t1['next'] = t1['next'] || t2['first'];
+  t1['last']['next'] = t2['first'];
+  t1['last'] = t2['last'];
+
+  t2['prev'] = t2['prev'] || t1['last'];
+  t2['first']['prev'] = t1['last'];
+  t2['first'] = t1['first'];
+
+  return t1['first'];
+};
+
+/**
+ * TODO: test!
+ * @param {vs.async.Task} task
+ * @param {boolean} [sequential] If true, the tasks will run sequentially
+ * @returns {Promise}
+ */
+vs.async.TaskService.prototype.runChain = function(task, sequential) {
+  // TODO: test!
+  var current = task['first'];
+  if (sequential) {
+    return new Promise(function(resolve, reject) {
+      for (; !!current; current = current['next']) {
+        current['func'].apply(current['thisArg']);
+      }
+      resolve();
+    });
+  }
+
+  var tasks = [];
+  for (; !!current; current = current['next']) {
+    tasks.push(current);
+  }
+
+  return u.async.each(tasks, function(task) {
+    return task['func'].apply(task['thisArg']);
+  }, true);
+};
+
+
 goog.provide('vs.ui.VisHandler');
 
 goog.require('vs.models.DataSource');
@@ -1739,112 +1716,6 @@ vs.ui.VisHandler.prototype.scheduleRedraw = function() {
 };
 
 
-goog.provide('vs.directives.Directive');
-
-/**
- * @param {angular.Scope} $scope Angular scope
- * @constructor
- */
-vs.directives.Directive = function($scope) {
-  /**
-   * @type {angular.Scope}
-   * @private
-   */
-  this._$scope = $scope;
-
-  /**
-   * @type {jQuery}
-   * @private
-   */
-  this._$element = null;
-
-  /**
-   * @private
-   */
-  this._$attrs = null;
-};
-
-/**
- * @type {angular.Scope}
- * @name vs.directives.Directive#$scope
- */
-vs.directives.Directive.prototype.$scope;
-
-/**
- * @type {jQuery}
- * @name vs.directives.Directive#$element
- */
-vs.directives.Directive.prototype.$element;
-
-/**
- * @type {angular.Attributes}
- * @name vs.directives.Directive#$attrs
- */
-vs.directives.Directive.prototype.$attrs;
-
-Object.defineProperties(vs.directives.Directive.prototype, {
-  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
-  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
-  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
-});
-
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Directive.prototype.link = {
-
-  'pre': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  },
-
-  'post': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  }
-};
-
-/**
- * @param {string} name
- * @param {function(new: vs.directives.Directive)} controllerCtor
- * @param {Array} [args]
- * @param {Object.<string, *>} [options]
- * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
- */
-vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
-  var controller = ['$scope', function($scope) {
-    var params = [].concat(args || []);
-    params.unshift($scope);
-
-    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
-    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
-  }];
-  var link;
-  if (typeof controllerCtor.prototype.link == 'function') {
-    link = function ($scope, $element, $attrs) {
-      var ctrl = $scope[name];
-      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
-    };
-  } else {
-    link = {};
-    if ('pre' in controllerCtor.prototype.link) {
-      link['pre'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
-    if ('post' in controllerCtor.prototype.link) {
-      link['post'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
-  }
-
-  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
-};
-
-
 goog.provide('vs.Configuration');
 
 /**
@@ -1875,23 +1746,6 @@ Object.defineProperties(vs.Configuration.prototype, {
 vs.Configuration.prototype.customize = function(options) {
   u.extend(this._options, options);
 };
-
-
-goog.provide('vs.ui.UiException');
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.ui.UiException = function(message, innerException) {
-  u.Exception.apply(this, arguments);
-
-  this.name = 'UiException';
-};
-
-goog.inherits(vs.ui.UiException, u.Exception);
 
 
 goog.provide('vs.async.ThreadPoolService');
@@ -2082,6 +1936,388 @@ vs.directives.Visualization.prototype.link = {
       if (!$scope.$$phase) { $scope.$apply(); }
     });
   }
+};
+
+
+goog.provide('vs.ui.svg.SvgVis');
+
+goog.require('vs.ui.VisHandler');
+
+/**
+ * @constructor
+ * @extends vs.ui.VisHandler
+ */
+vs.ui.svg.SvgVis = function () {
+  vs.ui.VisHandler.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.svg.SvgVis, vs.ui.VisHandler);
+
+Object.defineProperties(vs.ui.svg.SvgVis.prototype, {
+  'render': { get: /** @type {function (this:vs.ui.svg.SvgVis)} */ (function() { return 'svg'; })}
+});
+
+vs.ui.svg.SvgVis.prototype.beginDraw = function () {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
+      .then(function() {
+        if (d3.select(self['$element'][0]).select('svg').empty()) {
+          d3.select(self['$element'][0])
+            .append('svg')
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .append('rect')
+            .style('fill', '#ffffff')
+            .attr('width', '100%')
+            .attr('height', '100%');
+        }
+        resolve();
+      }, reject);
+  });
+};
+
+
+goog.provide('vs.directives.Movable');
+
+goog.require('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Movable = function($scope, $document) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
+};
+
+goog.inherits(vs.directives.Movable, vs.directives.Directive);
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  var $window = $scope['vsWindow']['handler']['$window'];
+  $window.css({ 'cursor': 'move' });
+
+  var startX = 0, startY = 0, x, y;
+
+  var $document = this._document;
+  function mousedown(event) {
+    if (event.target != $window[0]) { return; }
+
+    // Prevent default dragging of selected content
+    event.preventDefault();
+    var childOffset = $window.position();
+    x = childOffset.left;
+    y = childOffset.top;
+    startX = event.pageX - x;
+    startY = event.pageY - y;
+    $document.on('mousemove', mousemove);
+    $document.on('mouseup', mouseup);
+  }
+
+  function mousemove(event) {
+    y = event.pageY - startY;
+    x = event.pageX - startX;
+    $window.css({
+      'top': y + 'px',
+      'left':  x + 'px'
+    });
+  }
+
+  function mouseup() {
+    $document.off('mousemove', mousemove);
+    $document.off('mouseup', mouseup);
+  }
+
+  $window.on('mousedown', mousedown);
+};
+
+
+goog.provide('vs.models.Point');
+
+/**
+ * @param {number} [x]
+ * @param {number} [y]
+ * @constructor
+ */
+vs.models.Point = function(x, y) {
+  /**
+   * @type {number}
+   */
+  this['x'] = x;
+
+  /**
+   * @type {number}
+   */
+  this['y'] = y;
+};
+
+
+goog.provide('vs.models.Transformer');
+
+goog.require('vs.models.Point');
+
+/**
+ * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
+ * @constructor
+ */
+vs.models.Transformer = function(transformation) {
+  /**
+   * @type {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point}
+   * @private
+   */
+  this._transformation = transformation;
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {vs.models.Point}
+ */
+vs.models.Transformer.prototype.calc = function(point) {
+  return this._transformation.call(null, point);
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {Array.<number>}
+ */
+vs.models.Transformer.prototype.calcArr = function(point) {
+  var t = this.calc(point);
+  return [t['x'], t['y']];
+};
+
+/**
+ * @param {number} x
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcX = function(x) {
+  return this._transformation.call(null, {'x': x})['x'];
+};
+
+/**
+ * @param {number} y
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcY = function(y) {
+  return this._transformation({'y': y})['y'];
+};
+
+/**
+ * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.combine = function(transformer) {
+  var self = this;
+  if (transformer instanceof vs.models.Transformer) {
+    return new vs.models.Transformer(function (point) {
+      return transformer.calc(self.calc(point));
+    });
+  }
+
+  // function
+  return new vs.models.Transformer(function (point) {
+    return transformer.call(null, self.calc(point));
+  });
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.translate = function(offset) {
+  return this.combine(vs.models.Transformer.translate(offset));
+};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.scale = function(xScale, yScale) {
+  return this.combine(vs.models.Transformer.scale(xScale, yScale));
+};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.intCoords = function() {
+  return this.combine(vs.models.Transformer.intCoords());
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.translate = function(offset) {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(
+      point['x'] != undefined ? point['x'] + offset['x'] : undefined,
+      point['y'] != undefined ? point['y'] + offset['y'] : undefined);
+  });
+};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.scale = function(xScale, yScale) {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(
+      point['x'] != undefined ? xScale(point['x']) : undefined,
+      point['y'] != undefined ? yScale(point['y']) : undefined);
+  });
+};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.intCoords = function() {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(Math.floor(point['x']), Math.floor(point['y']));
+  });
+};
+
+
+goog.provide('vs.ui.canvas.CanvasVis');
+
+goog.require('vs.ui.VisHandler');
+
+goog.require('goog.string.format');
+
+/**
+ * @constructor
+ * @extends {vs.ui.VisHandler}
+ */
+vs.ui.canvas.CanvasVis = function () {
+  vs.ui.VisHandler.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.canvas.CanvasVis, vs.ui.VisHandler);
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.canvas.CanvasVis.Settings = u.extend({}, vs.ui.VisHandler.Settings, {
+  'doubleBuffer': vs.ui.Setting.PredefinedSettings['doubleBuffer']
+});
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#pendingCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.pendingCanvas;
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#activeCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.activeCanvas;
+
+/**
+ * @type {boolean}
+ * @name vs.ui.canvas.CanvasVis#doubleBuffer
+ */
+vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
+
+Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
+  'render': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
+  'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
+  'doubleBuffer': {
+    get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
+    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this['options']['doubleBuffer'] = value; })
+  },
+  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas'); })},
+  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas'); })}
+});
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
+      .then(
+      function() {
+        var pendingCanvas = self['pendingCanvas'];
+        if (pendingCanvas.length == 0) {
+          var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>',
+            /** @type {number} */ (self.optionValue('width')), /** @type {number} */ (self.optionValue('height')));
+          $(goog.string.format(format, 'block') + (self['doubleBuffer'] ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
+          pendingCanvas = self['pendingCanvas'];
+        }
+
+        pendingCanvas
+          .attr('width', self.optionValue('width'))
+          .attr('height', self.optionValue('height'));
+
+        var context = pendingCanvas[0].getContext('2d');
+        context.translate(0.5,0.5);
+        context.rect(0, 0, self.optionValue('width'), self.optionValue('height'));
+        context.fillStyle = '#ffffff';
+        context.fill();
+        resolve();
+      }, reject);
+  });
+};
+
+vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
+  if (!this['doubleBuffer']) { return; }
+  var activeCanvas = this['activeCanvas'];
+  var pendingCanvas = this['pendingCanvas'];
+  activeCanvas.css({ 'display': 'none' });
+  pendingCanvas.css({ 'display': 'block' });
+};
+
+/**
+ * @override
+ */
+vs.ui.canvas.CanvasVis.prototype.draw = function() {
+  var self = this;
+  return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
+    .then(function() { self.finalizeDraw(); });
+};
+
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {string} [fill]
+ * @param {string} [stroke]
+ */
+vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke) {
+  context.beginPath();
+  context.arc(cx, cy, r, 0, 2 * Math.PI);
+
+  if (stroke) {
+    context.strokeStyle = stroke;
+    context.stroke();
+  }
+
+  if (fill) {
+    context.fillStyle = fill;
+    context.fill();
+  }
+
+  context.closePath();
 };
 
 
@@ -2837,265 +3073,6 @@ Object.defineProperties(vs.directives.DataContext.prototype, {
 });
 
 
-goog.provide('vs.models.DataRow');
-
-goog.require('vs.models.DataSource');
-
-/**
- * @param {vs.models.DataSource} data
- * @param {number} index
- * @constructor
- */
-vs.models.DataRow = function(data, index) {
-  /**
-   * @type {vs.models.DataSource}
-   * @private
-   */
-  this._data = data;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._index = index;
-};
-
-/**
- * @type {number}
- * @name vs.models.DataRow#index
- */
-vs.models.DataRow.prototype.index;
-
-/**
- * @type {vs.models.DataSource}
- * @name vs.models.DataRow#data
- */
-vs.models.DataRow.prototype.data;
-
-Object.defineProperties(vs.models.DataRow.prototype, {
-  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
-  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
-});
-
-/**
- * @param {string|number} colIndexOrLabel
- * @param {string} [valsLabel]
- * @returns {number}
- */
-vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
-  /**
-   * @type {vs.models.DataArray}
-   */
-  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
-
-  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
-
-  return vals['d'][index * this['data']['nrows'] + this['index']];
-};
-
-/**
- * @param label
- * @returns {*}
- */
-vs.models.DataRow.prototype.info = function(label) {
-  var arr = this['data'].getRow(label);
-  if (!arr) { return undefined; }
-  return arr['d'][this['index']];
-};
-
-
-goog.provide('vs.models.ModelsException');
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.models.ModelsException = function(message, innerException) {
-  u.Exception.apply(this, arguments);
-
-  this.name = 'ModelsException';
-};
-
-goog.inherits(vs.models.ModelsException, u.Exception);
-
-
-goog.provide('vs.models.GenomicRangeQuery');
-
-goog.require('vs.models.Query');
-goog.require('vs.models.ModelsException');
-
-/**
- * @param {string} chr
- * @param {number} start
- * @param {number} end
- * @constructor
- */
-vs.models.GenomicRangeQuery = function(chr, start, end) {
-  /**
-   * @type {Array.<vs.models.Query>}
-   * @private
-   */
-  this._query = [
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'chr',
-      'test': vs.models.Query.Test['EQUALS'],
-      'testArgs': chr
-    }),
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'start',
-      'test': vs.models.Query.Test['LESS_THAN'],
-      'testArgs': end
-    }),
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'end',
-      'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
-      'testArgs': start
-    })
-  ];
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this._chr = chr;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._start = start;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._end = end;
-};
-
-/**
- * @type {string}
- * @name vs.models.GenomicRangeQuery#chr
- */
-vs.models.GenomicRangeQuery.prototype.chr;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#start
- */
-vs.models.GenomicRangeQuery.prototype.start;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#end
- */
-vs.models.GenomicRangeQuery.prototype.end;
-
-/**
- * @type {Array.<vs.models.Query>}
- * @name vs.models.GenomicRangeQuery#query
- */
-vs.models.GenomicRangeQuery.prototype.query;
-
-Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
-  'chr': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._chr; })},
-  'start': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._start; })},
-  'end': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._end; })},
-  'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
-});
-
-vs.models.GenomicRangeQuery.extract = function(query) {
-  var rowLabels = ['chr', 'start', 'end'];
-  var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
-  var bpValidTests = ['<', '>='];
-
-  var rowQueries = query.filter(function(q) {
-    if (q['target'] != vs.models.Query.Target['ROWS']) { return false; }
-    if (rowLabels.indexOf(q['targetLabel']) < 0) { return false; }
-    if ((q['targetLabel'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
-      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
-    }
-    if ((q['targetLabel'] == 'start' || q['targetLabel'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
-      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
-    }
-    if (q['targetLabel'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
-      throw new vs.models.ModelsException('The only supported test for "start" is "<"');
-    }
-    if (q['targetLabel'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
-      throw new vs.models.ModelsException('The only supported test for "end" is ">="');
-    }
-    return true;
-  });
-
-  var chrQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'chr' && !q['negate']; });
-  var startEndQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'start' || q['targetLabel'] == 'end' });
-  var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
-  var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
-
-  if (rowQueries.length > 0 && chrQueries.length != 1) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain exactly one "chr == " test');
-  }
-  if (rowQueries.length > 0 && startEndQueries.length < 2) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain at least two "start/end < or >= " tests');
-  }
-  if (rowQueries.length > 0 && (lessThanQueries.length < 1 || greaterThanQueries.length < 1)) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain a finite start/end range');
-  }
-
-  var range = rowQueries.length == 0 ? undefined : {
-    chr: chrQueries[0]['testArgs'],
-    end: startEndQueries.filter(function(q) { return q['targetLabel'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
-    start: startEndQueries.filter(function(q) { return q['targetLabel'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
-  };
-
-  return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);
-};
-
-
-goog.provide('vs.ui.svg.SvgVis');
-
-goog.require('vs.ui.VisHandler');
-
-/**
- * @constructor
- * @extends vs.ui.VisHandler
- */
-vs.ui.svg.SvgVis = function () {
-  vs.ui.VisHandler.apply(this, arguments);
-};
-
-goog.inherits(vs.ui.svg.SvgVis, vs.ui.VisHandler);
-
-Object.defineProperties(vs.ui.svg.SvgVis.prototype, {
-  'render': { get: /** @type {function (this:vs.ui.svg.SvgVis)} */ (function() { return 'svg'; })}
-});
-
-vs.ui.svg.SvgVis.prototype.beginDraw = function () {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
-      .then(function() {
-        if (d3.select(self['$element'][0]).select('svg').empty()) {
-          d3.select(self['$element'][0])
-            .append('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .append('rect')
-            .style('fill', '#ffffff')
-            .attr('width', '100%')
-            .attr('height', '100%');
-        }
-        resolve();
-      }, reject);
-  });
-};
-
-
 goog.provide('vs.ui.decorators.Grid');
 
 goog.require('vs.ui.Decorator');
@@ -3148,6 +3125,74 @@ Object.defineProperties(vs.ui.decorators.Grid.prototype, {
   'ticks': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
   'format': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
 });
+
+
+goog.provide('vs.ui.canvas.CanvasGrid');
+
+goog.require('vs.ui.decorators.Grid');
+goog.require('vs.models.Transformer');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Grid
+ */
+vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Grid.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.canvas.CanvasGrid, vs.ui.decorators.Grid);
+
+vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
+      .then(function() {
+        if (!self['target']['data']['isReady']) { resolve(); return; }
+
+        var target = self['target'];
+        var type = self.type;
+        var margins = target['margins'];
+        var height = target['height'];
+        var width = target['width'];
+        var intCoords = vs.models.Transformer.intCoords();
+        var translate = vs.models.Transformer
+          .translate({'x': margins['left'], 'y': margins['top']})
+          .intCoords();
+
+        var context = target['pendingCanvas'][0].getContext('2d');
+        var moveTo = context.__proto__.moveTo;
+        var lineTo = context.__proto__.lineTo;
+
+        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+
+        context.strokeStyle = '#eeeeee';
+        context.lineWidth = 1;
+
+        var ticks = scale.ticks(self['ticks']);
+
+        // Draw ticks
+        var x1 = type == 'x' ? scale : function() { return 0; };
+        var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
+        var y1 = type == 'y' ? scale : function() { return 0; };
+        var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
+
+        ticks.forEach(function(tick) {
+          moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
+          lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
+        });
+
+
+        context.stroke();
+        resolve();
+      }, reject);
+  });
+};
 
 
 goog.provide('vs.ui.svg.SvgGrid');
@@ -3221,74 +3266,6 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
           .style('shape-rendering', 'crispEdges');
 
         gridLines.exit().remove();
-        resolve();
-      }, reject);
-  });
-};
-
-
-goog.provide('vs.ui.canvas.CanvasGrid');
-
-goog.require('vs.ui.decorators.Grid');
-goog.require('vs.models.Transformer');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Grid
- */
-vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Grid.apply(this, arguments);
-};
-
-goog.inherits(vs.ui.canvas.CanvasGrid, vs.ui.decorators.Grid);
-
-vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
-      .then(function() {
-        if (!self['target']['data']['isReady']) { resolve(); return; }
-
-        var target = self['target'];
-        var type = self.type;
-        var margins = target['margins'];
-        var height = target['height'];
-        var width = target['width'];
-        var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer
-          .translate({'x': margins['left'], 'y': margins['top']})
-          .intCoords();
-
-        var context = target['pendingCanvas'][0].getContext('2d');
-        var moveTo = context.__proto__.moveTo;
-        var lineTo = context.__proto__.lineTo;
-
-        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
-
-        context.strokeStyle = '#eeeeee';
-        context.lineWidth = 1;
-
-        var ticks = scale.ticks(self['ticks']);
-
-        // Draw ticks
-        var x1 = type == 'x' ? scale : function() { return 0; };
-        var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
-        var y1 = type == 'y' ? scale : function() { return 0; };
-        var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
-
-        ticks.forEach(function(tick) {
-          moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
-          lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
-        });
-
-
-        context.stroke();
         resolve();
       }, reject);
   });
@@ -3412,72 +3389,159 @@ vs.directives.Window.prototype.link = {
 };
 
 
-goog.provide('vs.directives.Movable');
-
-goog.require('vs.directives.Directive');
+goog.provide('vs.models.ModelsException');
 
 /**
- * @param {angular.Scope} $scope
- * @param $document
+ * @param {string} message
+ * @param {Error} [innerException]
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends u.Exception
  */
-vs.directives.Movable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
+vs.models.ModelsException = function(message, innerException) {
+  u.Exception.apply(this, arguments);
 
-  /**
-   * Angular document
-   * @private
-   */
-  this._document = $document;
+  this.name = 'ModelsException';
 };
 
-goog.inherits(vs.directives.Movable, vs.directives.Directive);
+goog.inherits(vs.models.ModelsException, u.Exception);
+
+
+goog.provide('vs.models.GenomicRangeQuery');
+
+goog.require('vs.models.Query');
+goog.require('vs.models.ModelsException');
 
 /**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
+ * @param {string} chr
+ * @param {number} start
+ * @param {number} end
+ * @constructor
  */
-vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
-  $window.css({ 'cursor': 'move' });
+vs.models.GenomicRangeQuery = function(chr, start, end) {
+  /**
+   * @type {Array.<vs.models.Query>}
+   * @private
+   */
+  this._query = [
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'chr',
+      'test': vs.models.Query.Test['EQUALS'],
+      'testArgs': chr
+    }),
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'start',
+      'test': vs.models.Query.Test['LESS_THAN'],
+      'testArgs': end
+    }),
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'end',
+      'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
+      'testArgs': start
+    })
+  ];
 
-  var startX = 0, startY = 0, x, y;
+  /**
+   * @type {string}
+   * @private
+   */
+  this._chr = chr;
 
-  var $document = this._document;
-  function mousedown(event) {
-    if (event.target != $window[0]) { return; }
+  /**
+   * @type {number}
+   * @private
+   */
+  this._start = start;
 
-    // Prevent default dragging of selected content
-    event.preventDefault();
-    var childOffset = $window.position();
-    x = childOffset.left;
-    y = childOffset.top;
-    startX = event.pageX - x;
-    startY = event.pageY - y;
-    $document.on('mousemove', mousemove);
-    $document.on('mouseup', mouseup);
+  /**
+   * @type {number}
+   * @private
+   */
+  this._end = end;
+};
+
+/**
+ * @type {string}
+ * @name vs.models.GenomicRangeQuery#chr
+ */
+vs.models.GenomicRangeQuery.prototype.chr;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#start
+ */
+vs.models.GenomicRangeQuery.prototype.start;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#end
+ */
+vs.models.GenomicRangeQuery.prototype.end;
+
+/**
+ * @type {Array.<vs.models.Query>}
+ * @name vs.models.GenomicRangeQuery#query
+ */
+vs.models.GenomicRangeQuery.prototype.query;
+
+Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
+  'chr': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._chr; })},
+  'start': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._start; })},
+  'end': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._end; })},
+  'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
+});
+
+/**
+ * @param {Array.<vs.models.Query>} query
+ * @returns {vs.models.GenomicRangeQuery}
+ */
+vs.models.GenomicRangeQuery.extract = function(query) {
+  var rowLabels = ['chr', 'start', 'end'];
+  var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
+  var bpValidTests = ['<', '>='];
+
+  var rowQueries = query.filter(function(q) {
+    if (q['target'] != vs.models.Query.Target['ROWS']) { return false; }
+    if (rowLabels.indexOf(q['targetLabel']) < 0) { return false; }
+    if ((q['targetLabel'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
+      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
+    }
+    if ((q['targetLabel'] == 'start' || q['targetLabel'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
+      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
+    }
+    if (q['targetLabel'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
+      throw new vs.models.ModelsException('The only supported test for "start" is "<"');
+    }
+    if (q['targetLabel'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
+      throw new vs.models.ModelsException('The only supported test for "end" is ">="');
+    }
+    return true;
+  });
+
+  var chrQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'chr' && !q['negate']; });
+  var startEndQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'start' || q['targetLabel'] == 'end' });
+  var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
+  var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
+
+  if (rowQueries.length > 0 && chrQueries.length != 1) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain exactly one "chr == " test');
+  }
+  if (rowQueries.length > 0 && startEndQueries.length < 2) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain at least two "start/end < or >= " tests');
+  }
+  if (rowQueries.length > 0 && (lessThanQueries.length < 1 || greaterThanQueries.length < 1)) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain a finite start/end range');
   }
 
-  function mousemove(event) {
-    y = event.pageY - startY;
-    x = event.pageX - startX;
-    $window.css({
-      'top': y + 'px',
-      'left':  x + 'px'
-    });
-  }
+  var range = rowQueries.length == 0 ? undefined : {
+    chr: chrQueries[0]['testArgs'],
+    end: startEndQueries.filter(function(q) { return q['targetLabel'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
+    start: startEndQueries.filter(function(q) { return q['targetLabel'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
+  };
 
-  function mouseup() {
-    $document.off('mousemove', mousemove);
-    $document.off('mouseup', mouseup);
-  }
-
-  $window.on('mousedown', mousedown);
+  return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);
 };
 
 
@@ -3819,130 +3883,70 @@ Object.defineProperties(vs.directives.Resizable.BoundingBox.prototype, {
 });
 
 
-goog.provide('vs.ui.canvas.CanvasVis');
+goog.provide('vs.models.DataRow');
 
-goog.require('vs.ui.VisHandler');
-
-goog.require('goog.string.format');
+goog.require('vs.models.DataSource');
 
 /**
+ * @param {vs.models.DataSource} data
+ * @param {number} index
  * @constructor
- * @extends {vs.ui.VisHandler}
  */
-vs.ui.canvas.CanvasVis = function () {
-  vs.ui.VisHandler.apply(this, arguments);
+vs.models.DataRow = function(data, index) {
+  /**
+   * @type {vs.models.DataSource}
+   * @private
+   */
+  this._data = data;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._index = index;
 };
 
-goog.inherits(vs.ui.canvas.CanvasVis, vs.ui.VisHandler);
+/**
+ * @type {number}
+ * @name vs.models.DataRow#index
+ */
+vs.models.DataRow.prototype.index;
 
 /**
- * @type {Object.<string, vs.ui.Setting>}
+ * @type {vs.models.DataSource}
+ * @name vs.models.DataRow#data
  */
-vs.ui.canvas.CanvasVis.Settings = u.extend({}, vs.ui.VisHandler.Settings, {
-  'doubleBuffer': vs.ui.Setting.PredefinedSettings['doubleBuffer']
+vs.models.DataRow.prototype.data;
+
+Object.defineProperties(vs.models.DataRow.prototype, {
+  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
+  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
 });
 
 /**
- * @type {jQuery}
- * @name vs.ui.canvas.CanvasVis#pendingCanvas
+ * @param {string|number} colIndexOrLabel
+ * @param {string} [valsLabel]
+ * @returns {number}
  */
-vs.ui.canvas.CanvasVis.prototype.pendingCanvas;
+vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
+  /**
+   * @type {vs.models.DataArray}
+   */
+  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
 
-/**
- * @type {jQuery}
- * @name vs.ui.canvas.CanvasVis#activeCanvas
- */
-vs.ui.canvas.CanvasVis.prototype.activeCanvas;
+  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
 
-/**
- * @type {boolean}
- * @name vs.ui.canvas.CanvasVis#doubleBuffer
- */
-vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
-
-Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
-  'render': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
-  'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
-  'doubleBuffer': {
-    get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
-    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this['options']['doubleBuffer'] = value; })
-  },
-  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas'); })},
-  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas'); })}
-});
-
-/**
- * @returns {Promise}
- */
-vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
-      .then(
-      function() {
-        var pendingCanvas = self['pendingCanvas'];
-        if (pendingCanvas.length == 0) {
-          var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>',
-            /** @type {number} */ (self.optionValue('width')), /** @type {number} */ (self.optionValue('height')));
-          $(goog.string.format(format, 'block') + (self['doubleBuffer'] ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
-          pendingCanvas = self['pendingCanvas'];
-        }
-
-        pendingCanvas
-          .attr('width', self.optionValue('width'))
-          .attr('height', self.optionValue('height'));
-
-        var context = pendingCanvas[0].getContext('2d');
-        context.translate(0.5,0.5);
-        context.rect(0, 0, self.optionValue('width'), self.optionValue('height'));
-        context.fillStyle = '#ffffff';
-        context.fill();
-        resolve();
-      }, reject);
-  });
-};
-
-vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
-  if (!this['doubleBuffer']) { return; }
-  var activeCanvas = this['activeCanvas'];
-  var pendingCanvas = this['pendingCanvas'];
-  activeCanvas.css({ 'display': 'none' });
-  pendingCanvas.css({ 'display': 'block' });
+  return vals['d'][index * this['data']['nrows'] + this['index']];
 };
 
 /**
- * @override
+ * @param label
+ * @returns {*}
  */
-vs.ui.canvas.CanvasVis.prototype.draw = function() {
-  var self = this;
-  return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
-    .then(function() { self.finalizeDraw(); });
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {number} cx
- * @param {number} cy
- * @param {number} r
- * @param {string} [fill]
- * @param {string} [stroke]
- */
-vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke) {
-  context.beginPath();
-  context.arc(cx, cy, r, 0, 2 * Math.PI);
-
-  if (stroke) {
-    context.strokeStyle = stroke;
-    context.stroke();
-  }
-
-  if (fill) {
-    context.fillStyle = fill;
-    context.fill();
-  }
-
-  context.closePath();
+vs.models.DataRow.prototype.info = function(label) {
+  var arr = this['data'].getRow(label);
+  if (!arr) { return undefined; }
+  return arr['d'][this['index']];
 };
 
 
