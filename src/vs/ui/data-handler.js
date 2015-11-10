@@ -88,3 +88,11 @@ Object.defineProperties(vs.ui.DataHandler.prototype, {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
   }
 });
+
+/**
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.ui.DataHandler.prototype.query = function(queries) {
+  return this.data.applyQuery(queries);
+};

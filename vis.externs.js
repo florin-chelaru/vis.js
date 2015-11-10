@@ -432,9 +432,10 @@ vs.models.DataSource.prototype.changed;
 
 /**
  * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @param {boolean} [copy] True if the result should be a copy instead of changing the current instance
  * @returns {Promise.<vs.models.DataSource>}
  */
-vs.models.DataSource.prototype.applyQuery = function(queries) {};
+vs.models.DataSource.prototype.applyQuery = function(queries, copy) {};
 
 /**
  * @param {vs.models.DataSource} data
@@ -1118,6 +1119,12 @@ vs.ui.DataHandler.prototype.children;
  * @name vs.ui.DataHandler#visualizations
  */
 vs.ui.DataHandler.prototype.visualizations;
+
+/**
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.ui.DataHandler.prototype.query = function(queries) {};
 
 /**
  * @param {angular.Scope} $scope

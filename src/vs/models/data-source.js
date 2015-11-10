@@ -122,12 +122,14 @@ Object.defineProperties(vs.models.DataSource.prototype, {
 
 /**
  * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @param {boolean} [copy] True if the result should be a copy instead of changing the current instance
  * @returns {Promise.<vs.models.DataSource>}
  */
-vs.models.DataSource.prototype.applyQuery = function(queries) {
+vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
   if (queries instanceof vs.models.Query) { queries = [queries]; }
   if (!queries || !queries.length) { return /** @type {Promise} */ (Promise.resolve(this)); }
 
+  var self = this;
   var ret = this;
   return new Promise(function(resolve, reject) {
     u.async.each(queries, function(query) {
@@ -136,7 +138,19 @@ vs.models.DataSource.prototype.applyQuery = function(queries) {
           .then(function (data) { ret = data; itResolve(); }, itReject);
       });
     }, true)
-      .then(function() { resolve(ret); }, reject);
+      .then(function() {
+        if (copy) { resolve(ret); }
+        else {
+          self.query = ret.query;
+          self.nrows = ret.nrows;
+          self.ncols = ret.ncols;
+          self.rows = ret.rows;
+          self.cols = ret.cols;
+          self.vals = ret.vals;
+          resolve(self);
+          self.changed.fire(self);
+        }
+      }, reject);
   });
 };
 
@@ -225,7 +239,7 @@ vs.models.DataSource.singleQuery = function(data, q) {
               return u.reflection.wrap({
                 label: arr['label'],
                 boundaries: arr['boundaries'],
-                d: ret['cols'].map(function (col, j) {
+                d: u.array.range(ret['ncols']).map(function (j) {
                   return indices.map(function (i) {
                     return arr['d'][j * ret['nrows'] + i];
                   })

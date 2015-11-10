@@ -7,3 +7,4 @@
 goog.require('vs.ui.DataHandler');
 
 goog.exportSymbol('vs.ui.DataHandler', vs.ui.DataHandler);
+goog.exportProperty(vs.ui.DataHandler.prototype, 'query', vs.ui.DataHandler.prototype.query);

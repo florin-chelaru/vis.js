@@ -107,7 +107,7 @@
 
   <!-- End CSS -->
 
-  <target name="compile" depends="deps,concat,concat.externs,compress.css" description="">
+  <target name="compile" depends="deps,concat,concat.externs" description="">
     <local name="outfile"/>
     <property name="outfile" value="${compiledmin}"/>
     <java jar="${compiler}" fork="true" failonerror="true">
