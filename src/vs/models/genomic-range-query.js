@@ -16,6 +16,10 @@ goog.require('vs.models.ModelsException');
  * @constructor
  */
 vs.models.GenomicRangeQuery = function(chr, start, end) {
+
+  start = parseInt(start, 10);
+  end = parseInt(end, 10);
+
   /**
    * @type {Array.<vs.models.Query>}
    * @private
