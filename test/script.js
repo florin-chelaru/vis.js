@@ -462,14 +462,14 @@ main.controller('vs.MainController', ['$scope', '$templateCache', function($scop
             new vs.models.Query({target: 'rows', targetLabel: 'start', test: '<', testArgs: 20}),
             new vs.models.Query({target: 'rows', targetLabel: 'end', test: '>', testArgs: 10})
           ],
-          nrows: 4,
-          ncols: 2,
+          ncols: 4,
           cols: [
             { label: 'name', d: ['florin','suze','wouter','apas'] },
             { label: 'id', d: [1,2,3,4] },
             { label: 'age', d: [30,24,35,22] },
             { label: 'sex', d: ['m','f','m','m'] }
           ],
+          nrows: 2,
           rows: [
             { label: 'name', d: ['gene1','gene2'] },
             { label: 'id', d: [1,2] },

@@ -132,25 +132,27 @@ vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
   var self = this;
   var ret = this;
   return new Promise(function(resolve, reject) {
-    u.async.each(queries, function(query) {
-      return new Promise(function(itResolve, itReject) {
-        vs.models.DataSource.singleQuery(ret, query)
-          .then(function (data) { ret = data; itResolve(); }, itReject);
-      });
-    }, true)
-      .then(function() {
-        if (copy) { resolve(ret); }
-        else {
-          self.query = ret.query;
-          self.nrows = ret.nrows;
-          self.ncols = ret.ncols;
-          self.rows = ret.rows;
-          self.cols = ret.cols;
-          self.vals = ret.vals;
-          resolve(self);
-          self.changed.fire(self);
-        }
-      }, reject);
+    self['ready'].then(function() {
+      u.async.each(queries, function(query) {
+        return new Promise(function(itResolve, itReject) {
+          vs.models.DataSource.singleQuery(ret, query)
+            .then(function (data) { ret = data; itResolve(); }, itReject);
+        });
+      }, true)
+        .then(function() {
+          if (copy) { resolve(ret); }
+          else {
+            self['query'] = ret['query'];
+            self['nrows'] = ret['nrows'];
+            self['ncols'] = ret['ncols'];
+            self['rows'] = ret['rows'];
+            self['cols'] = ret['cols'];
+            self['vals'] = ret['vals'];
+            resolve(self);
+            self['changed'].fire(self);
+          }
+        }, reject);
+    }, reject);
   });
 };
 
@@ -222,24 +224,24 @@ vs.models.DataSource.singleQuery = function(data, q) {
       switch (q['target']) {
         case vs.models.Query.Target['ROWS']:
           ret = u.reflection.wrap({
-            query: ret['query'].concat([q]),
-            nrows: indices.length,
-            ncols: ret['ncols'],
-            rows: ret['rows'].map(function (arr) {
+            'query': ret['query'].concat([q]),
+            'nrows': indices.length,
+            'ncols': ret['ncols'],
+            'rows': ret['rows'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr['label'],
-                boundaries: arr['boundaries'],
-                d: indices.map(function (i) {
+                'label': arr['label'],
+                'boundaries': arr['boundaries'],
+                'd': indices.map(function (i) {
                   return arr['d'][i]
                 })
               }, vs.models.DataArray);
             }),
-            cols: ret['cols'],
-            vals: ret['vals'].map(function (arr) {
+            'cols': ret['cols'],
+            'vals': ret['vals'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr['label'],
-                boundaries: arr['boundaries'],
-                d: u.array.range(ret['ncols']).map(function (j) {
+                'label': arr['label'],
+                'boundaries': arr['boundaries'],
+                'd': u.array.range(ret['ncols']).map(function (j) {
                   return indices.map(function (i) {
                     return arr['d'][j * ret['nrows'] + i];
                   })
@@ -253,24 +255,24 @@ vs.models.DataSource.singleQuery = function(data, q) {
 
         case vs.models.Query.Target['COLS']:
           ret = u.reflection.wrap({
-            query: ret['query'].concat([q]),
-            nrows: ret['nrows'],
-            ncols: indices.length,
-            rows: ret['rows'],
-            cols: ret['cols'].map(function (arr) {
+            'query': ret['query'].concat([q]),
+            'nrows': ret['nrows'],
+            'ncols': indices.length,
+            'rows': ret['rows'],
+            'cols': ret['cols'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr['label'],
-                boundaries: arr['boundaries'],
-                d: indices.map(function (i) {
+                'label': arr['label'],
+                'boundaries': arr['boundaries'],
+                'd': indices.map(function (i) {
                   return arr['d'][i]
                 })
               }, vs.models.DataArray);
             }),
-            vals: ret['vals'].map(function (arr) {
+            'vals': ret['vals'].map(function (arr) {
               return u.reflection.wrap({
-                label: arr['label'],
-                boundaries: arr['boundaries'],
-                d: indices.map(function (i) {
+                'label': arr['label'],
+                'boundaries': arr['boundaries'],
+                'd': indices.map(function (i) {
                   return arr['d'].slice(i * ret['nrows'], (i + 1) * ret['nrows']);
                 }).reduce(function (arr1, arr2) {
                   return arr1.concat(arr2);
@@ -282,20 +284,20 @@ vs.models.DataSource.singleQuery = function(data, q) {
 
         case vs.models.Query.Target['VALS']:
           ret = u.reflection.wrap({
-            query: ret['query'].concat([q]),
-            nrows: ret['nrows'],
-            ncols: ret['ncols'],
-            rows: ret['rows'],
-            cols: ret['cols'],
-            vals: ret['vals'].map(function (arr) {
+            'query': ret['query'].concat([q]),
+            'nrows': ret['nrows'],
+            'ncols': ret['ncols'],
+            'rows': ret['rows'],
+            'cols': ret['cols'],
+            'vals': ret['vals'].map(function (arr) {
               var filtered = u.array.fill(arr['d'].length, undefined);
               indices.forEach(function (i) {
                 filtered[i] = arr['d'][i];
               });
               return u.reflection.wrap({
-                label: arr['label'],
-                boundaries: arr['boundaries'],
-                d: filtered
+                'label': arr['label'],
+                'boundaries': arr['boundaries'],
+                'd': filtered
               }, vs.models.DataArray);
             })
           }, vs.models.DataSource);
