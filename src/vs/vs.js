@@ -37,10 +37,7 @@ goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
 goog.require('vs.directives.Resizable');
 
-/*
-goog.require('vs.directives.Navbar');
-goog.require('vs.directives.NavLocation');
-*/
+goog.require('vs.directives.LoadingDecorator');
 
 goog.require('vs.directives.DataContext');
 
@@ -86,15 +83,10 @@ vs.main.directive('vsMovable', ['$document', function($document) {
 vs.main.directive('vsResizable', ['$document', function($document) {
   return vs.directives.Directive.createNew('vsResizable', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Resizable), [$document], {restrict: 'C', require: 'vsWindow'});
 }]);
-/*
-vs.main.directive('vsNavbar', [function() {
-  return vs.directives.Directive.createNew('vsNavbar', vs.directives.Navbar, null, {restrict: 'C', require: ['vsWindow', 'vsDataContext']});
-}]);
 
-vs.main.directive('vsNavLocation', [function() {
-  return vs.directives.Directive.createNew('vsNavLocation', vs.directives.NavLocation, null, {restrict: 'C', require: ['vsNavbar', 'vsDataContext']});
+vs.main.directive('vsLoader', ['taskService', '$timeout', function(taskService, $timeout) {
+  return vs.directives.Directive.createNew('vsLoader', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.LoadingDecorator), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
 }]);
-*/
 
 vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $timeout) {
   return vs.directives.Directive.createNew('vsAxis', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Axis), [taskService, $timeout], {restrict: 'C', require: '^visualization'});

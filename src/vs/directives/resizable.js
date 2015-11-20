@@ -71,6 +71,9 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     startY = event.pageY - target.top;
     self._document.on('mousemove', mousemove);
     self._document.on('mouseup', mouseup);
+
+    $window.trigger($.Event('resizestart', {}));
+    $element.trigger($.Event('resizestart', {}));
   }
 
   function mousemove(event) {
@@ -109,6 +112,8 @@ vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, cont
     event.stopPropagation();
     self._document.off('mousemove', mousemove);
     self._document.off('mouseup', mouseup);
+    $window.trigger($.Event('resizeend', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+    $element.trigger($.Event('resizeend', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
   }
 
   $window.find('> .vs-resize-grab').on('mousedown', mousedown);

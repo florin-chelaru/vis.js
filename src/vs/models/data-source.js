@@ -38,6 +38,12 @@ vs.models.DataSource = function() {
   this._changed = null;
 
   /**
+   * @type {u.Event.<vs.models.DataSource>}
+   * @private
+   */
+  this._changing = null;
+
+  /**
    * @type {Promise}
    * @private
    */
@@ -104,11 +110,23 @@ vs.models.DataSource.prototype.isReady;
  */
 vs.models.DataSource.prototype.changed;
 
+/**
+ * @type {u.Event.<vs.models.DataSource>}
+ * @name vs.models.DataSource#changing
+ */
+vs.models.DataSource.prototype.changing;
+
 Object.defineProperties(vs.models.DataSource.prototype, {
   'changed': {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._changed) { this._changed = new u.Event(); }
       return this._changed;
+    })
+  },
+  'changing': {
+    get: /** @type {function (this:vs.models.DataSource)} */ (function() {
+      if (!this._changing) { this._changing = new u.Event(); }
+      return this._changing;
     })
   },
   'ready': {

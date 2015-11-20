@@ -18,295 +18,6 @@
 */
 
 
-goog.provide('vs.async.Task');
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- * @constructor
- */
-vs.async.Task = function(func, thisArg) {
-  /**
-   * @type {number}
-   * @private
-   */
-  this._id = vs.async.Task.nextId();
-
-  /**
-   * @type {function(): Promise}
-   * @private
-   */
-  this._func = func;
-
-  /**
-   * @type {Object|undefined}
-   * @private
-   */
-  this._thisArg = thisArg;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._prev = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._next = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._first = this;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._last = this;
-};
-
-/**
- * @type {number}
- * @name vs.async.Task#id
- */
-vs.async.Task.prototype.id;
-
-/**
- * @type {Object|undefined}
- * @name vs.async.Task#thisArg
- */
-vs.async.Task.prototype.thisArg;
-
-/**
- * @type {function():Promise}
- * @name vs.async.Task#func
- */
-vs.async.Task.prototype.func;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#prev
- */
-vs.async.Task.prototype.prev;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#next
- */
-vs.async.Task.prototype.next;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#first
- */
-vs.async.Task.prototype.first;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#last
- */
-vs.async.Task.prototype.last;
-
-Object.defineProperties(vs.async.Task.prototype, {
-  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
-  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
-  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
-  'prev': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
-  },
-  'next': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
-  },
-  'first': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
-  },
-  'last': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
-  }
-});
-
-/**
- * @type {number}
- * @private
- */
-vs.async.Task._nextId = 0;
-
-/**
- * @returns {number}
- */
-vs.async.Task.nextId = function() {
-  return vs.async.Task._nextId++;
-};
-
-
-goog.provide('vs.async.TaskService');
-
-goog.require('vs.async.Task');
-
-/**
- * @param {function(Function, number)} $timeout Angular timeout service
- * @constructor
- */
-vs.async.TaskService = function($timeout) {
-  /**
-   * @type {function(Function, number)}
-   * @private
-   */
-  this._timeout = $timeout || setTimeout;
-
-  /**
-   * @type {Object.<number, vs.async.Task>}
-   * @private
-   */
-  this._tasks = {};
-};
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- */
-vs.async.TaskService.prototype.createTask = function(func, thisArg) {
-  var ret = new vs.async.Task(func, thisArg);
-  this._tasks[ret['id']] = ret;
-  return ret;
-};
-
-/**
- * @param {vs.async.Task|function():Promise} t1
- * @param {vs.async.Task|function():Promise} t2
- * @returns {vs.async.Task}
- */
-vs.async.TaskService.prototype.chain = function(t1, t2) {
-  if (typeof t1 == 'function') {
-    return this.chain(new vs.async.Task(t1), t2);
-  }
-
-  if (typeof t2 == 'function') {
-    return this.chain(t1, new vs.async.Task(t2));
-  }
-
-  t1['next'] = t1['next'] || t2['first'];
-  t1['last']['next'] = t2['first'];
-  t1['last'] = t2['last'];
-
-  t2['prev'] = t2['prev'] || t1['last'];
-  t2['first']['prev'] = t1['last'];
-  t2['first'] = t1['first'];
-
-  return t1['first'];
-};
-
-/**
- * TODO: test!
- * @param {vs.async.Task} task
- * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {Promise}
- */
-vs.async.TaskService.prototype.runChain = function(task, sequential) {
-  // TODO: test!
-  var current = task['first'];
-  if (sequential) {
-    return new Promise(function(resolve, reject) {
-      for (; !!current; current = current['next']) {
-        current['func'].apply(current['thisArg']);
-      }
-      resolve();
-    });
-  }
-
-  var tasks = [];
-  for (; !!current; current = current['next']) {
-    tasks.push(current);
-  }
-
-  return u.async.each(tasks, function(task) {
-    return task['func'].apply(task['thisArg']);
-  }, true);
-};
-
-
-goog.provide('vs.models.Boundaries');
-
-/**
- * @param {number} [min]
- * @param {number} [max]
- * @constructor
- */
-vs.models.Boundaries = function(min, max) {
-  /**
-   * @type {number}
-   */
-  this['min'] = min;
-
-  /**
-   * @type {number}
-   */
-  this['max'] = max;
-};
-
-
-goog.provide('vs.models.DataArray');
-goog.require('vs.models.Boundaries');
-
-/**
- * @param {Array} d
- * @param {string} [label]
- * @param {vs.models.Boundaries} [boundaries]
- * @constructor
- */
-vs.models.DataArray = function(d, label, boundaries) {
-  /**
-   * @type {Array}
-   * @private
-   */
-  this._d = d;
-
-  /**
-   * @type {string|undefined}
-   * @private
-   */
-  this._label = label;
-
-  /**
-   * @type {vs.models.Boundaries|undefined}
-   * @private
-   */
-  this._boundaries = boundaries;
-};
-
-/**
- * @type {string|undefined}
- * @name vs.models.DataArray#label
- */
-vs.models.DataArray.prototype.label;
-
-/**
- * @type {Array}
- * @name vs.models.DataArray#d
- */
-vs.models.DataArray.prototype.d;
-
-/**
- * @type {vs.models.Boundaries|undefined}
- * @name vs.models.DataArray#boundaries
- */
-vs.models.DataArray.prototype.boundaries;
-
-Object.defineProperties(vs.models.DataArray.prototype, {
-  'label': { get: /** @type {function (this:vs.models.DataArray)} */ (function () { return this._label; })},
-  'd': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._d; })},
-  'boundaries': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._boundaries; })}
-});
-
-
 goog.provide('vs.models.Query');
 
 /**
@@ -386,6 +97,80 @@ vs.models.Query.Test = {
 };
 
 
+goog.provide('vs.models.Boundaries');
+
+/**
+ * @param {number} [min]
+ * @param {number} [max]
+ * @constructor
+ */
+vs.models.Boundaries = function(min, max) {
+  /**
+   * @type {number}
+   */
+  this['min'] = min;
+
+  /**
+   * @type {number}
+   */
+  this['max'] = max;
+};
+
+
+goog.provide('vs.models.DataArray');
+goog.require('vs.models.Boundaries');
+
+/**
+ * @param {Array} d
+ * @param {string} [label]
+ * @param {vs.models.Boundaries} [boundaries]
+ * @constructor
+ */
+vs.models.DataArray = function(d, label, boundaries) {
+  /**
+   * @type {Array}
+   * @private
+   */
+  this._d = d;
+
+  /**
+   * @type {string|undefined}
+   * @private
+   */
+  this._label = label;
+
+  /**
+   * @type {vs.models.Boundaries|undefined}
+   * @private
+   */
+  this._boundaries = boundaries;
+};
+
+/**
+ * @type {string|undefined}
+ * @name vs.models.DataArray#label
+ */
+vs.models.DataArray.prototype.label;
+
+/**
+ * @type {Array}
+ * @name vs.models.DataArray#d
+ */
+vs.models.DataArray.prototype.d;
+
+/**
+ * @type {vs.models.Boundaries|undefined}
+ * @name vs.models.DataArray#boundaries
+ */
+vs.models.DataArray.prototype.boundaries;
+
+Object.defineProperties(vs.models.DataArray.prototype, {
+  'label': { get: /** @type {function (this:vs.models.DataArray)} */ (function () { return this._label; })},
+  'd': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._d; })},
+  'boundaries': { get: /** @type {function (this:vs.models.DataArray)} */ (function() { return this._boundaries; })}
+});
+
+
 goog.provide('vs.models.DataSource');
 
 goog.require('vs.models.DataArray');
@@ -418,6 +203,12 @@ vs.models.DataSource = function() {
    * @private
    */
   this._changed = null;
+
+  /**
+   * @type {u.Event.<vs.models.DataSource>}
+   * @private
+   */
+  this._changing = null;
 
   /**
    * @type {Promise}
@@ -486,11 +277,23 @@ vs.models.DataSource.prototype.isReady;
  */
 vs.models.DataSource.prototype.changed;
 
+/**
+ * @type {u.Event.<vs.models.DataSource>}
+ * @name vs.models.DataSource#changing
+ */
+vs.models.DataSource.prototype.changing;
+
 Object.defineProperties(vs.models.DataSource.prototype, {
   'changed': {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._changed) { this._changed = new u.Event(); }
       return this._changed;
+    })
+  },
+  'changing': {
+    get: /** @type {function (this:vs.models.DataSource)} */ (function() {
+      if (!this._changing) { this._changing = new u.Event(); }
+      return this._changing;
     })
   },
   'ready': {
@@ -799,6 +602,811 @@ vs.models.DataSource.prototype.raw = function() {
     'vals': this['vals'],
     'isReady': this['isReady']
   };
+};
+
+
+goog.provide('vs.models.DataRow');
+
+goog.require('vs.models.DataSource');
+
+/**
+ * @param {vs.models.DataSource} data
+ * @param {number} index
+ * @constructor
+ */
+vs.models.DataRow = function(data, index) {
+  /**
+   * @type {vs.models.DataSource}
+   * @private
+   */
+  this._data = data;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._index = index;
+};
+
+/**
+ * @type {number}
+ * @name vs.models.DataRow#index
+ */
+vs.models.DataRow.prototype.index;
+
+/**
+ * @type {vs.models.DataSource}
+ * @name vs.models.DataRow#data
+ */
+vs.models.DataRow.prototype.data;
+
+Object.defineProperties(vs.models.DataRow.prototype, {
+  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
+  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
+});
+
+/**
+ * @param {string|number} colIndexOrLabel
+ * @param {string} [valsLabel]
+ * @returns {number}
+ */
+vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
+  /**
+   * @type {vs.models.DataArray}
+   */
+  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
+
+  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
+
+  return vals['d'][index * this['data']['nrows'] + this['index']];
+};
+
+/**
+ * @param label
+ * @returns {*}
+ */
+vs.models.DataRow.prototype.info = function(label) {
+  var arr = this['data'].getRow(label);
+  if (!arr) { return undefined; }
+  return arr['d'][this['index']];
+};
+
+
+goog.provide('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope Angular scope
+ * @constructor
+ */
+vs.directives.Directive = function($scope) {
+  /**
+   * @type {angular.Scope}
+   * @private
+   */
+  this._$scope = $scope;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$element = null;
+
+  /**
+   * @private
+   */
+  this._$attrs = null;
+};
+
+/**
+ * @type {angular.Scope}
+ * @name vs.directives.Directive#$scope
+ */
+vs.directives.Directive.prototype.$scope;
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Directive#$element
+ */
+vs.directives.Directive.prototype.$element;
+
+/**
+ * @type {angular.Attributes}
+ * @name vs.directives.Directive#$attrs
+ */
+vs.directives.Directive.prototype.$attrs;
+
+Object.defineProperties(vs.directives.Directive.prototype, {
+  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
+  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
+  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
+});
+
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Directive.prototype.link = {
+
+  'pre': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  },
+
+  'post': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  }
+};
+
+/**
+ * @param {string} name
+ * @param {function(new: vs.directives.Directive)} controllerCtor
+ * @param {Array} [args]
+ * @param {Object.<string, *>} [options]
+ * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
+ */
+vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
+  var controller = ['$scope', function($scope) {
+    var params = [].concat(args || []);
+    params.unshift($scope);
+
+    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
+    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
+  }];
+  var link;
+  if (typeof controllerCtor.prototype.link == 'function') {
+    link = function ($scope, $element, $attrs) {
+      var ctrl = $scope[name];
+      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
+    };
+  } else {
+    link = {};
+    if ('pre' in controllerCtor.prototype.link) {
+      link['pre'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+    if ('post' in controllerCtor.prototype.link) {
+      link['post'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+  }
+
+  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
+};
+
+
+goog.provide('vs.directives.Resizable');
+
+goog.require('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Resizable = function($scope, $document) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._minWidth = 65;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._minHeight = 65;
+};
+
+goog.inherits(vs.directives.Resizable, vs.directives.Directive);
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  var $window = $scope['vsWindow']['handler']['$window'];
+  $window
+    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-left"></div>')
+    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-right"></div>')
+    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-bottom-left"></div>')
+    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-bottom-right"></div>')
+    .append('<div class="vs-resize-grab vs-grab-vertical vs-grab-left"></div>')
+    .append('<div class="vs-resize-grab vs-grab-vertical vs-grab-right"></div>')
+    .append('<div class="vs-resize-grab vs-grab-horizontal vs-grab-bottom"></div>');
+
+  var box;
+  var startX, startY, target;
+
+  var self = this;
+  function mousedown(event) {
+    // Prevent default dragging of selected content
+    event.stopPropagation();
+    event.preventDefault();
+    box = new vs.directives.Resizable.BoundingBox($window);
+    target = box.getHandler($(this));
+    startX = event.pageX - target.left;
+    startY = event.pageY - target.top;
+    self._document.on('mousemove', mousemove);
+    self._document.on('mouseup', mouseup);
+
+    $window.trigger($.Event('resizestart', {}));
+    $element.trigger($.Event('resizestart', {}));
+  }
+
+  function mousemove(event) {
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    var newY = event.pageY - startY;
+    var newX = event.pageX - startX;
+
+    target.top = newY;
+    target.left = newX;
+
+    box.update(target, self._minWidth, self._minHeight);
+    
+    $window.css({
+      'top': (box.top) + 'px',
+      'left': (box.left) + 'px',
+      'width': box.width + 'px',
+      'height': box.height + 'px'
+    });
+
+    $element.css({
+      'top': (box.top) + 'px',
+      'left': (box.left) + 'px',
+      'width': box.width + 'px',
+      'height': box.height + 'px'
+    });
+
+    $window.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+    $element.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+  }
+
+  function mouseup(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    self._document.off('mousemove', mousemove);
+    self._document.off('mouseup', mouseup);
+    $window.trigger($.Event('resizeend', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+    $element.trigger($.Event('resizeend', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
+  }
+
+  $window.find('> .vs-resize-grab').on('mousedown', mousedown);
+};
+
+/**
+ * @param {jQuery} $elem
+ * @constructor
+ */
+vs.directives.Resizable.ResizeHandler = function($elem) {
+  /** @type {jQuery} */
+  this.$elem = $elem;
+  var rect = $elem[0].getBoundingClientRect();
+
+  // We compute the relative position of this handler to the window's parent element
+  // We add 1 to each because jQuery.position() includes all margins and borders; so if we change the border of window,
+  // this should also change
+  var pos = {left:$elem.position().left + $elem.parent().position().left + 1, top:$elem.position().top + $elem.parent().position().top + 1};
+  this.top = pos.top;
+  this.left = pos.left;
+  this.width = rect.width;
+  this.height = rect.height;
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-left'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topRight = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-right'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-left'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-right'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.left = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-left'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.right = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-right'));
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottom = function($elem) {
+  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom'));
+};
+
+/**
+ * @param {jQuery} $element
+ * @constructor
+ */
+vs.directives.Resizable.BoundingBox = function($element) {
+  this.offset = $element.position();
+  this.topLeft = vs.directives.Resizable.ResizeHandler.topLeft($element);
+  this.topRight = vs.directives.Resizable.ResizeHandler.topRight($element);
+  this.bottomLeft = vs.directives.Resizable.ResizeHandler.bottomLeft($element);
+  this.bottomRight = vs.directives.Resizable.ResizeHandler.bottomRight($element);
+  this.leftHandler = vs.directives.Resizable.ResizeHandler.left($element);
+  this.rightHandler = vs.directives.Resizable.ResizeHandler.right($element);
+  this.bottomHandler = vs.directives.Resizable.ResizeHandler.bottom($element);
+
+  // This assumes that all handlers are square and of the same size
+  // The 1 corresponds to the border
+  this._margin = -this.topLeft.width * 0.5 - 1;
+};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {
+  switch ($elem[0]) {
+    case this.topLeft.$elem[0]:
+      return this.topLeft;
+    case this.bottomLeft.$elem[0]:
+      return this.bottomLeft;
+    case this.topRight.$elem[0]:
+      return this.topRight;
+    case this.bottomRight.$elem[0]:
+      return this.bottomRight;
+    case this.leftHandler.$elem[0]:
+      return this.leftHandler;
+    case this.rightHandler.$elem[0]:
+      return this.rightHandler;
+    case this.bottomHandler.$elem[0]:
+      return this.bottomHandler;
+    default:
+      return null;
+  }
+};
+
+/**
+ * @param {vs.directives.Resizable.ResizeHandler} handler
+ * @param {number} [minWidth]
+ * @param {number} [minHeight]
+ */
+vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {
+  minWidth = minWidth || 0;
+  minHeight = minHeight || 0;
+  switch (handler) {
+    case this.topLeft:
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
+      this.bottomLeft.left = handler.left;
+      this.topRight.top = handler.top;
+      this.leftHandler.left = handler.left;
+      break;
+    case this.bottomLeft:
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
+      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
+      this.topLeft.left = handler.left;
+      this.bottomRight.top = handler.top;
+      this.leftHandler.left = handler.left;
+      this.bottomHandler.top = handler.top;
+      break;
+    case this.topRight:
+      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
+      this.topLeft.top = handler.top;
+      this.bottomRight.left = handler.left;
+      this.rightHandler.left = handler.left;
+      break;
+    case this.bottomRight:
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
+      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
+      this.topRight.left = handler.left;
+      this.bottomLeft.top = handler.top;
+      this.rightHandler.left = handler.left;
+      this.bottomHandler.top = handler.top;
+      break;
+    case this.leftHandler:
+      handler.top = this.topLeft.top;
+      handler.left = Math.min(handler.left, this.rightHandler.left - handler.width - 2 * this._margin - minWidth);
+
+      this.topLeft.left = handler.left;
+      this.bottomLeft.left = handler.left;
+
+      break;
+    case this.rightHandler:
+      handler.top = this.topLeft.top;
+      handler.left = Math.max(handler.left, this.leftHandler.left + this.leftHandler.width + 2 * this._margin + minWidth);
+
+      this.topRight.left = handler.left;
+      this.bottomRight.left = handler.left;
+
+      break;
+    case this.bottomHandler:
+      handler.left = this.topLeft.left;
+      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
+
+      this.bottomRight.top = handler.top;
+      this.bottomLeft.top = handler.top;
+      break;
+  }
+};
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#left
+ */
+vs.directives.Resizable.BoundingBox.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#top
+ */
+vs.directives.Resizable.BoundingBox.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#width
+ */
+vs.directives.Resizable.BoundingBox.prototype.width;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#height
+ */
+vs.directives.Resizable.BoundingBox.prototype.height;
+
+Object.defineProperties(vs.directives.Resizable.BoundingBox.prototype, {
+  left: {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.left + this.topLeft.width + this._margin; })
+  },
+  top: {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.top + this.topLeft.height + this._margin; })
+  },
+  width: {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
+      return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin - 2;
+    })
+  },
+  height: {
+    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
+      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin - 1;
+    })
+  }
+});
+
+
+goog.provide('vs.models.ModelsException');
+
+/**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.models.ModelsException = function(message, innerException) {
+  u.Exception.apply(this, arguments);
+
+  this.name = 'ModelsException';
+};
+
+goog.inherits(vs.models.ModelsException, u.Exception);
+
+
+goog.provide('vs.models.GenomicRangeQuery');
+
+goog.require('vs.models.Query');
+goog.require('vs.models.ModelsException');
+
+/**
+ * @param {string} chr
+ * @param {number} start
+ * @param {number} end
+ * @constructor
+ */
+vs.models.GenomicRangeQuery = function(chr, start, end) {
+
+  start = parseInt(start, 10);
+  end = parseInt(end, 10);
+
+  /**
+   * @type {Array.<vs.models.Query>}
+   * @private
+   */
+  this._query = [
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'chr',
+      'test': vs.models.Query.Test['EQUALS'],
+      'testArgs': chr
+    }),
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'start',
+      'test': vs.models.Query.Test['LESS_THAN'],
+      'testArgs': end
+    }),
+    new vs.models.Query({
+      'target': vs.models.Query.Target['ROWS'],
+      'targetLabel': 'end',
+      'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
+      'testArgs': start
+    })
+  ];
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._chr = chr;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._start = start;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._end = end;
+};
+
+/**
+ * @type {string}
+ * @name vs.models.GenomicRangeQuery#chr
+ */
+vs.models.GenomicRangeQuery.prototype.chr;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#start
+ */
+vs.models.GenomicRangeQuery.prototype.start;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#end
+ */
+vs.models.GenomicRangeQuery.prototype.end;
+
+/**
+ * @type {Array.<vs.models.Query>}
+ * @name vs.models.GenomicRangeQuery#query
+ */
+vs.models.GenomicRangeQuery.prototype.query;
+
+Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
+  'chr': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._chr; })},
+  'start': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._start; })},
+  'end': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._end; })},
+  'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
+});
+
+/**
+ * @param {Array.<vs.models.Query>} query
+ * @returns {vs.models.GenomicRangeQuery}
+ */
+vs.models.GenomicRangeQuery.extract = function(query) {
+  var rowLabels = ['chr', 'start', 'end'];
+  var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
+  var bpValidTests = ['<', '>='];
+
+  var rowQueries = query.filter(function(q) {
+    if (q['target'] != vs.models.Query.Target['ROWS']) { return false; }
+    if (rowLabels.indexOf(q['targetLabel']) < 0) { return false; }
+    if ((q['targetLabel'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
+      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
+    }
+    if ((q['targetLabel'] == 'start' || q['targetLabel'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
+      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
+    }
+    if (q['targetLabel'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
+      throw new vs.models.ModelsException('The only supported test for "start" is "<"');
+    }
+    if (q['targetLabel'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
+      throw new vs.models.ModelsException('The only supported test for "end" is ">="');
+    }
+    return true;
+  });
+
+  var chrQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'chr' && !q['negate']; });
+  var startEndQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'start' || q['targetLabel'] == 'end' });
+  var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
+  var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
+
+  if (rowQueries.length > 0 && chrQueries.length != 1) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain exactly one "chr == " test');
+  }
+  if (rowQueries.length > 0 && startEndQueries.length < 2) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain at least two "start/end < or >= " tests');
+  }
+  if (rowQueries.length > 0 && (lessThanQueries.length < 1 || greaterThanQueries.length < 1)) {
+    throw new vs.models.ModelsException('Valid queries must either be empty, or contain a finite start/end range');
+  }
+
+  var range = rowQueries.length == 0 ? undefined : {
+    chr: chrQueries[0]['testArgs'],
+    end: startEndQueries.filter(function(q) { return q['targetLabel'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
+    start: startEndQueries.filter(function(q) { return q['targetLabel'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
+  };
+
+  return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);
+};
+
+
+goog.provide('vs.async.Task');
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ * @constructor
+ */
+vs.async.Task = function(func, thisArg) {
+  /**
+   * @type {number}
+   * @private
+   */
+  this._id = vs.async.Task.nextId();
+
+  /**
+   * @type {function(): Promise}
+   * @private
+   */
+  this._func = func;
+
+  /**
+   * @type {Object|undefined}
+   * @private
+   */
+  this._thisArg = thisArg;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._prev = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._next = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._first = this;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._last = this;
+};
+
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+
+Object.defineProperties(vs.async.Task.prototype, {
+  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
+  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
+  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
+  'prev': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
+  },
+  'next': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
+  },
+  'first': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
+  },
+  'last': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
+  }
+});
+
+/**
+ * @type {number}
+ * @private
+ */
+vs.async.Task._nextId = 0;
+
+/**
+ * @returns {number}
+ */
+vs.async.Task.nextId = function() {
+  return vs.async.Task._nextId++;
 };
 
 
@@ -1294,6 +1902,92 @@ vs.ui.Setting.PredefinedSettings = {
 };
 
 
+goog.provide('vs.async.TaskService');
+
+goog.require('vs.async.Task');
+
+/**
+ * @param {function(Function, number)} $timeout Angular timeout service
+ * @constructor
+ */
+vs.async.TaskService = function($timeout) {
+  /**
+   * @type {function(Function, number)}
+   * @private
+   */
+  this._timeout = $timeout || setTimeout;
+
+  /**
+   * @type {Object.<number, vs.async.Task>}
+   * @private
+   */
+  this._tasks = {};
+};
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ */
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {
+  var ret = new vs.async.Task(func, thisArg);
+  this._tasks[ret['id']] = ret;
+  return ret;
+};
+
+/**
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
+ * @returns {vs.async.Task}
+ */
+vs.async.TaskService.prototype.chain = function(t1, t2) {
+  if (typeof t1 == 'function') {
+    return this.chain(new vs.async.Task(t1), t2);
+  }
+
+  if (typeof t2 == 'function') {
+    return this.chain(t1, new vs.async.Task(t2));
+  }
+
+  t1['next'] = t1['next'] || t2['first'];
+  t1['last']['next'] = t2['first'];
+  t1['last'] = t2['last'];
+
+  t2['prev'] = t2['prev'] || t1['last'];
+  t2['first']['prev'] = t1['last'];
+  t2['first'] = t1['first'];
+
+  return t1['first'];
+};
+
+/**
+ * TODO: test!
+ * @param {vs.async.Task} task
+ * @param {boolean} [sequential] If true, the tasks will run sequentially
+ * @returns {Promise}
+ */
+vs.async.TaskService.prototype.runChain = function(task, sequential) {
+  // TODO: test!
+  var current = task['first'];
+  if (sequential) {
+    return new Promise(function(resolve, reject) {
+      for (; !!current; current = current['next']) {
+        current['func'].apply(current['thisArg']);
+      }
+      resolve();
+    });
+  }
+
+  var tasks = [];
+  for (; !!current; current = current['next']) {
+    tasks.push(current);
+  }
+
+  return u.async.each(tasks, function(task) {
+    return task['func'].apply(task['thisArg']);
+  }, true);
+};
+
+
 goog.provide('vs.ui.VisHandler');
 
 goog.require('vs.models.DataSource');
@@ -1413,16 +2107,28 @@ vs.ui.VisHandler = function($ng, options, data) {
   // Data ready for the first time
   this._data['ready'].then(onDataChanged);*/
 
-  this._data['changed'].addListener(this.draw, this);
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._redrawScheduled = false;
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._redrawPromise = Promise.resolve();
+
+  this._data['changed'].addListener(this.scheduleRedraw, this);
 
   // Data ready for the first time
   var self = this;
-  this._data['ready'].then(function() { self.draw(); });
+  this._data['ready'].then(function() { self.scheduleRedraw(); });
 
   // Options changed
   this._$scope.$watch(
     function(){ return self._options; },
-    function() { self.draw(); },
+    function() { self.scheduleRedraw(); },
     true);
 };
 
@@ -1564,12 +2270,12 @@ vs.ui.VisHandler.prototype.optionValue = function(optionKey) {
 /**
  * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.beginDraw = function() { /*console.log('Vis.beginDraw'); */return Promise.resolve(); };
+vs.ui.VisHandler.prototype.beginDraw = function() { u.log.info('beginDraw'); return Promise.resolve(); };
 
 /**
  * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.endDraw = function() { /*console.log('Vis.endDraw'); */return Promise.resolve(); };
+vs.ui.VisHandler.prototype.endDraw = function() { u.log.info('endDraw'); return Promise.resolve(); };
 
 /**
  * @returns {Promise}
@@ -1577,24 +2283,18 @@ vs.ui.VisHandler.prototype.endDraw = function() { /*console.log('Vis.endDraw'); 
 vs.ui.VisHandler.prototype.draw = function() {
   var self = this;
   var lastDraw = this._lastDraw;
-  if (!this._lastDrawFired) { return lastDraw; }
+
+  u.log.info('trying draw...');
+  if (!this._lastDrawFired) { u.log.info('draw already in progress; returning.'); return lastDraw; }
 
   this._lastDrawFired = false;
   var promise = new Promise(function(resolve, reject) {
     var taskService = self._taskService;
 
-    // Since we chose to run draw tasks sequentially, there is no need to queue them using promises.
-    // The beginDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
-    // TODO: Create an entirely new chain, containing both the beginDraw and draw tasks and run that instead.
-    /*lastDraw
-     .then(function() { return taskService.runChain(self['beginDrawTask']); })
-     .then(function() { return taskService.runChain(self['endDrawTask']); })
-     .then(resolve);*/
-
     Promise.resolve()
-      .then(function() { taskService.runChain(self['beginDrawTask'], true); })
-      .then(function() { taskService.runChain(self['endDrawTask'], true); })
-      .then(function() { self._lastDrawFired = true; })
+      .then(function() { return taskService.runChain(self['beginDrawTask']); })
+      .then(function() { return taskService.runChain(self['endDrawTask']); })
+      .then(function() { self._lastDrawFired = true; return Promise.resolve(); })
       .then(resolve, reject);
   });
   this._lastDraw = promise;
@@ -1602,10 +2302,23 @@ vs.ui.VisHandler.prototype.draw = function() {
 };
 
 /**
+ * @returns {Promise}
  */
 vs.ui.VisHandler.prototype.scheduleRedraw = function() {
   // This will trigger an asynchronous angular digest
-  this._$timeout.call(null, function() {}, 0);
+  if (!this._redrawScheduled) {
+    this._redrawScheduled = true;
+    var lastDraw = this._lastDraw || Promise.resolve();
+    var self = this;
+
+    this._redrawPromise = new Promise(function(resolve, reject) {
+      lastDraw.then(function() { self._$timeout.call(null, function() {
+        self._redrawScheduled = false;
+        self.draw().then(resolve, reject);
+      }, 0); });
+    });
+  }
+  return this._redrawPromise;
 };
 
 
@@ -1693,21 +2406,22 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   });
 };
 
-vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
-  if (!this['doubleBuffer']) { return; }
-  var activeCanvas = this['activeCanvas'];
-  var pendingCanvas = this['pendingCanvas'];
-  activeCanvas.css({ 'display': 'none' });
-  pendingCanvas.css({ 'display': 'block' });
-};
-
 /**
- * @override
+ * @returns {Promise}
  */
-vs.ui.canvas.CanvasVis.prototype.draw = function() {
+vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
   var self = this;
-  return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
-    .then(function() { self.finalizeDraw(); });
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['doubleBuffer']) { resolve(); return; }
+    var activeCanvas = self['activeCanvas'];
+    var pendingCanvas = self['pendingCanvas'];
+    activeCanvas.css({ 'display': 'none' });
+    pendingCanvas.css({ 'display': 'block' });
+    resolve();
+  }).then(function() {
+    return vs.ui.VisHandler.prototype.endDraw.apply(self, args);
+  });
 };
 
 /**
@@ -1734,955 +2448,6 @@ vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke) {
 
   context.closePath();
 };
-
-
-goog.provide('vs.Configuration');
-
-/**
- * @constructor
- */
-vs.Configuration = function() {
-
-  /**
-   * @type {Object.<string, *>}
-   * @private
-   */
-  this._options = {};
-};
-
-/**
- * @type {Object.<string, *>}
- * @name vs.Configuration#options
- */
-vs.Configuration.prototype.options;
-
-Object.defineProperties(vs.Configuration.prototype, {
-  'options': { get: /** @type {function (this:vs.Configuration)} */ (function () { return this._options; })}
-});
-
-/**
- * @param {Object.<string, *>} options
- */
-vs.Configuration.prototype.customize = function(options) {
-  u.extend(this._options, options);
-};
-
-
-goog.provide('vs.ui.UiException');
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.ui.UiException = function(message, innerException) {
-  u.Exception.apply(this, arguments);
-
-  this.name = 'UiException';
-};
-
-goog.inherits(vs.ui.UiException, u.Exception);
-
-
-goog.provide('vs.async.ThreadPoolService');
-
-goog.require('vs.Configuration');
-goog.require('vs.ui.UiException');
-
-/**
- * @param {vs.Configuration} config
- * @constructor
- */
-vs.async.ThreadPoolService = function(config) {
-  var settings = config['options']['parallel'];
-  if (!settings) { throw new vs.ui.UiException('Parallel settings have not been configured. Make sure you call configuration.customize({parallel: ...})'); }
-  var nthreads = settings['nthreads'] || 16;
-  var worker = settings['worker'];
-  if (!worker) { throw new vs.ui.UiException('Parallel worker path needs to be defined in the configuration: configuration.customize({parallel: {worker: <path to worker>}})'); }
-
-  /**
-   * @type {parallel.ThreadPool}
-   * @private
-   */
-  this._pool = new parallel.ThreadPool(nthreads, worker);
-};
-
-/**
- * @type {parallel.ThreadPool}
- * @name vs.async.ThreadPoolService#pool
- */
-vs.async.ThreadPoolService.prototype.pool;
-
-Object.defineProperties(vs.async.ThreadPoolService.prototype, {
-  'pool': { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
-});
-
-
-goog.provide('vs.ui.VisualizationFactory');
-
-goog.require('vs.Configuration');
-goog.require('vs.ui.VisHandler');
-goog.require('vs.ui.UiException');
-goog.require('vs.models.DataSource');
-goog.require('vs.async.TaskService');
-goog.require('vs.async.ThreadPoolService');
-
-/**
- * @param {vs.Configuration} config
- * @param {vs.async.TaskService} taskService
- * @param {Function} $timeout
- * @param {vs.async.ThreadPoolService} threadPool
- * @constructor
- */
-vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {
-
-  /**
-   * visualization alias -> rendering type -> fully qualified type
-   * @type {Object.<string, Object.<string, string>>}
-   * @private
-   */
-  this._visMap = config['options']['visualizations'] || {};
-
-  /**
-   * @type {vs.async.TaskService}
-   * @private
-   */
-  this._taskService = taskService;
-
-  /**
-   * @type {Function}
-   * @private
-   */
-  this._$timeout = $timeout;
-
-  /**
-   * @type {vs.async.ThreadPoolService}
-   * @private
-   */
-  this._threadPool = threadPool;
-};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @returns {vs.ui.VisHandler}
- */
-vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {
-  if (!$attrs['vsContext']) { throw new vs.ui.UiException('No visual context defined for visualization'); }
-  var visualContext = $scope.$eval($attrs['vsContext']);
-  if (!visualContext) { throw new vs.ui.UiException('Undefined visual context reference: ' + $attrs['vsContext']); }
-
-  var type = visualContext['construct']['type'];
-  var render = visualContext['construct']['render'];
-  if (!this._visMap[type]) { throw new vs.ui.UiException('Undefined visualization type: ' + type + '. Did you forget to register it in the configuration?'); }
-  if (!this._visMap[type][render]) {
-    throw new vs.ui.UiException('Unsupported rendering for visualization type ' + type + ': ' + render + '. ' +
-      'Supported are the following: ' + Object.keys(this._visMap[type] || {}).join(', ') + '.');
-  }
-
-  var typeStr = this._visMap[type][render];
-  var visCtor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
-
-  if (!$attrs['vsData']) { throw new vs.ui.UiException('Data source not defined for visualization: ' + type + '/' + render + '.'); }
-  var data = $scope.$eval($attrs['vsData']);
-  if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
-
-  return u.reflection.applyConstructor(visCtor, [
-    {'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout': this._$timeout, 'threadPool': this._threadPool['pool']},
-    visualContext['options'], data]);
-};
-
-
-goog.provide('vs.models.Point');
-
-/**
- * @param {number} [x]
- * @param {number} [y]
- * @constructor
- */
-vs.models.Point = function(x, y) {
-  /**
-   * @type {number}
-   */
-  this['x'] = x;
-
-  /**
-   * @type {number}
-   */
-  this['y'] = y;
-};
-
-
-goog.provide('vs.models.Transformer');
-
-goog.require('vs.models.Point');
-
-/**
- * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
- * @constructor
- */
-vs.models.Transformer = function(transformation) {
-  /**
-   * @type {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point}
-   * @private
-   */
-  this._transformation = transformation;
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {vs.models.Point}
- */
-vs.models.Transformer.prototype.calc = function(point) {
-  return this._transformation.call(null, point);
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {Array.<number>}
- */
-vs.models.Transformer.prototype.calcArr = function(point) {
-  var t = this.calc(point);
-  return [t['x'], t['y']];
-};
-
-/**
- * @param {number} x
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcX = function(x) {
-  return this._transformation.call(null, {'x': x})['x'];
-};
-
-/**
- * @param {number} y
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcY = function(y) {
-  return this._transformation({'y': y})['y'];
-};
-
-/**
- * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.combine = function(transformer) {
-  var self = this;
-  if (transformer instanceof vs.models.Transformer) {
-    return new vs.models.Transformer(function (point) {
-      return transformer.calc(self.calc(point));
-    });
-  }
-
-  // function
-  return new vs.models.Transformer(function (point) {
-    return transformer.call(null, self.calc(point));
-  });
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.translate = function(offset) {
-  return this.combine(vs.models.Transformer.translate(offset));
-};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.scale = function(xScale, yScale) {
-  return this.combine(vs.models.Transformer.scale(xScale, yScale));
-};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.intCoords = function() {
-  return this.combine(vs.models.Transformer.intCoords());
-};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.translate = function(offset) {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(
-      point['x'] != undefined ? point['x'] + offset['x'] : undefined,
-      point['y'] != undefined ? point['y'] + offset['y'] : undefined);
-  });
-};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.scale = function(xScale, yScale) {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(
-      point['x'] != undefined ? xScale(point['x']) : undefined,
-      point['y'] != undefined ? yScale(point['y']) : undefined);
-  });
-};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.intCoords = function() {
-  return new vs.models.Transformer(function(point) {
-    return new vs.models.Point(Math.floor(point['x']), Math.floor(point['y']));
-  });
-};
-
-
-goog.provide('vs.ui.VisualContext');
-
-/**
- * @param {{render: string, type: string}} construct
- * @param {Object.<string, *>} [options]
- * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
- * @constructor
- */
-vs.ui.VisualContext = function(construct, options, decorators) {
-  /**
-   * @type {{render: string, type: string}}
-   */
-  this['construct'] = construct;
-
-  /**
-   * @type {Object.<string, *>}
-   */
-  this['options'] = options || {};
-
-  /**
-   * @type {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}|Array}
-   */
-  this['decorators'] = decorators || [];
-};
-
-
-goog.provide('vs.ui.DataHandler');
-
-goog.require('vs.models.DataSource');
-goog.require('vs.ui.VisualContext');
-goog.require('vs.models.Query');
-
-/**
- * @param {vs.ui.DataHandler|{data: vs.models.DataSource, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
- * @constructor
- */
-vs.ui.DataHandler = function(options) {
-  /**
-   * @type {vs.models.DataSource}
-   * @private
-   */
-  this._data = options['data'];
-
-  /**
-   * @type {Array.<vs.ui.VisualContext>}
-   * @private
-   */
-  this._visualizations = options['visualizations'] || [];
-
-  /**
-   * @type {Array.<vs.ui.DataHandler>}
-   * @private
-   */
-  this._children = options['children'] || [];
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this._name = options['name'] || '';
-};
-
-/**
- * @type {string}
- * @name vs.ui.DataHandler#name
- */
-vs.ui.DataHandler.prototype.name;
-
-/**
- * @type {vs.models.DataSource}
- * @name vs.ui.DataHandler#data
- */
-vs.ui.DataHandler.prototype.data;
-
-/**
- * @type {u.Event.<vs.models.DataSource>}
- * @name vs.ui.DataHandler#dataChanged
- */
-vs.ui.DataHandler.prototype.dataChanged;
-
-/**
- * @type {Array.<vs.ui.DataHandler>}
- * @name vs.ui.DataHandler#children
- */
-vs.ui.DataHandler.prototype.children;
-
-/**
- * @type {Array.<vs.ui.VisualContext>}
- * @name vs.ui.DataHandler#visualizations
- */
-vs.ui.DataHandler.prototype.visualizations;
-
-Object.defineProperties(vs.ui.DataHandler.prototype, {
-  'name': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
-
-  'data': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
-    set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
-  },
-
-  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
-
-  'children': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
-  },
-
-  'visualizations': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
-  }
-});
-
-/**
- * @param {vs.models.Query|Array.<vs.models.Query>} queries
- * @returns {Promise.<vs.models.DataSource>}
- */
-vs.ui.DataHandler.prototype.query = function(queries) {
-  return this.data.applyQuery(queries);
-};
-
-
-goog.provide('vs.directives.Directive');
-
-/**
- * @param {angular.Scope} $scope Angular scope
- * @constructor
- */
-vs.directives.Directive = function($scope) {
-  /**
-   * @type {angular.Scope}
-   * @private
-   */
-  this._$scope = $scope;
-
-  /**
-   * @type {jQuery}
-   * @private
-   */
-  this._$element = null;
-
-  /**
-   * @private
-   */
-  this._$attrs = null;
-};
-
-/**
- * @type {angular.Scope}
- * @name vs.directives.Directive#$scope
- */
-vs.directives.Directive.prototype.$scope;
-
-/**
- * @type {jQuery}
- * @name vs.directives.Directive#$element
- */
-vs.directives.Directive.prototype.$element;
-
-/**
- * @type {angular.Attributes}
- * @name vs.directives.Directive#$attrs
- */
-vs.directives.Directive.prototype.$attrs;
-
-Object.defineProperties(vs.directives.Directive.prototype, {
-  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
-  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
-  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
-});
-
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Directive.prototype.link = {
-
-  'pre': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  },
-
-  'post': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  }
-};
-
-/**
- * @param {string} name
- * @param {function(new: vs.directives.Directive)} controllerCtor
- * @param {Array} [args]
- * @param {Object.<string, *>} [options]
- * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
- */
-vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
-  var controller = ['$scope', function($scope) {
-    var params = [].concat(args || []);
-    params.unshift($scope);
-
-    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
-    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
-  }];
-  var link;
-  if (typeof controllerCtor.prototype.link == 'function') {
-    link = function ($scope, $element, $attrs) {
-      var ctrl = $scope[name];
-      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
-    };
-  } else {
-    link = {};
-    if ('pre' in controllerCtor.prototype.link) {
-      link['pre'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
-    if ('post' in controllerCtor.prototype.link) {
-      link['post'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
-  }
-
-  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
-};
-
-
-goog.provide('vs.directives.DataContext');
-
-goog.require('vs.directives.Directive');
-goog.require('vs.ui.DataHandler');
-
-/**
- * @param {angular.Scope} $scope
- * @param {angular.$templateCache} $templateCache
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.DataContext = function($scope, $templateCache) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * Angular template service
-   * @type {angular.$templateCache}
-   * @private
-   */
-  this._$templateCache = $templateCache;
-
-  /**
-   * @type {vs.ui.DataHandler}
-   * @private
-   */
-  this._handler = null;
-
-  for (var key in $scope) {
-    if (!$scope.hasOwnProperty(key)) { continue; }
-    if ($scope[key] instanceof vs.ui.DataHandler) {
-      this._handler = $scope[key];
-      break;
-    }
-  }
-
-  if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
-  $scope['dataHandler'] = this._handler;
-
-  /**
-   * @type {string|null}
-   * @private
-   */
-  this._template = null;
-
-  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
-  var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
-
-  var t = $('<div></div>');
-  this._handler['visualizations'].forEach(function(visContext, i) {
-    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
-    visContext['decorators']['elem'].forEach(function(decorator, j) {
-      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
-    });
-  });
-  var template = t.html();
-  var templateId = u.generatePseudoGUID(10);
-  this._$templateCache.put(templateId, template);
-  this._template = templateId;
-};
-
-goog.inherits(vs.directives.DataContext, vs.directives.Directive);
-
-/**
- * @type {vs.ui.DataHandler}
- * @name vs.directives.DataContext#handler
- */
-vs.directives.DataContext.prototype.handler;
-
-/**
- * @type {string}
- * @name vs.directives.DataContext#template
- */
-vs.directives.DataContext.prototype.template;
-
-Object.defineProperties(vs.directives.DataContext.prototype, {
-  'handler': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
-  'template': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
-});
-
-
-goog.provide('vs.directives.Resizable');
-
-goog.require('vs.directives.Directive');
-
-/**
- * @param {angular.Scope} $scope
- * @param $document
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Resizable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * Angular document
-   * @private
-   */
-  this._document = $document;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._minWidth = 65;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._minHeight = 65;
-};
-
-goog.inherits(vs.directives.Resizable, vs.directives.Directive);
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
-  $window
-    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-left"></div>')
-    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-right"></div>')
-    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-bottom-left"></div>')
-    .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-bottom-right"></div>')
-    .append('<div class="vs-resize-grab vs-grab-vertical vs-grab-left"></div>')
-    .append('<div class="vs-resize-grab vs-grab-vertical vs-grab-right"></div>')
-    .append('<div class="vs-resize-grab vs-grab-horizontal vs-grab-bottom"></div>');
-
-  var box;
-  var startX, startY, target;
-
-  var self = this;
-  function mousedown(event) {
-    // Prevent default dragging of selected content
-    event.stopPropagation();
-    event.preventDefault();
-    box = new vs.directives.Resizable.BoundingBox($window);
-    target = box.getHandler($(this));
-    startX = event.pageX - target.left;
-    startY = event.pageY - target.top;
-    self._document.on('mousemove', mousemove);
-    self._document.on('mouseup', mouseup);
-  }
-
-  function mousemove(event) {
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    var newY = event.pageY - startY;
-    var newX = event.pageX - startX;
-
-    target.top = newY;
-    target.left = newX;
-
-    box.update(target, self._minWidth, self._minHeight);
-    
-    $window.css({
-      'top': (box.top) + 'px',
-      'left': (box.left) + 'px',
-      'width': box.width + 'px',
-      'height': box.height + 'px'
-    });
-
-    $element.css({
-      'top': (box.top) + 'px',
-      'left': (box.left) + 'px',
-      'width': box.width + 'px',
-      'height': box.height + 'px'
-    });
-
-    $window.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
-    $element.trigger($.Event('resize', {'top': box.top, 'left': box.left, 'width': box.width, 'height': box.height}));
-  }
-
-  function mouseup(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    self._document.off('mousemove', mousemove);
-    self._document.off('mouseup', mouseup);
-  }
-
-  $window.find('> .vs-resize-grab').on('mousedown', mousedown);
-};
-
-/**
- * @param {jQuery} $elem
- * @constructor
- */
-vs.directives.Resizable.ResizeHandler = function($elem) {
-  /** @type {jQuery} */
-  this.$elem = $elem;
-  var rect = $elem[0].getBoundingClientRect();
-
-  // We compute the relative position of this handler to the window's parent element
-  // We add 1 to each because jQuery.position() includes all margins and borders; so if we change the border of window,
-  // this should also change
-  var pos = {left:$elem.position().left + $elem.parent().position().left + 1, top:$elem.position().top + $elem.parent().position().top + 1};
-  this.top = pos.top;
-  this.left = pos.left;
-  this.width = rect.width;
-  this.height = rect.height;
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-left'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topRight = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-top-right'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-left'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom-right'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.left = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-left'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.right = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-right'));
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottom = function($elem) {
-  return new vs.directives.Resizable.ResizeHandler($elem.find('> .vs-grab-bottom'));
-};
-
-/**
- * @param {jQuery} $element
- * @constructor
- */
-vs.directives.Resizable.BoundingBox = function($element) {
-  this.offset = $element.position();
-  this.topLeft = vs.directives.Resizable.ResizeHandler.topLeft($element);
-  this.topRight = vs.directives.Resizable.ResizeHandler.topRight($element);
-  this.bottomLeft = vs.directives.Resizable.ResizeHandler.bottomLeft($element);
-  this.bottomRight = vs.directives.Resizable.ResizeHandler.bottomRight($element);
-  this.leftHandler = vs.directives.Resizable.ResizeHandler.left($element);
-  this.rightHandler = vs.directives.Resizable.ResizeHandler.right($element);
-  this.bottomHandler = vs.directives.Resizable.ResizeHandler.bottom($element);
-
-  // This assumes that all handlers are square and of the same size
-  // The 1 corresponds to the border
-  this._margin = -this.topLeft.width * 0.5 - 1;
-};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {
-  switch ($elem[0]) {
-    case this.topLeft.$elem[0]:
-      return this.topLeft;
-    case this.bottomLeft.$elem[0]:
-      return this.bottomLeft;
-    case this.topRight.$elem[0]:
-      return this.topRight;
-    case this.bottomRight.$elem[0]:
-      return this.bottomRight;
-    case this.leftHandler.$elem[0]:
-      return this.leftHandler;
-    case this.rightHandler.$elem[0]:
-      return this.rightHandler;
-    case this.bottomHandler.$elem[0]:
-      return this.bottomHandler;
-    default:
-      return null;
-  }
-};
-
-/**
- * @param {vs.directives.Resizable.ResizeHandler} handler
- * @param {number} [minWidth]
- * @param {number} [minHeight]
- */
-vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {
-  minWidth = minWidth || 0;
-  minHeight = minHeight || 0;
-  switch (handler) {
-    case this.topLeft:
-      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
-      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
-      this.bottomLeft.left = handler.left;
-      this.topRight.top = handler.top;
-      this.leftHandler.left = handler.left;
-      break;
-    case this.bottomLeft:
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
-      handler.left = Math.min(handler.left, this.topRight.left - handler.width - 2 * this._margin - minWidth);
-      this.topLeft.left = handler.left;
-      this.bottomRight.top = handler.top;
-      this.leftHandler.left = handler.left;
-      this.bottomHandler.top = handler.top;
-      break;
-    case this.topRight:
-      handler.top = Math.min(handler.top, this.bottomLeft.top - handler.height - 2 * this._margin - minHeight);
-      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
-      this.topLeft.top = handler.top;
-      this.bottomRight.left = handler.left;
-      this.rightHandler.left = handler.left;
-      break;
-    case this.bottomRight:
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
-      handler.left = Math.max(handler.left, this.topLeft.left + this.topLeft.width + 2 * this._margin + minWidth);
-      this.topRight.left = handler.left;
-      this.bottomLeft.top = handler.top;
-      this.rightHandler.left = handler.left;
-      this.bottomHandler.top = handler.top;
-      break;
-    case this.leftHandler:
-      handler.top = this.topLeft.top;
-      handler.left = Math.min(handler.left, this.rightHandler.left - handler.width - 2 * this._margin - minWidth);
-
-      this.topLeft.left = handler.left;
-      this.bottomLeft.left = handler.left;
-
-      break;
-    case this.rightHandler:
-      handler.top = this.topLeft.top;
-      handler.left = Math.max(handler.left, this.leftHandler.left + this.leftHandler.width + 2 * this._margin + minWidth);
-
-      this.topRight.left = handler.left;
-      this.bottomRight.left = handler.left;
-
-      break;
-    case this.bottomHandler:
-      handler.left = this.topLeft.left;
-      handler.top = Math.max(handler.top, this.topLeft.top + this.topLeft.height + 2 * this._margin + minHeight);
-
-      this.bottomRight.top = handler.top;
-      this.bottomLeft.top = handler.top;
-      break;
-  }
-};
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#left
- */
-vs.directives.Resizable.BoundingBox.prototype.left;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#top
- */
-vs.directives.Resizable.BoundingBox.prototype.top;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#width
- */
-vs.directives.Resizable.BoundingBox.prototype.width;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#height
- */
-vs.directives.Resizable.BoundingBox.prototype.height;
-
-Object.defineProperties(vs.directives.Resizable.BoundingBox.prototype, {
-  left: {
-    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.left + this.topLeft.width + this._margin; })
-  },
-  top: {
-    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() { return this.topLeft.top + this.topLeft.height + this._margin; })
-  },
-  width: {
-    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
-      return this.topRight.left - this.topLeft.left - this.topLeft.width - 2 * this._margin - 2;
-    })
-  },
-  height: {
-    get: /** @type {function (this:vs.directives.Resizable.BoundingBox)} */ (function() {
-      return this.bottomLeft.top - this.topLeft.top - this.topLeft.height - this._margin - 1;
-    })
-  }
-});
 
 
 goog.provide('vs.ui.svg.SvgVis');
@@ -2722,460 +2487,6 @@ vs.ui.svg.SvgVis.prototype.beginDraw = function () {
         resolve();
       }, reject);
   });
-};
-
-
-goog.provide('vs.models.ModelsException');
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.models.ModelsException = function(message, innerException) {
-  u.Exception.apply(this, arguments);
-
-  this.name = 'ModelsException';
-};
-
-goog.inherits(vs.models.ModelsException, u.Exception);
-
-
-goog.provide('vs.models.GenomicRangeQuery');
-
-goog.require('vs.models.Query');
-goog.require('vs.models.ModelsException');
-
-/**
- * @param {string} chr
- * @param {number} start
- * @param {number} end
- * @constructor
- */
-vs.models.GenomicRangeQuery = function(chr, start, end) {
-
-  start = parseInt(start, 10);
-  end = parseInt(end, 10);
-
-  /**
-   * @type {Array.<vs.models.Query>}
-   * @private
-   */
-  this._query = [
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'chr',
-      'test': vs.models.Query.Test['EQUALS'],
-      'testArgs': chr
-    }),
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'start',
-      'test': vs.models.Query.Test['LESS_THAN'],
-      'testArgs': end
-    }),
-    new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'end',
-      'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
-      'testArgs': start
-    })
-  ];
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this._chr = chr;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._start = start;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._end = end;
-};
-
-/**
- * @type {string}
- * @name vs.models.GenomicRangeQuery#chr
- */
-vs.models.GenomicRangeQuery.prototype.chr;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#start
- */
-vs.models.GenomicRangeQuery.prototype.start;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#end
- */
-vs.models.GenomicRangeQuery.prototype.end;
-
-/**
- * @type {Array.<vs.models.Query>}
- * @name vs.models.GenomicRangeQuery#query
- */
-vs.models.GenomicRangeQuery.prototype.query;
-
-Object.defineProperties(vs.models.GenomicRangeQuery.prototype, {
-  'chr': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._chr; })},
-  'start': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._start; })},
-  'end': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._end; })},
-  'query': { get: /** @type {function (this:vs.models.GenomicRangeQuery)} */ (function() { return this._query; })}
-});
-
-/**
- * @param {Array.<vs.models.Query>} query
- * @returns {vs.models.GenomicRangeQuery}
- */
-vs.models.GenomicRangeQuery.extract = function(query) {
-  var rowLabels = ['chr', 'start', 'end'];
-  var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
-  var bpValidTests = ['<', '>='];
-
-  var rowQueries = query.filter(function(q) {
-    if (q['target'] != vs.models.Query.Target['ROWS']) { return false; }
-    if (rowLabels.indexOf(q['targetLabel']) < 0) { return false; }
-    if ((q['targetLabel'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
-      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
-    }
-    if ((q['targetLabel'] == 'start' || q['targetLabel'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
-      throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
-    }
-    if (q['targetLabel'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
-      throw new vs.models.ModelsException('The only supported test for "start" is "<"');
-    }
-    if (q['targetLabel'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
-      throw new vs.models.ModelsException('The only supported test for "end" is ">="');
-    }
-    return true;
-  });
-
-  var chrQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'chr' && !q['negate']; });
-  var startEndQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'start' || q['targetLabel'] == 'end' });
-  var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
-  var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
-
-  if (rowQueries.length > 0 && chrQueries.length != 1) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain exactly one "chr == " test');
-  }
-  if (rowQueries.length > 0 && startEndQueries.length < 2) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain at least two "start/end < or >= " tests');
-  }
-  if (rowQueries.length > 0 && (lessThanQueries.length < 1 || greaterThanQueries.length < 1)) {
-    throw new vs.models.ModelsException('Valid queries must either be empty, or contain a finite start/end range');
-  }
-
-  var range = rowQueries.length == 0 ? undefined : {
-    chr: chrQueries[0]['testArgs'],
-    end: startEndQueries.filter(function(q) { return q['targetLabel'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
-    start: startEndQueries.filter(function(q) { return q['targetLabel'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
-  };
-
-  return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);
-};
-
-
-goog.provide('vs.directives.Visualization');
-
-goog.require('vs.directives.Directive');
-goog.require('vs.ui.VisualizationFactory');
-goog.require('vs.async.TaskService');
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.ui.VisualizationFactory} visualizationFactory
- * @param {vs.async.TaskService} taskService
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Visualization = function($scope, visualizationFactory, taskService) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * @type {vs.ui.VisHandler}
-   * @private
-   */
-  this._handler = null;
-
-  /**
-   * @type {vs.async.TaskService}
-   * @private
-   */
-  this._taskService = taskService;
-
-  /**
-   * @type {vs.ui.VisualizationFactory}
-   * @private
-   */
-  this._visualizationFactory = visualizationFactory;
-};
-
-goog.inherits(vs.directives.Visualization, vs.directives.Directive);
-
-
-/**
- * @type {vs.async.TaskService}
- * @name vs.directives.Visualization#taskService
- */
-vs.directives.Visualization.prototype.taskService;
-
-/**
- * @type {vs.ui.VisHandler}
- * @name vs.directives.Visualization#handler
- */
-vs.directives.Visualization.prototype.handler;
-
-Object.defineProperties(vs.directives.Visualization.prototype, {
-  'taskService': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._taskService; })},
-  'handler': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._handler; })}
-});
-
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Visualization.prototype.link = {
-
-  'pre': function($scope, $element, $attrs, controller) {
-    this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
-    $element.css({
-      'top': (this._handler['options']['y'] || 0) + 'px',
-      'left': (this._handler['options']['x'] || 0) + 'px',
-      'width': this._handler['options']['width'] + 'px',
-      'height': this._handler['options']['height'] + 'px'
-    });
-  },
-
-  'post': function($scope, $element, $attrs, controller) {
-    var self = this;
-    $element.resize(function(event) {
-      self._handler['options']['width'] = event['width'];
-      self._handler['options']['height'] = event['height'];
-      if (!$scope.$$phase) { $scope.$apply(); }
-    });
-  }
-};
-
-
-goog.provide('vs.models.DataRow');
-
-goog.require('vs.models.DataSource');
-
-/**
- * @param {vs.models.DataSource} data
- * @param {number} index
- * @constructor
- */
-vs.models.DataRow = function(data, index) {
-  /**
-   * @type {vs.models.DataSource}
-   * @private
-   */
-  this._data = data;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._index = index;
-};
-
-/**
- * @type {number}
- * @name vs.models.DataRow#index
- */
-vs.models.DataRow.prototype.index;
-
-/**
- * @type {vs.models.DataSource}
- * @name vs.models.DataRow#data
- */
-vs.models.DataRow.prototype.data;
-
-Object.defineProperties(vs.models.DataRow.prototype, {
-  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
-  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
-});
-
-/**
- * @param {string|number} colIndexOrLabel
- * @param {string} [valsLabel]
- * @returns {number}
- */
-vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
-  /**
-   * @type {vs.models.DataArray}
-   */
-  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
-
-  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
-
-  return vals['d'][index * this['data']['nrows'] + this['index']];
-};
-
-/**
- * @param label
- * @returns {*}
- */
-vs.models.DataRow.prototype.info = function(label) {
-  var arr = this['data'].getRow(label);
-  if (!arr) { return undefined; }
-  return arr['d'][this['index']];
-};
-
-
-goog.provide('vs.directives.Window');
-
-goog.require('vs.directives.Directive');
-
-/**
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Window = function() {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * @type {jQuery}
-   * @private
-   */
-  this._$window = null;
-};
-
-goog.inherits(vs.directives.Window, vs.directives.Directive);
-
-/**
- * @type {jQuery}
- * @name vs.directives.Window#$window
- */
-vs.directives.Window.prototype.$window;
-
-Object.defineProperties(vs.directives.Window.prototype, {
-  '$window': { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
-});
-
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Window.prototype.link = {
-  'pre': function($scope, $element, $attrs, controller) {
-    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
-    var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
-    var style = $scope.$eval($attrs['vsStyle'] || '{}');
-
-    var box = {
-      'top': style['top'] || ($element.css('top') ? (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px' : undefined),
-      'left': style['left'] || $element.css('left') || undefined,
-      'bottom': style['bottom'] || $element.css('bottom') || undefined,
-      'right': style['right'] || $element.css('right') || undefined,
-      'width': style['width'] || ($element.width() + 'px'),
-      'height': style['height'] || ($element.height() + 'px')
-    };
-
-    /*$window.css({
-      'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
-      'left': $element.css('left'),
-      'bottom': $element.css('bottom'),
-      'right': $element.css('right')
-    });*/
-    $window.css(box);
-
-    $element.css({
-      'top': '',
-      'left': '',
-      'bottom': '',
-      'right': ''
-    });
-
-    $window.append($element);
-
-    // Bring to front when selected
-    $window.on('mousedown', function() {
-      $window.siblings().css('zIndex', 0);
-      $window.css('zIndex', 1);
-    });
-
-    this._$window = $window;
-  },
-  'post': vs.directives.Directive.prototype.link['post']
-};
-
-
-goog.provide('vs.directives.Movable');
-
-goog.require('vs.directives.Directive');
-
-/**
- * @param {angular.Scope} $scope
- * @param $document
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Movable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * Angular document
-   * @private
-   */
-  this._document = $document;
-};
-
-goog.inherits(vs.directives.Movable, vs.directives.Directive);
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
-  $window.css({ 'cursor': 'move' });
-
-  var startX = 0, startY = 0, x, y;
-
-  var $document = this._document;
-  function mousedown(event) {
-    if (event.target != $window[0]) { return; }
-
-    // Prevent default dragging of selected content
-    event.preventDefault();
-    var childOffset = $window.position();
-    x = childOffset.left;
-    y = childOffset.top;
-    startX = event.pageX - x;
-    startY = event.pageY - y;
-    $document.on('mousemove', mousemove);
-    $document.on('mouseup', mouseup);
-  }
-
-  function mousemove(event) {
-    y = event.pageY - startY;
-    x = event.pageX - startX;
-    $window.css({
-      'top': y + 'px',
-      'left':  x + 'px'
-    });
-  }
-
-  function mouseup() {
-    $document.off('mousemove', mousemove);
-    $document.off('mouseup', mouseup);
-  }
-
-  $window.on('mousedown', mousedown);
 };
 
 
@@ -3340,6 +2651,402 @@ vs.ui.Decorator.prototype.beginDraw = function() { return Promise.resolve(); };
 vs.ui.Decorator.prototype.endDraw = function() { return Promise.resolve(); };
 
 
+goog.provide('vs.ui.decorators.Axis');
+
+goog.require('vs.ui.Decorator');
+goog.require('vs.ui.Setting');
+
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.Decorator
+ */
+vs.ui.decorators.Axis = function($ng, $targetElement, target, options) {
+  vs.ui.Decorator.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.decorators.Axis, vs.ui.Decorator);
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.decorators.Axis.Settings = {
+  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
+  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
+  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
+};
+
+/**
+ * @type {{x: string, y: string}}
+ */
+vs.ui.decorators.Axis.Orientation = {
+  'x': 'bottom',
+  'y': 'left'
+};
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Axis#type
+ */
+vs.ui.decorators.Axis.prototype.type;
+
+/**
+ * @type {number}
+ * @name vs.ui.decorators.Axis#ticks
+ */
+vs.ui.decorators.Axis.prototype.ticks;
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Axis#format
+ */
+vs.ui.decorators.Axis.prototype.format;
+
+Object.defineProperties(vs.ui.decorators.Axis.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return vs.ui.decorators.Axis.Settings; })},
+  'type': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
+  'ticks': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
+  'format': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })}
+});
+
+
+goog.provide('vs.ui.svg.SvgAxis');
+
+goog.require('vs.ui.decorators.Axis');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Axis
+ */
+vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Axis.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.svg.SvgAxis, vs.ui.decorators.Axis);
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgAxis.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['target']['data']['isReady']) { resolve(); return; }
+
+    var target = self['target'];
+    var svg = d3.select(target['$element'][0]).select('svg');
+    var type = self.type;
+    var className = 'vs-axis-' + type;
+    var axis = svg.select('.' + className);
+    if (axis.empty()) {
+      axis = svg.insert('g', '.viewport')
+        .attr('class', className);
+    }
+
+    var height = target['height'];
+    var width = target['width'];
+    var margins = target['margins'];
+    var origins = {'x': margins['left'], 'y': height - margins['bottom']};
+
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
+
+    var axisFn = d3.svg.axis()
+      .scale(scale)
+      .orient(vs.ui.decorators.Axis.Orientation[type])
+      .ticks(self['ticks']);
+
+    if (self['format']) {
+      axisFn = axisFn.tickFormat(d3.format(self['format']));
+    }
+
+    axis.call(axisFn);
+
+    var axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
+    var axisLocation = type == 'x' ? origins : {'x': margins['left'], 'y': margins['top']};
+    axisBox = { 'x': axisBox['x'] + axisLocation['x'], 'y': axisBox['y'] + axisLocation['y'], 'width': axisBox['width'], 'height': axisBox['height']};
+
+    var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
+
+    var dif;
+    if (axisBox['height'] > height) {
+      dif = (axisBox['height'] - height);
+      offset['top'] += 0.5 * dif;
+      offset['bottom'] += 0.5 * dif;
+    }
+
+    if (axisBox['width'] > width) {
+      dif = (axisBox['width'] - width);
+      offset['left'] += 0.5 * dif;
+      offset['right'] += 0.5 * dif;
+    }
+
+    if (axisBox['x'] < 0) { offset['left'] += -axisBox['x']; }
+    if (axisBox['y'] < 0) { offset['top'] += -axisBox['y']; }
+    if (axisBox['x'] + axisBox['width'] > width) { offset['right'] += axisBox['x'] + axisBox['width'] - width; }
+    if (axisBox['y'] + axisBox['height'] > height) { offset['bottom'] += axisBox['y'] + axisBox['height'] - height; }
+
+    if (offset['top'] + offset['left'] + offset['bottom'] + offset['right'] > 0) {
+      target['margins'] = target['margins'].add(offset);
+      target.scheduleRedraw();
+    }
+
+    axis.attr('transform', 'translate(' + axisLocation['x'] + ', ' + axisLocation['y'] + ')');
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Axis.prototype.endDraw.apply(self, args);
+  });
+};
+
+
+goog.provide('vs.ui.UiException');
+
+/**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.ui.UiException = function(message, innerException) {
+  u.Exception.apply(this, arguments);
+
+  this.name = 'UiException';
+};
+
+goog.inherits(vs.ui.UiException, u.Exception);
+
+
+goog.provide('vs.Configuration');
+
+/**
+ * @constructor
+ */
+vs.Configuration = function() {
+
+  /**
+   * @type {Object.<string, *>}
+   * @private
+   */
+  this._options = {};
+};
+
+/**
+ * @type {Object.<string, *>}
+ * @name vs.Configuration#options
+ */
+vs.Configuration.prototype.options;
+
+Object.defineProperties(vs.Configuration.prototype, {
+  'options': { get: /** @type {function (this:vs.Configuration)} */ (function () { return this._options; })}
+});
+
+/**
+ * @param {Object.<string, *>} options
+ */
+vs.Configuration.prototype.customize = function(options) {
+  u.extend(this._options, options);
+};
+
+
+goog.provide('vs.async.ThreadPoolService');
+
+goog.require('vs.Configuration');
+goog.require('vs.ui.UiException');
+
+/**
+ * @param {vs.Configuration} config
+ * @constructor
+ */
+vs.async.ThreadPoolService = function(config) {
+  var settings = config['options']['parallel'];
+  if (!settings) { throw new vs.ui.UiException('Parallel settings have not been configured. Make sure you call configuration.customize({parallel: ...})'); }
+  var nthreads = settings['nthreads'] || 16;
+  var worker = settings['worker'];
+  if (!worker) { throw new vs.ui.UiException('Parallel worker path needs to be defined in the configuration: configuration.customize({parallel: {worker: <path to worker>}})'); }
+
+  /**
+   * @type {parallel.ThreadPool}
+   * @private
+   */
+  this._pool = new parallel.ThreadPool(nthreads, worker);
+};
+
+/**
+ * @type {parallel.ThreadPool}
+ * @name vs.async.ThreadPoolService#pool
+ */
+vs.async.ThreadPoolService.prototype.pool;
+
+Object.defineProperties(vs.async.ThreadPoolService.prototype, {
+  'pool': { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
+});
+
+
+goog.provide('vs.ui.VisualizationFactory');
+
+goog.require('vs.Configuration');
+goog.require('vs.ui.VisHandler');
+goog.require('vs.ui.UiException');
+goog.require('vs.models.DataSource');
+goog.require('vs.async.TaskService');
+goog.require('vs.async.ThreadPoolService');
+
+/**
+ * @param {vs.Configuration} config
+ * @param {vs.async.TaskService} taskService
+ * @param {Function} $timeout
+ * @param {vs.async.ThreadPoolService} threadPool
+ * @constructor
+ */
+vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {
+
+  /**
+   * visualization alias -> rendering type -> fully qualified type
+   * @type {Object.<string, Object.<string, string>>}
+   * @private
+   */
+  this._visMap = config['options']['visualizations'] || {};
+
+  /**
+   * @type {vs.async.TaskService}
+   * @private
+   */
+  this._taskService = taskService;
+
+  /**
+   * @type {Function}
+   * @private
+   */
+  this._$timeout = $timeout;
+
+  /**
+   * @type {vs.async.ThreadPoolService}
+   * @private
+   */
+  this._threadPool = threadPool;
+};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @returns {vs.ui.VisHandler}
+ */
+vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {
+  if (!$attrs['vsContext']) { throw new vs.ui.UiException('No visual context defined for visualization'); }
+  var visualContext = $scope.$eval($attrs['vsContext']);
+  if (!visualContext) { throw new vs.ui.UiException('Undefined visual context reference: ' + $attrs['vsContext']); }
+
+  var type = visualContext['construct']['type'];
+  var render = visualContext['construct']['render'];
+  if (!this._visMap[type]) { throw new vs.ui.UiException('Undefined visualization type: ' + type + '. Did you forget to register it in the configuration?'); }
+  if (!this._visMap[type][render]) {
+    throw new vs.ui.UiException('Unsupported rendering for visualization type ' + type + ': ' + render + '. ' +
+      'Supported are the following: ' + Object.keys(this._visMap[type] || {}).join(', ') + '.');
+  }
+
+  var typeStr = this._visMap[type][render];
+  var visCtor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
+
+  if (!$attrs['vsData']) { throw new vs.ui.UiException('Data source not defined for visualization: ' + type + '/' + render + '.'); }
+  var data = $scope.$eval($attrs['vsData']);
+  if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
+
+  return u.reflection.applyConstructor(visCtor, [
+    {'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout': this._$timeout, 'threadPool': this._threadPool['pool']},
+    visualContext['options'], data]);
+};
+
+
+goog.provide('vs.directives.Visualization');
+
+goog.require('vs.directives.Directive');
+goog.require('vs.ui.VisualizationFactory');
+goog.require('vs.async.TaskService');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.ui.VisualizationFactory} visualizationFactory
+ * @param {vs.async.TaskService} taskService
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Visualization = function($scope, visualizationFactory, taskService) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * @type {vs.ui.VisHandler}
+   * @private
+   */
+  this._handler = null;
+
+  /**
+   * @type {vs.async.TaskService}
+   * @private
+   */
+  this._taskService = taskService;
+
+  /**
+   * @type {vs.ui.VisualizationFactory}
+   * @private
+   */
+  this._visualizationFactory = visualizationFactory;
+};
+
+goog.inherits(vs.directives.Visualization, vs.directives.Directive);
+
+
+/**
+ * @type {vs.async.TaskService}
+ * @name vs.directives.Visualization#taskService
+ */
+vs.directives.Visualization.prototype.taskService;
+
+/**
+ * @type {vs.ui.VisHandler}
+ * @name vs.directives.Visualization#handler
+ */
+vs.directives.Visualization.prototype.handler;
+
+Object.defineProperties(vs.directives.Visualization.prototype, {
+  'taskService': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._taskService; })},
+  'handler': { get: /** @type {function (this:vs.directives.Visualization)} */ (function() { return this._handler; })}
+});
+
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Visualization.prototype.link = {
+
+  'pre': function($scope, $element, $attrs, controller) {
+    this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
+    $element.css({
+      'top': (this._handler['options']['y'] || 0) + 'px',
+      'left': (this._handler['options']['x'] || 0) + 'px',
+      'width': this._handler['options']['width'] + 'px',
+      'height': this._handler['options']['height'] + 'px'
+    });
+  },
+
+  'post': function($scope, $element, $attrs, controller) {
+    var self = this;
+    $element.on('resizeend', function(e) {
+      self._handler['options']['width'] = e['width'];
+      self._handler['options']['height'] = e['height'];
+      self._handler.scheduleRedraw();
+    });
+  }
+};
+
+
 goog.provide('vs.directives.GraphicDecorator');
 
 goog.require('vs.directives.Visualization');
@@ -3423,6 +3130,381 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
 vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) { throw new u.AbstractMethodException(); };
 
 
+goog.provide('vs.models.Point');
+
+/**
+ * @param {number} [x]
+ * @param {number} [y]
+ * @constructor
+ */
+vs.models.Point = function(x, y) {
+  /**
+   * @type {number}
+   */
+  this['x'] = x;
+
+  /**
+   * @type {number}
+   */
+  this['y'] = y;
+};
+
+
+goog.provide('vs.models.Transformer');
+
+goog.require('vs.models.Point');
+
+/**
+ * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
+ * @constructor
+ */
+vs.models.Transformer = function(transformation) {
+  /**
+   * @type {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point}
+   * @private
+   */
+  this._transformation = transformation;
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {vs.models.Point}
+ */
+vs.models.Transformer.prototype.calc = function(point) {
+  return this._transformation.call(null, point);
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {Array.<number>}
+ */
+vs.models.Transformer.prototype.calcArr = function(point) {
+  var t = this.calc(point);
+  return [t['x'], t['y']];
+};
+
+/**
+ * @param {number} x
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcX = function(x) {
+  return this._transformation.call(null, {'x': x})['x'];
+};
+
+/**
+ * @param {number} y
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcY = function(y) {
+  return this._transformation({'y': y})['y'];
+};
+
+/**
+ * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.combine = function(transformer) {
+  var self = this;
+  if (transformer instanceof vs.models.Transformer) {
+    return new vs.models.Transformer(function (point) {
+      return transformer.calc(self.calc(point));
+    });
+  }
+
+  // function
+  return new vs.models.Transformer(function (point) {
+    return transformer.call(null, self.calc(point));
+  });
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.translate = function(offset) {
+  return this.combine(vs.models.Transformer.translate(offset));
+};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.scale = function(xScale, yScale) {
+  return this.combine(vs.models.Transformer.scale(xScale, yScale));
+};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.intCoords = function() {
+  return this.combine(vs.models.Transformer.intCoords());
+};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.translate = function(offset) {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(
+      point['x'] != undefined ? point['x'] + offset['x'] : undefined,
+      point['y'] != undefined ? point['y'] + offset['y'] : undefined);
+  });
+};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.scale = function(xScale, yScale) {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(
+      point['x'] != undefined ? xScale(point['x']) : undefined,
+      point['y'] != undefined ? yScale(point['y']) : undefined);
+  });
+};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.intCoords = function() {
+  return new vs.models.Transformer(function(point) {
+    return new vs.models.Point(Math.floor(point['x']), Math.floor(point['y']));
+  });
+};
+
+
+goog.provide('vs.ui.canvas.CanvasAxis');
+
+goog.require('vs.ui.decorators.Axis');
+goog.require('vs.models.Transformer');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Axis
+ */
+vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Axis.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.canvas.CanvasAxis, vs.ui.decorators.Axis);
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['target']['data']['isReady']) { resolve(); return; }
+
+    var target = self['target'];
+    var type = self.type;
+    var minYMargin = 25;
+    var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
+
+    if (type == 'x' && target['margins']['bottom'] < minYMargin) { offset['bottom'] = minYMargin - target['margins']['bottom']; }
+
+    if (offset['top'] + offset['bottom'] + offset['left'] + offset['right'] > 0) {
+      target['margins'] = target['margins'].add(offset);
+      target.scheduleRedraw();
+      resolve();
+      return;
+    }
+
+    var height = target['height'];
+    var width = target['width'];
+    var margins = target['margins'];
+    var intCoords = vs.models.Transformer.intCoords();
+    var translate = vs.models.Transformer
+      .translate({'x': margins['left'], 'y': margins['top']})
+      .intCoords();
+
+    var context = target['pendingCanvas'][0].getContext('2d');
+    var moveTo = context.__proto__.moveTo;
+    var lineTo = context.__proto__.lineTo;
+
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
+
+    context.strokeStyle = '#000000';
+    context.lineWidth = 1;
+    context.font = '17px Times New Roman';
+    context.fillStyle = '#000000';
+
+    var ticks = scale.ticks(self['ticks']);
+    var units = ticks.map(scale.tickFormat(self['ticks'], self['format']));
+
+    var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
+
+    var minXMargin = maxTextSize + 11;
+    if (type == 'y' && margins['left'] < minXMargin) {
+      offset['left'] = minXMargin - margins['left'];
+      target['margins'] = margins.add(offset);
+      target.scheduleRedraw();
+      resolve();
+      return;
+    }
+
+    var origins = {'x': margins['left'], 'y': height - margins['bottom']};
+
+    // Draw main line
+    context.beginPath();
+    moveTo.apply(context, intCoords.calcArr(origins));
+    switch (type) {
+      case 'x': lineTo.apply(context, intCoords.calcArr({'x': width - margins['right'], 'y': origins['y']})); break;
+      case 'y': lineTo.apply(context, intCoords.calcArr({'x': origins['x'], 'y': margins['top']})); break;
+    }
+
+    // Draw ticks
+    var x1 = type == 'x' ? scale : function() { return 0; };
+    var x2 = type == 'x' ? scale : function() { return -6; };
+    var y1 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
+    var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom'] + 6; };
+
+    ticks.forEach(function(tick) {
+      moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
+      lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
+    });
+
+    context.stroke();
+
+    // Draw units
+    if (type == 'x') {
+      context.textAlign = 'center';
+      context.textBaseline = 'top';
+    } else {
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      translate = translate.translate({'x': -5, 'y': 0});
+    }
+
+    units.forEach(function(unit, i) {
+      var p = translate.calc({'x': x2(ticks[i]), 'y': y2(ticks[i])});
+      context.fillText(unit, p['x'], p['y']);
+    });
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Axis.prototype.endDraw.apply(self, args);
+  });
+};
+
+
+goog.provide('vs.directives.Axis');
+
+goog.require('vs.directives.Visualization');
+goog.require('vs.directives.GraphicDecorator');
+
+goog.require('vs.ui.VisHandler');
+goog.require('vs.ui.svg.SvgAxis');
+goog.require('vs.ui.canvas.CanvasAxis');
+
+goog.require('vs.async.TaskService');
+
+/**
+ * @constructor
+ * @extends {vs.directives.GraphicDecorator}
+ */
+vs.directives.Axis = function() {
+  vs.directives.GraphicDecorator.apply(this, arguments);
+};
+
+goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @returns {vs.ui.Decorator}
+ * @override
+ */
+vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {
+  switch (target['render']) {
+    case 'svg':
+      return new vs.ui.svg.SvgAxis($ng, $targetElement, target, options);
+    case 'canvas':
+      return new vs.ui.canvas.CanvasAxis($ng, $targetElement, target, options);
+  }
+  return null;
+};
+
+
+goog.provide('vs.directives.Movable');
+
+goog.require('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Movable = function($scope, $document) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
+};
+
+goog.inherits(vs.directives.Movable, vs.directives.Directive);
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  var $window = $scope['vsWindow']['handler']['$window'];
+  $window.css({ 'cursor': 'move' });
+
+  var startX = 0, startY = 0, x, y;
+
+  var $document = this._document;
+  function mousedown(event) {
+    if (event.target != $window[0]) { return; }
+
+    // Prevent default dragging of selected content
+    event.preventDefault();
+    var childOffset = $window.position();
+    x = childOffset.left;
+    y = childOffset.top;
+    startX = event.pageX - x;
+    startY = event.pageY - y;
+    $document.on('mousemove', mousemove);
+    $document.on('mouseup', mouseup);
+  }
+
+  function mousemove(event) {
+    y = event.pageY - startY;
+    x = event.pageX - startX;
+    $window.css({
+      'top': y + 'px',
+      'left':  x + 'px'
+    });
+  }
+
+  function mouseup() {
+    $document.off('mousemove', mousemove);
+    $document.off('mouseup', mouseup);
+  }
+
+  $window.on('mousedown', mousedown);
+};
+
+
 goog.provide('vs.ui.decorators.Grid');
 
 goog.require('vs.ui.Decorator');
@@ -3502,54 +3584,53 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
-      .then(function() {
-        if (!self['target']['data']['isReady']) { resolve(); return; }
+    if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self['target'];
-        var svg = d3.select(target['$element'][0]).select('svg');
+    var target = self['target'];
+    var svg = d3.select(target['$element'][0]).select('svg');
 
-        var type = self.type;
-        var className = 'grid-' + type;
-        var grid = svg.select('.' + className);
-        if (grid.empty()) {
-          grid = svg.insert('g', '.viewport')
-            .attr('class', className);
-        }
+    var type = self.type;
+    var className = 'grid-' + type;
+    var grid = svg.select('.' + className);
+    if (grid.empty()) {
+      grid = svg.insert('g', '.viewport')
+        .attr('class', className);
+    }
 
-        var height = target['height'];
-        var width = target['width'];
-        var margins = target['margins'];
-        var origins = {'x': margins['left'], 'y': height - margins['bottom']};
+    var height = target['height'];
+    var width = target['width'];
+    var margins = target['margins'];
+    var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
-        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
 
-        var gridLines = grid
-          .selectAll('.grid-line')
-          .data(scale.ticks(self['ticks']));
+    var gridLines = grid
+      .selectAll('.grid-line')
+      .data(scale.ticks(self['ticks']));
 
-        gridLines
-          .enter().append('line')
-          .attr('class', 'grid-line');
+    gridLines
+      .enter().append('line')
+      .attr('class', 'grid-line');
 
-        var x1 = type == 'x' ? scale : 0;
-        var x2 = type == 'x' ? scale : width - margins['left'] - margins['right'];
-        var y1 = type == 'y' ? scale : 0;
-        var y2 = type == 'y' ? scale : height - margins['top'] - margins['bottom'];
+    var x1 = type == 'x' ? scale : 0;
+    var x2 = type == 'x' ? scale : width - margins['left'] - margins['right'];
+    var y1 = type == 'y' ? scale : 0;
+    var y2 = type == 'y' ? scale : height - margins['top'] - margins['bottom'];
 
-        gridLines
-          .attr('transform', 'translate(' + margins['left'] + ', ' + margins['top'] + ')')
-          .attr('x1', x1)
-          .attr('x2', x2)
-          .attr('y1', y1)
-          .attr('y2', y2)
-          .style('stroke', '#eeeeee')
-          .style('shape-rendering', 'crispEdges');
+    gridLines
+      .attr('transform', 'translate(' + margins['left'] + ', ' + margins['top'] + ')')
+      .attr('x1', x1)
+      .attr('x2', x2)
+      .attr('y1', y1)
+      .attr('y2', y2)
+      .style('stroke', '#eeeeee')
+      .style('shape-rendering', 'crispEdges');
 
-        gridLines.exit().remove();
-        resolve();
-      }, reject);
+    gridLines.exit().remove();
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
   });
 };
 
@@ -3577,47 +3658,46 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Grid.prototype.endDraw.apply(self, args)
-      .then(function() {
-        if (!self['target']['data']['isReady']) { resolve(); return; }
+    if (!self['target']['data']['isReady']) { resolve(); return; }
 
-        var target = self['target'];
-        var type = self.type;
-        var margins = target['margins'];
-        var height = target['height'];
-        var width = target['width'];
-        var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer
-          .translate({'x': margins['left'], 'y': margins['top']})
-          .intCoords();
+    var target = self['target'];
+    var type = self.type;
+    var margins = target['margins'];
+    var height = target['height'];
+    var width = target['width'];
+    var intCoords = vs.models.Transformer.intCoords();
+    var translate = vs.models.Transformer
+      .translate({'x': margins['left'], 'y': margins['top']})
+      .intCoords();
 
-        var context = target['pendingCanvas'][0].getContext('2d');
-        var moveTo = context.__proto__.moveTo;
-        var lineTo = context.__proto__.lineTo;
+    var context = target['pendingCanvas'][0].getContext('2d');
+    var moveTo = context.__proto__.moveTo;
+    var lineTo = context.__proto__.lineTo;
 
-        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
 
-        context.strokeStyle = '#eeeeee';
-        context.lineWidth = 1;
+    context.strokeStyle = '#eeeeee';
+    context.lineWidth = 1;
 
-        var ticks = scale.ticks(self['ticks']);
+    var ticks = scale.ticks(self['ticks']);
 
-        // Draw ticks
-        var x1 = type == 'x' ? scale : function() { return 0; };
-        var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
-        var y1 = type == 'y' ? scale : function() { return 0; };
-        var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
+    // Draw ticks
+    var x1 = type == 'x' ? scale : function() { return 0; };
+    var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
+    var y1 = type == 'y' ? scale : function() { return 0; };
+    var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
 
-        ticks.forEach(function(tick) {
-          moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
-          lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
-        });
+    ticks.forEach(function(tick) {
+      moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
+      lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
+    });
 
 
-        context.stroke();
-        resolve();
-      }, reject);
+    context.stroke();
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
   });
 };
 
@@ -3662,319 +3742,413 @@ vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, tar
 };
 
 
-goog.provide('vs.ui.decorators.Axis');
-
-goog.require('vs.ui.Decorator');
-goog.require('vs.ui.Setting');
-
+goog.provide('vs.ui.VisualContext');
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
+ * @param {{render: string, type: string}} construct
+ * @param {Object.<string, *>} [options]
+ * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
  * @constructor
- * @extends vs.ui.Decorator
  */
-vs.ui.decorators.Axis = function($ng, $targetElement, target, options) {
-  vs.ui.Decorator.apply(this, arguments);
+vs.ui.VisualContext = function(construct, options, decorators) {
+  /**
+   * @type {{render: string, type: string}}
+   */
+  this['construct'] = construct;
+
+  /**
+   * @type {Object.<string, *>}
+   */
+  this['options'] = options || {};
+
+  /**
+   * @type {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}|Array}
+   */
+  this['decorators'] = decorators || [];
 };
 
-goog.inherits(vs.ui.decorators.Axis, vs.ui.Decorator);
+
+goog.provide('vs.ui.DataHandler');
+
+goog.require('vs.models.DataSource');
+goog.require('vs.ui.VisualContext');
+goog.require('vs.models.Query');
 
 /**
- * @type {Object.<string, vs.ui.Setting>}
+ * @param {vs.ui.DataHandler|{data: vs.models.DataSource, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
+ * @constructor
  */
-vs.ui.decorators.Axis.Settings = {
-  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
-  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
-  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
-};
+vs.ui.DataHandler = function(options) {
+  /**
+   * @type {vs.models.DataSource}
+   * @private
+   */
+  this._data = options['data'];
 
-/**
- * @type {{x: string, y: string}}
- */
-vs.ui.decorators.Axis.Orientation = {
-  'x': 'bottom',
-  'y': 'left'
+  /**
+   * @type {Array.<vs.ui.VisualContext>}
+   * @private
+   */
+  this._visualizations = options['visualizations'] || [];
+
+  /**
+   * @type {Array.<vs.ui.DataHandler>}
+   * @private
+   */
+  this._children = options['children'] || [];
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._name = options['name'] || '';
 };
 
 /**
  * @type {string}
- * @name vs.ui.decorators.Axis#type
+ * @name vs.ui.DataHandler#name
  */
-vs.ui.decorators.Axis.prototype.type;
+vs.ui.DataHandler.prototype.name;
 
 /**
- * @type {number}
- * @name vs.ui.decorators.Axis#ticks
+ * @type {vs.models.DataSource}
+ * @name vs.ui.DataHandler#data
  */
-vs.ui.decorators.Axis.prototype.ticks;
+vs.ui.DataHandler.prototype.data;
+
+/**
+ * @type {u.Event.<vs.models.DataSource>}
+ * @name vs.ui.DataHandler#dataChanged
+ */
+vs.ui.DataHandler.prototype.dataChanged;
+
+/**
+ * @type {Array.<vs.ui.DataHandler>}
+ * @name vs.ui.DataHandler#children
+ */
+vs.ui.DataHandler.prototype.children;
+
+/**
+ * @type {Array.<vs.ui.VisualContext>}
+ * @name vs.ui.DataHandler#visualizations
+ */
+vs.ui.DataHandler.prototype.visualizations;
+
+Object.defineProperties(vs.ui.DataHandler.prototype, {
+  'name': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
+
+  'data': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
+    set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
+  },
+
+  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
+
+  'children': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
+  },
+
+  'visualizations': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
+  }
+});
+
+/**
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.ui.DataHandler.prototype.query = function(queries) {
+  return this.data.applyQuery(queries);
+};
+
+
+goog.provide('vs.directives.DataContext');
+
+goog.require('vs.directives.Directive');
+goog.require('vs.ui.DataHandler');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {angular.$templateCache} $templateCache
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.DataContext = function($scope, $templateCache) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular template service
+   * @type {angular.$templateCache}
+   * @private
+   */
+  this._$templateCache = $templateCache;
+
+  /**
+   * @type {vs.ui.DataHandler}
+   * @private
+   */
+  this._handler = null;
+
+  for (var key in $scope) {
+    if (!$scope.hasOwnProperty(key)) { continue; }
+    if ($scope[key] instanceof vs.ui.DataHandler) {
+      this._handler = $scope[key];
+      break;
+    }
+  }
+
+  if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
+  $scope['dataHandler'] = this._handler;
+
+  /**
+   * @type {string|null}
+   * @private
+   */
+  this._template = null;
+
+  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
+  var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
+
+  var t = $('<div></div>');
+  this._handler['visualizations'].forEach(function(visContext, i) {
+    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
+    visContext['decorators']['elem'].forEach(function(decorator, j) {
+      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
+    });
+  });
+  var template = t.html();
+  var templateId = u.generatePseudoGUID(10);
+  this._$templateCache.put(templateId, template);
+  this._template = templateId;
+};
+
+goog.inherits(vs.directives.DataContext, vs.directives.Directive);
+
+/**
+ * @type {vs.ui.DataHandler}
+ * @name vs.directives.DataContext#handler
+ */
+vs.directives.DataContext.prototype.handler;
 
 /**
  * @type {string}
- * @name vs.ui.decorators.Axis#format
+ * @name vs.directives.DataContext#template
  */
-vs.ui.decorators.Axis.prototype.format;
+vs.directives.DataContext.prototype.template;
 
-Object.defineProperties(vs.ui.decorators.Axis.prototype, {
-  'settings': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return vs.ui.decorators.Axis.Settings; })},
-  'type': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
-  'ticks': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
-  'format': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })}
+Object.defineProperties(vs.directives.DataContext.prototype, {
+  'handler': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
+  'template': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
 });
 
 
-goog.provide('vs.ui.canvas.CanvasAxis');
+goog.provide('vs.directives.Window');
 
-goog.require('vs.ui.decorators.Axis');
-goog.require('vs.models.Transformer');
+goog.require('vs.directives.Directive');
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
  * @constructor
- * @extends vs.ui.decorators.Axis
+ * @extends {vs.directives.Directive}
  */
-vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Axis.apply(this, arguments);
+vs.directives.Window = function() {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$window = null;
 };
 
-goog.inherits(vs.ui.canvas.CanvasAxis, vs.ui.decorators.Axis);
+goog.inherits(vs.directives.Window, vs.directives.Directive);
 
 /**
- * @returns {Promise}
+ * @type {jQuery}
+ * @name vs.directives.Window#$window
  */
-vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
-      .then(function() {
-        if (!self['target']['data']['isReady']) { resolve(); return; }
+vs.directives.Window.prototype.$window;
 
-        var target = self['target'];
-        var type = self.type;
-        var minYMargin = 25;
-        var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
-
-        if (type == 'x' && target['margins']['bottom'] < minYMargin) { offset['bottom'] = minYMargin - target['margins']['bottom']; }
-
-        if (offset['top'] + offset['bottom'] + offset['left'] + offset['right'] > 0) {
-          target['margins'] = target['margins'].add(offset);
-          target.scheduleRedraw();
-          resolve();
-          return;
-        }
-
-        var height = target['height'];
-        var width = target['width'];
-        var margins = target['margins'];
-        var intCoords = vs.models.Transformer.intCoords();
-        var translate = vs.models.Transformer
-          .translate({'x': margins['left'], 'y': margins['top']})
-          .intCoords();
-
-        var context = target['pendingCanvas'][0].getContext('2d');
-        var moveTo = context.__proto__.moveTo;
-        var lineTo = context.__proto__.lineTo;
-
-        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
-
-        context.strokeStyle = '#000000';
-        context.lineWidth = 1;
-        context.font = '17px Times New Roman';
-        context.fillStyle = '#000000';
-
-        var ticks = scale.ticks(self['ticks']);
-        var units = ticks.map(scale.tickFormat(self['ticks'], self['format']));
-
-        var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
-
-        var minXMargin = maxTextSize + 11;
-        if (type == 'y' && margins['left'] < minXMargin) {
-          offset['left'] = minXMargin - margins['left'];
-          target['margins'] = margins.add(offset);
-          target.scheduleRedraw();
-          resolve();
-          return;
-        }
-
-        var origins = {'x': margins['left'], 'y': height - margins['bottom']};
-
-        // Draw main line
-        context.beginPath();
-        moveTo.apply(context, intCoords.calcArr(origins));
-        switch (type) {
-          case 'x': lineTo.apply(context, intCoords.calcArr({'x': width - margins['right'], 'y': origins['y']})); break;
-          case 'y': lineTo.apply(context, intCoords.calcArr({'x': origins['x'], 'y': margins['top']})); break;
-        }
-
-        // Draw ticks
-        var x1 = type == 'x' ? scale : function() { return 0; };
-        var x2 = type == 'x' ? scale : function() { return -6; };
-        var y1 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
-        var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom'] + 6; };
-
-        ticks.forEach(function(tick) {
-          moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
-          lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
-        });
-
-        context.stroke();
-
-        // Draw units
-        if (type == 'x') {
-          context.textAlign = 'center';
-          context.textBaseline = 'top';
-        } else {
-          context.textAlign = 'right';
-          context.textBaseline = 'middle';
-          translate = translate.translate({'x': -5, 'y': 0});
-        }
-
-        units.forEach(function(unit, i) {
-          var p = translate.calc({'x': x2(ticks[i]), 'y': y2(ticks[i])});
-          context.fillText(unit, p['x'], p['y']);
-        });
-        resolve();
-      }, reject);
-  });
-};
-
-
-goog.provide('vs.ui.svg.SvgAxis');
-
-goog.require('vs.ui.decorators.Axis');
+Object.defineProperties(vs.directives.Window.prototype, {
+  '$window': { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
+});
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Axis
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
-vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Axis.apply(this, arguments);
-};
+vs.directives.Window.prototype.link = {
+  'pre': function($scope, $element, $attrs, controller) {
+    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
+    var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
+    var style = $scope.$eval($attrs['vsStyle'] || '{}');
 
-goog.inherits(vs.ui.svg.SvgAxis, vs.ui.decorators.Axis);
+    var box = {
+      'top': style['top'] || ($element.css('top') ? (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px' : undefined),
+      'left': style['left'] || $element.css('left') || undefined,
+      'bottom': style['bottom'] || $element.css('bottom') || undefined,
+      'right': style['right'] || $element.css('right') || undefined,
+      'width': style['width'] || ($element.width() + 'px'),
+      'height': style['height'] || ($element.height() + 'px')
+    };
 
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgAxis.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Axis.prototype.endDraw.apply(self, args)
-      .then(function() {
-        if (!self['target']['data']['isReady']) { resolve(); return; }
+    /*$window.css({
+      'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
+      'left': $element.css('left'),
+      'bottom': $element.css('bottom'),
+      'right': $element.css('right')
+    });*/
+    $window.css(box);
 
-        var target = self['target'];
-        var svg = d3.select(target['$element'][0]).select('svg');
-        var type = self.type;
-        var className = 'vs-axis-' + type;
-        var axis = svg.select('.' + className);
-        if (axis.empty()) {
-          axis = svg.insert('g', '.viewport')
-            .attr('class', className);
-        }
+    $element.css({
+      'top': '',
+      'left': '',
+      'bottom': '',
+      'right': ''
+    });
 
-        var height = target['height'];
-        var width = target['width'];
-        var margins = target['margins'];
-        var origins = {'x': margins['left'], 'y': height - margins['bottom']};
+    $window.append($element);
 
-        var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-        if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
+    // Bring to front when selected
+    $window.on('mousedown', function() {
+      $window.siblings().css('zIndex', 0);
+      $window.css('zIndex', 1);
+    });
 
-        var axisFn = d3.svg.axis()
-          .scale(scale)
-          .orient(vs.ui.decorators.Axis.Orientation[type])
-          .ticks(self['ticks']);
-
-        if (self['format']) {
-          axisFn = axisFn.tickFormat(d3.format(self['format']));
-        }
-
-        axis.call(axisFn);
-
-        var axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
-        var axisLocation = type == 'x' ? origins : {'x': margins['left'], 'y': margins['top']};
-        axisBox = { 'x': axisBox['x'] + axisLocation['x'], 'y': axisBox['y'] + axisLocation['y'], 'width': axisBox['width'], 'height': axisBox['height']};
-
-        var offset = {'top':0, 'bottom':0, 'left':0, 'right':0};
-
-        var dif;
-        if (axisBox['height'] > height) {
-          dif = (axisBox['height'] - height);
-          offset['top'] += 0.5 * dif;
-          offset['bottom'] += 0.5 * dif;
-        }
-
-        if (axisBox['width'] > width) {
-          dif = (axisBox['width'] - width);
-          offset['left'] += 0.5 * dif;
-          offset['right'] += 0.5 * dif;
-        }
-
-        if (axisBox['x'] < 0) { offset['left'] += -axisBox['x']; }
-        if (axisBox['y'] < 0) { offset['top'] += -axisBox['y']; }
-        if (axisBox['x'] + axisBox['width'] > width) { offset['right'] += axisBox['x'] + axisBox['width'] - width; }
-        if (axisBox['y'] + axisBox['height'] > height) { offset['bottom'] += axisBox['y'] + axisBox['height'] - height; }
-
-        target['margins'] = target['margins'].add(offset);
-        target.scheduleRedraw();
-
-        axis.attr('transform', 'translate(' + axisLocation['x'] + ', ' + axisLocation['y'] + ')');
-        resolve();
-      }, reject);
-  });
+    this._$window = $window;
+  },
+  'post': vs.directives.Directive.prototype.link['post']
 };
 
 
-goog.provide('vs.directives.Axis');
+goog.provide('vs.directives.LoadingDecorator');
 
-goog.require('vs.directives.Visualization');
-goog.require('vs.directives.GraphicDecorator');
-
-goog.require('vs.ui.VisHandler');
-goog.require('vs.ui.svg.SvgAxis');
-goog.require('vs.ui.canvas.CanvasAxis');
-
+goog.require('vs.directives.Directive');
 goog.require('vs.async.TaskService');
 
 /**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
  * @constructor
- * @extends {vs.directives.GraphicDecorator}
+ * @extends {vs.directives.Directive}
  */
-vs.directives.Axis = function() {
-  vs.directives.GraphicDecorator.apply(this, arguments);
+vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * @type {vs.async.TaskService}
+   * @private
+   */
+  this._taskService = taskService;
+
+  /**
+   * @type {angular.$timeout}
+   * @private
+   */
+  this._$timeout = $timeout;
 };
 
-goog.inherits(vs.directives.Axis, vs.directives.GraphicDecorator);
+goog.inherits(vs.directives.LoadingDecorator, vs.directives.Directive);
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @returns {vs.ui.Decorator}
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
  * @override
  */
-vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {
-  switch (target['render']) {
-    case 'svg':
-      return new vs.ui.svg.SvgAxis($ng, $targetElement, target, options);
-    case 'canvas':
-      return new vs.ui.canvas.CanvasAxis($ng, $targetElement, target, options);
-  }
-  return null;
+vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+
+  /** @type {vs.directives.Visualization} */
+  var vis = $scope['visualization']['handler'];
+
+  /** @type {vs.ui.VisHandler} */
+  var target = vis['handler'];
+
+  var startTimeout = null;
+  var endTimeout = null;
+  var progressInterval = null;
+
+  var $overlay = $('<div class="vs-loading-overlay" style="opacity: 0;"></div>').appendTo($element);
+
+  var $container = $('<div class="vs-loading-container" style="opacity: 0;"></div>').appendTo($element);
+
+  var $progress = $('<div class="progress" ></div>').appendTo($container);
+  var $progressBar = $(
+    '<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" ' +
+          'aria-valuemin="0" aria-valuemax="100" style="width:0"> ' +
+    '</div>').appendTo($progress);
+
+  var updateProgress = function() {
+    $progressBar.css({
+     '-webkit-transition': '',
+     '-o-transition': '',
+     'transition': ''
+     });
+    var w = $progressBar.css('width');
+    var p = (w == undefined || w.indexOf('px') >= 0) ? ($progressBar.width() / $progress.width() * 100) : parseInt(w, 10);
+    if (p >= 99) { return; }
+    var remaining = 100 - p;
+    p = Math.min(p + Math.ceil(remaining * 0.25), 99);
+    $progressBar.css('width', p + '%');
+  };
+
+  $element.on('resizestart', function(e) {
+    $overlay.css('opacity', '1');
+  });
+  $element.on('resizeend', function(e) {
+    target.scheduleRedraw()
+      .then(function() {
+        $overlay.css('opacity', '0');
+      });
+  });
+
+  var afterDraw = function() {
+    if (endTimeout != null) { return Promise.resolve(); }
+    if (startTimeout != null) {
+      clearTimeout(startTimeout);
+      startTimeout = null;
+      return Promise.resolve();
+    }
+
+    endTimeout = setTimeout(function() {
+      endTimeout = null;
+      clearInterval(progressInterval);
+      $container.css('opacity', 0);
+      $progressBar.css('width', '100%');
+    }, 500);
+    return Promise.resolve();
+  };
+
+  var beforeDraw = function() {
+    if (startTimeout != null) { return Promise.resolve(); }
+    if (endTimeout != null) {
+      clearTimeout(endTimeout);
+      endTimeout = null;
+      return Promise.resolve();
+    }
+    startTimeout = setTimeout(function() {
+      startTimeout = null;
+      $progressBar.css({
+        '-webkit-transition': 'none',
+        '-o-transition': 'none',
+        'transition': 'none'
+      });
+      $progressBar.css('width', '0');
+      $container.css('opacity', '1');
+
+      progressInterval = setInterval(updateProgress, 500)
+    }, 500);
+
+    // In this case, it's ok to resolve the promise before the timeout is done; we don't want the visualization to wait
+    return Promise.resolve();
+  };
+
+  target['data']['changing'].addListener(beforeDraw);
+  target['data']['changed'].addListener(afterDraw);
+
+  this._taskService.chain(target['endDrawTask'], this._taskService.createTask(afterDraw));
+  this._taskService.chain(this._taskService.createTask(beforeDraw), target['beginDrawTask']);
 };
 
 
@@ -4011,10 +4185,7 @@ goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
 goog.require('vs.directives.Resizable');
 
-/*
-goog.require('vs.directives.Navbar');
-goog.require('vs.directives.NavLocation');
-*/
+goog.require('vs.directives.LoadingDecorator');
 
 goog.require('vs.directives.DataContext');
 
@@ -4060,15 +4231,10 @@ vs.main.directive('vsMovable', ['$document', function($document) {
 vs.main.directive('vsResizable', ['$document', function($document) {
   return vs.directives.Directive.createNew('vsResizable', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Resizable), [$document], {restrict: 'C', require: 'vsWindow'});
 }]);
-/*
-vs.main.directive('vsNavbar', [function() {
-  return vs.directives.Directive.createNew('vsNavbar', vs.directives.Navbar, null, {restrict: 'C', require: ['vsWindow', 'vsDataContext']});
-}]);
 
-vs.main.directive('vsNavLocation', [function() {
-  return vs.directives.Directive.createNew('vsNavLocation', vs.directives.NavLocation, null, {restrict: 'C', require: ['vsNavbar', 'vsDataContext']});
+vs.main.directive('vsLoader', ['taskService', '$timeout', function(taskService, $timeout) {
+  return vs.directives.Directive.createNew('vsLoader', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.LoadingDecorator), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
 }]);
-*/
 
 vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $timeout) {
   return vs.directives.Directive.createNew('vsAxis', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Axis), [taskService, $timeout], {restrict: 'C', require: '^visualization'});

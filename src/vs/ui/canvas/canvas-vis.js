@@ -88,21 +88,22 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   });
 };
 
-vs.ui.canvas.CanvasVis.prototype.finalizeDraw = function() {
-  if (!this['doubleBuffer']) { return; }
-  var activeCanvas = this['activeCanvas'];
-  var pendingCanvas = this['pendingCanvas'];
-  activeCanvas.css({ 'display': 'none' });
-  pendingCanvas.css({ 'display': 'block' });
-};
-
 /**
- * @override
+ * @returns {Promise}
  */
-vs.ui.canvas.CanvasVis.prototype.draw = function() {
+vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
   var self = this;
-  return vs.ui.VisHandler.prototype.draw.apply(this, arguments)
-    .then(function() { self.finalizeDraw(); });
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['doubleBuffer']) { resolve(); return; }
+    var activeCanvas = self['activeCanvas'];
+    var pendingCanvas = self['pendingCanvas'];
+    activeCanvas.css({ 'display': 'none' });
+    pendingCanvas.css({ 'display': 'block' });
+    resolve();
+  }).then(function() {
+    return vs.ui.VisHandler.prototype.endDraw.apply(self, args);
+  });
 };
 
 /**

@@ -123,16 +123,28 @@ vs.ui.VisHandler = function($ng, options, data) {
   // Data ready for the first time
   this._data['ready'].then(onDataChanged);*/
 
-  this._data['changed'].addListener(this.draw, this);
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._redrawScheduled = false;
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._redrawPromise = Promise.resolve();
+
+  this._data['changed'].addListener(this.scheduleRedraw, this);
 
   // Data ready for the first time
   var self = this;
-  this._data['ready'].then(function() { self.draw(); });
+  this._data['ready'].then(function() { self.scheduleRedraw(); });
 
   // Options changed
   this._$scope.$watch(
     function(){ return self._options; },
-    function() { self.draw(); },
+    function() { self.scheduleRedraw(); },
     true);
 };
 
@@ -274,12 +286,12 @@ vs.ui.VisHandler.prototype.optionValue = function(optionKey) {
 /**
  * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.beginDraw = function() { /*console.log('Vis.beginDraw'); */return Promise.resolve(); };
+vs.ui.VisHandler.prototype.beginDraw = function() { u.log.info('beginDraw'); return Promise.resolve(); };
 
 /**
  * @returns {Promise}
  */
-vs.ui.VisHandler.prototype.endDraw = function() { /*console.log('Vis.endDraw'); */return Promise.resolve(); };
+vs.ui.VisHandler.prototype.endDraw = function() { u.log.info('endDraw'); return Promise.resolve(); };
 
 /**
  * @returns {Promise}
@@ -287,24 +299,18 @@ vs.ui.VisHandler.prototype.endDraw = function() { /*console.log('Vis.endDraw'); 
 vs.ui.VisHandler.prototype.draw = function() {
   var self = this;
   var lastDraw = this._lastDraw;
-  if (!this._lastDrawFired) { return lastDraw; }
+
+  u.log.info('trying draw...');
+  if (!this._lastDrawFired) { u.log.info('draw already in progress; returning.'); return lastDraw; }
 
   this._lastDrawFired = false;
   var promise = new Promise(function(resolve, reject) {
     var taskService = self._taskService;
 
-    // Since we chose to run draw tasks sequentially, there is no need to queue them using promises.
-    // The beginDraw and draw must run one after the other, with no delay in between, so this is a temporary fix for that problem.
-    // TODO: Create an entirely new chain, containing both the beginDraw and draw tasks and run that instead.
-    /*lastDraw
-     .then(function() { return taskService.runChain(self['beginDrawTask']); })
-     .then(function() { return taskService.runChain(self['endDrawTask']); })
-     .then(resolve);*/
-
     Promise.resolve()
-      .then(function() { taskService.runChain(self['beginDrawTask'], true); })
-      .then(function() { taskService.runChain(self['endDrawTask'], true); })
-      .then(function() { self._lastDrawFired = true; })
+      .then(function() { return taskService.runChain(self['beginDrawTask']); })
+      .then(function() { return taskService.runChain(self['endDrawTask']); })
+      .then(function() { self._lastDrawFired = true; return Promise.resolve(); })
       .then(resolve, reject);
   });
   this._lastDraw = promise;
@@ -312,8 +318,21 @@ vs.ui.VisHandler.prototype.draw = function() {
 };
 
 /**
+ * @returns {Promise}
  */
 vs.ui.VisHandler.prototype.scheduleRedraw = function() {
   // This will trigger an asynchronous angular digest
-  this._$timeout.call(null, function() {}, 0);
+  if (!this._redrawScheduled) {
+    this._redrawScheduled = true;
+    var lastDraw = this._lastDraw || Promise.resolve();
+    var self = this;
+
+    this._redrawPromise = new Promise(function(resolve, reject) {
+      lastDraw.then(function() { self._$timeout.call(null, function() {
+        self._redrawScheduled = false;
+        self.draw().then(resolve, reject);
+      }, 0); });
+    });
+  }
+  return this._redrawPromise;
 };

@@ -76,10 +76,10 @@ vs.directives.Visualization.prototype.link = {
 
   'post': function($scope, $element, $attrs, controller) {
     var self = this;
-    $element.resize(function(event) {
-      self._handler['options']['width'] = event['width'];
-      self._handler['options']['height'] = event['height'];
-      if (!$scope.$$phase) { $scope.$apply(); }
+    $element.on('resizeend', function(e) {
+      self._handler['options']['width'] = e['width'];
+      self._handler['options']['height'] = e['height'];
+      self._handler.scheduleRedraw();
     });
   }
 };
