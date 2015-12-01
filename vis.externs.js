@@ -486,6 +486,11 @@ vs.models.DataSource.prototype.rowIndex = function(label) {};
 vs.models.DataSource.prototype.raw = function() {};
 
 /**
+ * @returns {Array.<vs.models.DataRow>}
+ */
+vs.models.DataSource.prototype.asDataRowArray = function() {};
+
+/**
  * @param {{
  *  key: string,
  *  type: (vs.ui.Setting.Type|string),

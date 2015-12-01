@@ -5,6 +5,7 @@
  */
 
 goog.provide('vs.models.DataSource');
+goog.provide('vs.models.DataRow');
 
 goog.require('vs.models.DataArray');
 goog.require('vs.models.Query');
@@ -54,6 +55,18 @@ vs.models.DataSource = function() {
    * @private
    */
   this._isReady = null;
+
+  /**
+   * @type {Array.<vs.models.DataRow>}
+   * @private
+   */
+  this._dataRowArray = null;
+
+  /**
+   * @type {u.EventListener.<vs.models.DataSource>}
+   * @private
+   */
+  this._dataRowArrayChangedListener = null;
 };
 
 /**
@@ -436,3 +449,81 @@ vs.models.DataSource.prototype.raw = function() {
     'isReady': this['isReady']
   };
 };
+
+/**
+ * @returns {Array.<vs.models.DataRow>}
+ */
+vs.models.DataSource.prototype.asDataRowArray = function() {
+  if (this._dataRowArrayChangedListener == undefined) {
+    this._dataRowArrayChangedListener = this.changed.addListener(function() { this._dataRowArray = null; }, this);
+  }
+  if (this._dataRowArray == undefined) {
+    var self = this;
+    this._dataRowArray = u.array.range(this.nrows).map(function(i) { return new vs.models.DataRow(self, i); });
+  }
+
+  return this._dataRowArray;
+};
+
+/**
+ * @param {vs.models.DataSource} data
+ * @param {number} index
+ * @constructor
+ */
+vs.models.DataRow = function(data, index) {
+  /**
+   * @type {vs.models.DataSource}
+   * @private
+   */
+  this._data = data;
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this._index = index;
+};
+
+/**
+ * @type {number}
+ * @name vs.models.DataRow#index
+ */
+vs.models.DataRow.prototype.index;
+
+/**
+ * @type {vs.models.DataSource}
+ * @name vs.models.DataRow#data
+ */
+vs.models.DataRow.prototype.data;
+
+Object.defineProperties(vs.models.DataRow.prototype, {
+  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
+  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
+});
+
+/**
+ * @param {string|number} colIndexOrLabel
+ * @param {string} [valsLabel]
+ * @returns {number}
+ */
+vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
+  /**
+   * @type {vs.models.DataArray}
+   */
+  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
+
+  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
+
+  return vals['d'][index * this['data']['nrows'] + this['index']];
+};
+
+/**
+ * @param label
+ * @returns {*}
+ */
+vs.models.DataRow.prototype.info = function(label) {
+  var arr = this['data'].getRow(label);
+  if (!arr) { return undefined; }
+  return arr['d'][this['index']];
+};
+

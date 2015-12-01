@@ -15,6 +15,7 @@ goog.exportProperty(vs.models.DataSource.prototype, 'valsIndex', vs.models.DataS
 goog.exportProperty(vs.models.DataSource.prototype, 'colIndex', vs.models.DataSource.prototype.colIndex);
 goog.exportProperty(vs.models.DataSource.prototype, 'rowIndex', vs.models.DataSource.prototype.rowIndex);
 goog.exportProperty(vs.models.DataSource.prototype, 'raw', vs.models.DataSource.prototype.raw);
+goog.exportProperty(vs.models.DataSource.prototype, 'asDataRowArray', vs.models.DataSource.prototype.asDataRowArray);
 
 // Export for inheritance:
 

@@ -16,8 +16,8 @@ goog.addDependency('../../../../src/vs/directives/visualization.js', ['vs.direct
 goog.addDependency('../../../../src/vs/directives/window.js', ['vs.directives.Window'], ['vs.directives.Directive'], false);
 goog.addDependency('../../../../src/vs/models/boundaries.js', ['vs.models.Boundaries'], [], false);
 goog.addDependency('../../../../src/vs/models/data-array.js', ['vs.models.DataArray'], ['vs.models.Boundaries'], false);
-goog.addDependency('../../../../src/vs/models/data-row.js', ['vs.models.DataRow'], ['vs.models.DataSource'], false);
-goog.addDependency('../../../../src/vs/models/data-source.js', ['vs.models.DataSource'], ['vs.models.DataArray', 'vs.models.Query'], false);
+goog.addDependency('../../../../src/vs/models/data-source.js', ['vs.models.DataRow', 'vs.models.DataSource'], ['vs.models.DataArray', 'vs.models.Query'], false);
+goog.addDependency('../../../../src/vs/models/deprecated/data-row.js', ['vs.models.deprecated.DataRow'], ['vs.models.DataSource'], false);
 goog.addDependency('../../../../src/vs/models/genomic-range-query.js', ['vs.models.GenomicRangeQuery'], ['vs.models.ModelsException', 'vs.models.Query'], false);
 goog.addDependency('../../../../src/vs/models/margins.js', ['vs.models.Margins'], [], false);
 goog.addDependency('../../../../src/vs/models/models-exception.js', ['vs.models.ModelsException'], [], false);

@@ -21,6 +21,9 @@ var u = {
     "do": function () {},
     "Deferred": function () {}
   },
+  /**
+   * @constructor
+   */
   "EventListener": function () {},
 
   /**
