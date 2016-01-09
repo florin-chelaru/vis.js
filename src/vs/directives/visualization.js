@@ -8,6 +8,7 @@ goog.provide('vs.directives.Visualization');
 
 goog.require('vs.directives.Directive');
 goog.require('vs.ui.VisualizationFactory');
+goog.require('vs.ui.VisHandler');
 goog.require('vs.async.TaskService');
 
 /**
@@ -63,7 +64,6 @@ Object.defineProperties(vs.directives.Visualization.prototype, {
  * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
  */
 vs.directives.Visualization.prototype.link = {
-
   'pre': function($scope, $element, $attrs, controller) {
     this._handler = this._visualizationFactory.createNew($scope, $element, $attrs);
     $element.css({

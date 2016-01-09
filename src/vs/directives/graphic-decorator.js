@@ -16,10 +16,11 @@ goog.require('vs.async.TaskService');
  * @param {angular.Scope} $scope
  * @param {vs.async.TaskService} taskService
  * @param {angular.$timeout} $timeout
+ * @param {boolean} [overridesVisHandler]
  * @constructor
  * @extends {vs.directives.Directive}
  */
-vs.directives.GraphicDecorator = function($scope, taskService, $timeout) {
+vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overridesVisHandler) {
   vs.directives.Directive.apply(this, arguments);
 
   /**
@@ -39,6 +40,12 @@ vs.directives.GraphicDecorator = function($scope, taskService, $timeout) {
    * @private
    */
   this._handler = null;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._overridesVisHandler = !!overridesVisHandler;
 };
 
 goog.inherits(vs.directives.GraphicDecorator, vs.directives.Directive);
@@ -73,8 +80,13 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
     vis['handler'],
     /** @type {Object.<string, *>} */ (options));
 
-  this._taskService.chain(this._handler['endDrawTask'], vis['handler']['endDrawTask']);
-  this._taskService.chain(vis['handler']['beginDrawTask'], this._handler['beginDrawTask']);
+  if (!this._overridesVisHandler) {
+    this._taskService.chain(this._handler['endDrawTask'], vis['handler']['endDrawTask']);
+    this._taskService.chain(vis['handler']['beginDrawTask'], this._handler['beginDrawTask']);
+  } else {
+    this._taskService.chain(vis['handler']['endDrawTask'], this._handler['endDrawTask']);
+    this._taskService.chain(this._handler['beginDrawTask'], vis['handler']['beginDrawTask']);
+  }
 };
 
 /**

@@ -25,13 +25,9 @@ goog.require('vs.models.DataRow');
 goog.require('vs.models.Transformer');
 goog.require('vs.models.GenomicRangeQuery');
 
-
-
 goog.require('vs.directives.Axis');
 goog.require('vs.directives.Grid');
-
-
-
+goog.require('vs.directives.Brushing');
 
 goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
@@ -40,7 +36,6 @@ goog.require('vs.directives.Resizable');
 goog.require('vs.directives.LoadingDecorator');
 
 goog.require('vs.directives.DataContext');
-
 
 vs.main = angular.module('vs', []);
 
@@ -70,8 +65,6 @@ vs.main.directive('vsDataContext', ['$templateCache', function($templateCache) {
   return vs.directives.Directive.createNew('vsDataContext', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.DataContext), [$templateCache], {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.handler.template"></div>'});
 }]);
 
-
-
 vs.main.directive('vsWindow', function() {
   return vs.directives.Directive.createNew('vsWindow', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Window), null, {restrict: 'C'});
 });
@@ -94,6 +87,10 @@ vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $t
 
 vs.main.directive('vsGrid', ['taskService', '$timeout', function(taskService, $timeout) {
   return vs.directives.Directive.createNew('vsGrid', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Grid), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+}]);
+
+vs.main.directive('vsBrushing', ['taskService', '$timeout', '$rootScope', function(taskService, $timeout, $rootScope) {
+  return vs.directives.Directive.createNew('vsBrushing', /** @type {function(new:vs.directives.Directive)} */ (vs.directives.Brushing), [taskService, $timeout, $rootScope], {restrict: 'C', require: '^visualization'});
 }]);
 
 

@@ -15,6 +15,18 @@ goog.require('vs.models.Query');
  */
 vs.models.DataSource = function() {
   /**
+   * @type {string|null}
+   * @private
+   */
+  this._id = null;
+
+  /**
+   * @type {string|null}
+   * @private
+   */
+  this._state = null;
+
+  /**
    * @type {Object.<string, number>}
    * @private
    */
@@ -68,6 +80,19 @@ vs.models.DataSource = function() {
    */
   this._dataRowArrayChangedListener = null;
 };
+
+/**
+ * @type {string}
+ * @name vs.models.DataSource#id;
+ */
+vs.models.DataSource.prototype.id;
+
+/**
+ * Two data sources are identical if their id + state are identical
+ * @type {string}
+ * @name vs.models.DataSource#state
+ */
+vs.models.DataSource.prototype.state;
 
 /**
  * @type {Array.<vs.models.Query>}
@@ -130,6 +155,23 @@ vs.models.DataSource.prototype.changed;
 vs.models.DataSource.prototype.changing;
 
 Object.defineProperties(vs.models.DataSource.prototype, {
+  'id': {
+    get: /** @type {function (this:vs.models.DataSource)} */ (function() {
+      if (!this._id) { this._id = u.generatePseudoGUID(6); }
+      return this._id;
+    })
+  },
+  'state': {
+    get: /** @type {function (this:vs.models.DataSource)} */ (function() {
+      if (!this._state) {
+        this._state = u.generatePseudoGUID(6);
+        this['changing'].addListener(function() {
+          this._state = u.generatePseudoGUID(6);
+        }, this);
+      }
+      return this._state;
+    })
+  },
   'changed': {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._changed) { this._changed = new u.Event(); }
@@ -188,6 +230,16 @@ vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
 };
 
 /**
+ * For a static data source (that does not change over time), this does the exact same thing as applyQuery; for dynamic
+ * data sources this simply filters out data already loaded in memory, without making any external calls.
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.models.DataSource.prototype.filter = function(queries) {
+  return vs.models.DataSource.prototype.applyQuery.call(this, queries, true);
+};
+
+/**
  * @param {vs.models.DataSource} data
  * @param {vs.models.Query} q
  * @returns {Promise.<vs.models.DataSource>}
@@ -203,17 +255,19 @@ vs.models.DataSource.singleQuery = function(data, q) {
       var targetArr = null;
       switch (q['target']) {
         case vs.models.Query.Target['VALS']:
-          targetArr = ret.getVals(q['targetLabel']);
+          targetArr = q['targetLabel'] != undefined ? ret.getVals(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.nrows * ret.ncols));
           break;
         case vs.models.Query.Target['ROWS']:
-          targetArr = ret.getRow(q['targetLabel']);
+          targetArr = q['targetLabel'] != undefined ? ret.getRow(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.nrows));
           break;
         case vs.models.Query.Target['COLS']:
-          targetArr = ret.getCol(q['targetLabel']);
+          targetArr = q['targetLabel'] != undefined ? ret.getCol(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.ncols));
           break;
       }
 
-      var indices = u.array.range(targetArr['d'].length)
+      /** @type {Array.<number>} */
+      var initialIndices = q['targetLabel'] != undefined ? u.array.range(targetArr['d'].length) : targetArr['d'];
+      var indices = initialIndices
         .filter(function (i) {
           var test = true;
           var item = targetArr['d'][i];
@@ -259,27 +313,25 @@ vs.models.DataSource.singleQuery = function(data, q) {
             'nrows': indices.length,
             'ncols': ret['ncols'],
             'rows': ret['rows'].map(function (arr) {
-              return u.reflection.wrap({
-                'label': arr['label'],
-                'boundaries': arr['boundaries'],
-                'd': indices.map(function (i) {
+              return new vs.models.DataArray(
+                indices.map(function (i) {
                   return arr['d'][i]
-                })
-              }, vs.models.DataArray);
+                }),
+                arr['label'],
+                arr['boundaries']);
             }),
             'cols': ret['cols'],
             'vals': ret['vals'].map(function (arr) {
-              return u.reflection.wrap({
-                'label': arr['label'],
-                'boundaries': arr['boundaries'],
-                'd': u.array.range(ret['ncols']).map(function (j) {
+              return new vs.models.DataArray(
+                u.array.range(ret['ncols']).map(function (j) {
                   return indices.map(function (i) {
                     return arr['d'][j * ret['nrows'] + i];
                   })
                 }).reduce(function (arr1, arr2) {
                   return arr1.concat(arr2);
-                })
-              }, vs.models.DataArray);
+                }),
+                arr['label'],
+                arr['boundaries']);
             })
           }, vs.models.DataSource);
           break;
@@ -291,24 +343,22 @@ vs.models.DataSource.singleQuery = function(data, q) {
             'ncols': indices.length,
             'rows': ret['rows'],
             'cols': ret['cols'].map(function (arr) {
-              return u.reflection.wrap({
-                'label': arr['label'],
-                'boundaries': arr['boundaries'],
-                'd': indices.map(function (i) {
+              return new vs.models.DataArray(
+                indices.map(function (i) {
                   return arr['d'][i]
-                })
-              }, vs.models.DataArray);
+                }),
+                arr['label'],
+                arr['boundaries']);
             }),
             'vals': ret['vals'].map(function (arr) {
-              return u.reflection.wrap({
-                'label': arr['label'],
-                'boundaries': arr['boundaries'],
-                'd': indices.map(function (i) {
+              return new vs.models.DataArray(
+                indices.map(function (i) {
                   return arr['d'].slice(i * ret['nrows'], (i + 1) * ret['nrows']);
                 }).reduce(function (arr1, arr2) {
                   return arr1.concat(arr2);
-                })
-              }, vs.models.DataArray);
+                }),
+                arr['label'],
+                arr['boundaries']);
             })
           }, vs.models.DataSource);
           break;
@@ -325,11 +375,7 @@ vs.models.DataSource.singleQuery = function(data, q) {
               indices.forEach(function (i) {
                 filtered[i] = arr['d'][i];
               });
-              return u.reflection.wrap({
-                'label': arr['label'],
-                'boundaries': arr['boundaries'],
-                'd': filtered
-              }, vs.models.DataArray);
+              return new vs.models.DataArray(filtered, arr['label'], arr['boundaries']);
             })
           }, vs.models.DataSource);
           break;
@@ -455,14 +501,31 @@ vs.models.DataSource.prototype.raw = function() {
  */
 vs.models.DataSource.prototype.asDataRowArray = function() {
   if (this._dataRowArrayChangedListener == undefined) {
-    this._dataRowArrayChangedListener = this.changed.addListener(function() { this._dataRowArray = null; }, this);
+    this._dataRowArrayChangedListener = this['changed'].addListener(function() { this._dataRowArray = null; }, this);
   }
   if (this._dataRowArray == undefined) {
     var self = this;
-    this._dataRowArray = u.array.range(this.nrows).map(function(i) { return new vs.models.DataRow(self, i); });
+    this._dataRowArray = u.array.range(this['nrows']).map(function(i) { return new vs.models.DataRow(self, i); });
   }
 
   return this._dataRowArray;
+};
+
+/**
+ * @param {number} i
+ * @returns {string}
+ */
+vs.models.DataSource.prototype.key = function(i) {
+  return '' + this['id'] + this['state'] + i;
+};
+
+/**
+ * @param {vs.models.DataRow} d
+ * @param {number} [i]
+ * @returns {string}
+ */
+vs.models.DataSource.key = function(d, i) {
+  return d['data'].key(d['index']);
 };
 
 /**

@@ -7,7 +7,13 @@
 goog.provide('vs.models.Query');
 
 /**
- * @param {({target: (vs.models.Query.Target|string), targetLabel: string, test: (vs.models.Query.Test|string), testArgs: *, negate: (boolean|undefined)}|vs.models.Query)} opts
+ * Argument details:
+ *  - target: rows, columns or values
+ *  - targetLabel: if defined, the label of the row/column/value array to test; if undefined, the index within the current structure is used
+ *  - test: the filter to be applied on the data (>, <, ==, etc)
+ *  - testArgs: arguments to test against
+ *  - negate: take the complement of the result
+ * @param {({target: string, targetLabel: (string|undefined), test: string, testArgs: *, negate: (boolean|undefined)}|vs.models.Query)} opts
  * @constructor
  */
 vs.models.Query = function(opts) {
@@ -51,12 +57,12 @@ vs.models.Query.prototype.toString = function() {
 };
 
 /**
- * @param {({target: (vs.models.Query.Target|string), targetLabel: string, test: (vs.models.Query.Test|string), testArgs: *, negate: (boolean|undefined)}|vs.models.Query)} [other]
+ * @param {({target: string, targetLabel: (string|undefined), test: string, testArgs: *, negate: (boolean|undefined)}|vs.models.Query)} [other]
  * @returns {boolean}
  */
 vs.models.Query.prototype.equals = function(other) {
   if (!other) { return false; }
-  var q = new vs.models.Query(other);
+  var q = new vs.models.Query(/** @type {({target: string, targetLabel: (string|undefined), test: string, testArgs: *, negate: (boolean|undefined)}|vs.models.Query)} */ (other));
   return this.toString() == q.toString();
 };
 
