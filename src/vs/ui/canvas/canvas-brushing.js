@@ -19,53 +19,75 @@ goog.require('vs.models.Transformer');
  */
 vs.ui.canvas.CanvasBrushing = function($ng, $targetElement, target, options) {
   vs.ui.decorators.Brushing.apply(this, arguments);
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._initialized = null;
 };
 
 goog.inherits(vs.ui.canvas.CanvasBrushing, vs.ui.decorators.Brushing);
 
 vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
-  /*var self = this;
+  var self = this;
   var args = arguments;
-  return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
 
-    var target = self['target'];
-    var type = self.type;
-    var margins = target['margins'];
-    var height = target['height'];
-    var width = target['width'];
-    var intCoords = vs.models.Transformer.intCoords();
-    var translate = vs.models.Transformer
-      .translate({'x': margins['left'], 'y': margins['top']})
-      .intCoords();
+  if (this._initialized == null) {
+    this._initialized = new Promise(function(resolve, reject) {
+      if (!self['data']['isReady']) { resolve(); return; }
+      var target = self['target'];
+      var data = self['data'];
 
-    var context = target['pendingCanvas'][0].getContext('2d');
-    var moveTo = context.__proto__.moveTo;
-    var lineTo = context.__proto__.lineTo;
+      var activeCanvas = target['activeCanvas'][0];
+      var mousemove = function(evt) {
+        var rect = activeCanvas.getBoundingClientRect();
+        var mousePos = {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
 
-    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+        // And now, use the getItemsAt method.
+        // TODO: Aici am ramas
+      };
+      activeCanvas.addEventListener('mousemove', mousemove);
 
-    context.strokeStyle = '#eeeeee';
-    context.lineWidth = 1;
-
-    var ticks = scale.ticks(self['ticks']);
-
-    // Draw ticks
-    var x1 = type == 'x' ? scale : function() { return 0; };
-    var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
-    var y1 = type == 'y' ? scale : function() { return 0; };
-    var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
-
-    ticks.forEach(function(tick) {
-      moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
-      lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
+      if (target['doubleBuffer']) {
+        var pendingCanvas = target['pendingCanvas'][0];
+        pendingCanvas.addListener('mousemove', mousemove);
+      }
     });
+  }
+
+  return new Promise(function(resolve, reject) {
 
 
-    context.stroke();
+
+
+
+
+    var newItems = null;
+    var viewport = d3.select(target['$element'][0]).select('svg').select('.viewport');
+    if (!self._newDataItems) {
+      newItems = viewport.selectAll('.vs-item');
+    } else {
+      newItems = viewport.selectAll('.vs-item').data(self._newDataItems, vs.models.DataSource.key);
+    }
+
+    newItems
+      .on('mouseover', function (d) {
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOVER']));
+      })
+      .on('mouseout', function (d) {
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOUT']));
+      })
+      .on('click', function (d) {
+        //self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['SELECT']));
+        d3.event.stopPropagation();
+      });
+
     resolve();
   }).then(function() {
-    return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
-  });*/
+      return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
+    });
 };

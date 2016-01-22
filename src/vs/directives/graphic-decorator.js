@@ -16,7 +16,8 @@ goog.require('vs.async.TaskService');
  * @param {angular.Scope} $scope
  * @param {vs.async.TaskService} taskService
  * @param {angular.$timeout} $timeout
- * @param {boolean} [overridesVisHandler]
+ * @param {boolean} [overridesVisHandler] If set to true, this flag will allow the decorator's draw methods to execute
+ * before and after respectively of the VisHandler's beginDraw/endDraw methods.
  * @constructor
  * @extends {vs.directives.Directive}
  */

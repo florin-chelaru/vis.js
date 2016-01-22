@@ -59,7 +59,7 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
+    if (!self['data']['isReady']) { resolve(); return; }
 
     var target = self['target'];
     var data = self['data'];

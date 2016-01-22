@@ -107,6 +107,13 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
 };
 
 /**
+ * @param {number} x
+ * @param {number} y
+ * @returns {Array.<vs.models.DataRow>}
+ */
+vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) { return []; };
+
+/**
  * @param {CanvasRenderingContext2D} context
  * @param {number} cx
  * @param {number} cy
