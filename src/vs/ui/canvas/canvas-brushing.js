@@ -35,11 +35,10 @@ vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
 
   if (this._initialized == null) {
     this._initialized = new Promise(function(resolve, reject) {
-      if (!self['data']['isReady']) { resolve(); return; }
-      var target = self['target'];
-      var data = self['data'];
 
+      var target = self['target'];
       var activeCanvas = target['activeCanvas'][0];
+      var selectedItem = null;
       var mousemove = function(evt) {
         var rect = activeCanvas.getBoundingClientRect();
         var mousePos = {
@@ -47,47 +46,31 @@ vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
           y: evt.clientY - rect.top
         };
 
-        // And now, use the getItemsAt method.
-        // TODO: Aici am ramas
+        var data = self['data'];
+
+        if (selectedItem) {
+          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, selectedItem, vs.ui.BrushingEvent.Action['MOUSEOUT']));
+          selectedItem = null;
+        }
+
+        var items = target.getItemsAt(mousePos.x, mousePos.y);
+        if (items.length > 0) {
+          selectedItem = items[0];
+          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, items[0], vs.ui.BrushingEvent.Action['MOUSEOVER']));
+        }
       };
       activeCanvas.addEventListener('mousemove', mousemove);
 
       if (target['doubleBuffer']) {
         var pendingCanvas = target['pendingCanvas'][0];
-        pendingCanvas.addListener('mousemove', mousemove);
+        pendingCanvas.addEventListener('mousemove', mousemove);
       }
+
+      resolve();
     });
   }
 
-  return new Promise(function(resolve, reject) {
-
-
-
-
-
-
-    var newItems = null;
-    var viewport = d3.select(target['$element'][0]).select('svg').select('.viewport');
-    if (!self._newDataItems) {
-      newItems = viewport.selectAll('.vs-item');
-    } else {
-      newItems = viewport.selectAll('.vs-item').data(self._newDataItems, vs.models.DataSource.key);
-    }
-
-    newItems
-      .on('mouseover', function (d) {
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOVER']));
-      })
-      .on('mouseout', function (d) {
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOUT']));
-      })
-      .on('click', function (d) {
-        //self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['SELECT']));
-        d3.event.stopPropagation();
-      });
-
-    resolve();
-  }).then(function() {
-      return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
-    });
+  return this._initialized.then(function() {
+    return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
+  });
 };
