@@ -63,8 +63,7 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    vs.ui.VisHandler.prototype.beginDraw.apply(self, args)
-      .then(
+    vs.ui.VisHandler.prototype.beginDraw.apply(self, args).then(
       function() {
         var pendingCanvas = self['pendingCanvas'];
         if (pendingCanvas.length == 0) {
@@ -114,19 +113,27 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
 vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) { return []; };
 
 /**
+ * @param {jQuery} canvas
+ * @param {vs.models.DataRow} d
+ */
+vs.ui.canvas.CanvasVis.prototype.drawHighlightItem = function(canvas, d) {};
+
+/**
  * @param {CanvasRenderingContext2D} context
  * @param {number} cx
  * @param {number} cy
  * @param {number} r
  * @param {string} [fill]
  * @param {string} [stroke]
+ * @param {number} [strokeWidth]
  */
-vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke) {
+vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke, strokeWidth) {
   context.beginPath();
   context.arc(cx, cy, r, 0, 2 * Math.PI);
 
   if (stroke) {
     context.strokeStyle = stroke;
+    context.lineWidth = strokeWidth || 0;
     context.stroke();
   }
 
