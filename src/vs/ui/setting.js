@@ -392,5 +392,13 @@ vs.ui.Setting.PredefinedSettings = {
   'doubleBuffer': new vs.ui.Setting({'key':'doubleBuffer', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'double buffer', 'template':'_switch.html'}),
 
   'xScale': new vs.ui.Setting({'key':'xScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.xScale, 'hidden': true}),
-  'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'hidden': true})
+  'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'hidden': true}),
+
+  'fill': new vs.ui.Setting({'key':'fill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,0.3)', 'label':'object fill'}),
+  'stroke': new vs.ui.Setting({'key':'stroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,1)', 'label':'object stroke'}),
+  'strokeThickness': new vs.ui.Setting({'key':'strokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':1, 'label':'stroke thickness'}),
+
+  'selectFill': new vs.ui.Setting({'key':'selectFill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ff6520', 'label':'selected object fill'}),
+  'selectStroke': new vs.ui.Setting({'key':'selectStroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ffc600', 'label':'selected object stroke'}),
+  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'}),
 };

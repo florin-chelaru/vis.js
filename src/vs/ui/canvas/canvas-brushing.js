@@ -35,6 +35,9 @@ vs.ui.canvas.CanvasBrushing = function($ng, $targetElement, target, options) {
 
 goog.inherits(vs.ui.canvas.CanvasBrushing, vs.ui.decorators.Brushing);
 
+/**
+ * @returns {Promise}
+ */
 vs.ui.canvas.CanvasBrushing.prototype.beginDraw = function() {
   var self = this;
   var args = arguments;
@@ -46,6 +49,9 @@ vs.ui.canvas.CanvasBrushing.prototype.beginDraw = function() {
   });
 };
 
+/**
+ * @returns {Promise}
+ */
 vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
@@ -114,24 +120,12 @@ vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
   var context = this._brushingCanvas[0].getContext('2d');
   context.drawImage(target['activeCanvas'][0], 0, 0);
 
-  /*var target = this['target'];
-  var svg = d3.select(target['$element'][0]).select('svg');
-  var viewport = svg.empty() ? null : svg.select('.viewport');
-  if (viewport == null || viewport.empty()) { return; }*/
-
   // TODO: Use LinkService!
 
   if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
     target.drawHighlightItem(this._brushingCanvas, e['selectedRow']);
-    /*var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
-    items
-      .style('stroke', '#ffc600')
-      .style('stroke-width', '2');
-    $(items[0]).appendTo($(viewport[0]));*/
     this._brushingCanvas.css('display', 'block');
   } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
-    //this._brushingCanvas.css({ 'display': 'none' });
-    /*viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
-      .style('stroke', 'none');*/
+    this._brushingCanvas.css('display', 'none');
   }
 };

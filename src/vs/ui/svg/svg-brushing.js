@@ -99,16 +99,27 @@ vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
   var viewport = svg.empty() ? null : svg.select('.viewport');
   if (viewport == null || viewport.empty()) { return; }
 
+  var fill = /** @type {string} */ (target.optionValue('fill'));
+  var stroke = /** @type {string} */ (target.optionValue('stroke'));
+  var strokeThickness = /** @type {number} */ (target.optionValue('strokeThickness'));
+
+  var selectFill = /** @type {string} */ (target.optionValue('selectFill'));
+  var selectStroke = /** @type {string} */ (target.optionValue('selectStroke'));
+  var selectStrokeThickness = /** @type {number} */ (target.optionValue('selectStrokeThickness'));
+
   // TODO: Use LinkService!
 
   if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
     var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
     items
-      .style('stroke', '#ffc600')
-      .style('stroke-width', '2');
+      .style('stroke', selectStroke)
+      .style('stroke-width', selectStrokeThickness)
+      .style('fill', selectFill);
     $(items[0]).appendTo($(viewport[0]));
   } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
     viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
-      .style('stroke', 'none');
+      .style('stroke', stroke)
+      .style('stroke-width', strokeThickness)
+      .style('fill', fill);
   }
 };

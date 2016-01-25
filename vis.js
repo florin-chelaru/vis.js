@@ -18,109 +18,301 @@
 */
 
 
-goog.provide('vs.directives.Directive');
+goog.provide('vs.Configuration');
 
 /**
- * @param {angular.Scope} $scope Angular scope
  * @constructor
  */
-vs.directives.Directive = function($scope) {
-  /**
-   * @type {angular.Scope}
-   * @private
-   */
-  this._$scope = $scope;
+vs.Configuration = function() {
 
   /**
-   * @type {jQuery}
+   * @type {Object.<string, *>}
    * @private
    */
-  this._$element = null;
-
-  /**
-   * @private
-   */
-  this._$attrs = null;
+  this._options = {};
 };
 
 /**
- * @type {angular.Scope}
- * @name vs.directives.Directive#$scope
+ * @type {Object.<string, *>}
+ * @name vs.Configuration#options
  */
-vs.directives.Directive.prototype.$scope;
+vs.Configuration.prototype.options;
 
-/**
- * @type {jQuery}
- * @name vs.directives.Directive#$element
- */
-vs.directives.Directive.prototype.$element;
-
-/**
- * @type {angular.Attributes}
- * @name vs.directives.Directive#$attrs
- */
-vs.directives.Directive.prototype.$attrs;
-
-Object.defineProperties(vs.directives.Directive.prototype, {
-  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
-  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
-  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
+Object.defineProperties(vs.Configuration.prototype, {
+  'options': { get: /** @type {function (this:vs.Configuration)} */ (function () { return this._options; })}
 });
 
 /**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ * @param {Object.<string, *>} options
  */
-vs.directives.Directive.prototype.link = {
+vs.Configuration.prototype.customize = function(options) {
+  u.extend(this._options, options);
+};
 
-  'pre': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  },
 
-  'post': function($scope, $element, $attrs, controller) {
-    this._$element = $element;
-    this._$attrs = $attrs;
-  }
+goog.provide('vs.ui.UiException');
+
+/**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.ui.UiException = function(message, innerException) {
+  u.Exception.apply(this, arguments);
+
+  this.name = 'UiException';
+};
+
+goog.inherits(vs.ui.UiException, u.Exception);
+
+
+goog.provide('vs.async.ThreadPoolService');
+
+goog.require('vs.Configuration');
+goog.require('vs.ui.UiException');
+
+/**
+ * @param {vs.Configuration} config
+ * @constructor
+ */
+vs.async.ThreadPoolService = function(config) {
+  var settings = config['options']['parallel'];
+  if (!settings) { throw new vs.ui.UiException('Parallel settings have not been configured. Make sure you call configuration.customize({parallel: ...})'); }
+  var nthreads = settings['nthreads'] || 16;
+  var worker = settings['worker'];
+  if (!worker) { throw new vs.ui.UiException('Parallel worker path needs to be defined in the configuration: configuration.customize({parallel: {worker: <path to worker>}})'); }
+
+  /**
+   * @type {parallel.ThreadPool}
+   * @private
+   */
+  this._pool = new parallel.ThreadPool(nthreads, worker);
 };
 
 /**
- * @param {string} name
- * @param {function(new: vs.directives.Directive)} controllerCtor
- * @param {Array} [args]
- * @param {Object.<string, *>} [options]
- * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
+ * @type {parallel.ThreadPool}
+ * @name vs.async.ThreadPoolService#pool
  */
-vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
-  var controller = ['$scope', function($scope) {
-    var params = [].concat(args || []);
-    params.unshift($scope);
+vs.async.ThreadPoolService.prototype.pool;
 
-    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
-    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
-  }];
-  var link;
-  if (typeof controllerCtor.prototype.link == 'function') {
-    link = function ($scope, $element, $attrs) {
-      var ctrl = $scope[name];
-      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
-    };
-  } else {
-    link = {};
-    if ('pre' in controllerCtor.prototype.link) {
-      link['pre'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
-    if ('post' in controllerCtor.prototype.link) {
-      link['post'] = function($scope, $element, $attrs) {
-        var ctrl = $scope[name];
-        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
-      };
-    }
+Object.defineProperties(vs.async.ThreadPoolService.prototype, {
+  'pool': { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
+});
+
+
+goog.provide('vs.async.Task');
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ * @constructor
+ */
+vs.async.Task = function(func, thisArg) {
+  /**
+   * @type {number}
+   * @private
+   */
+  this._id = vs.async.Task.nextId();
+
+  /**
+   * @type {function(): Promise}
+   * @private
+   */
+  this._func = func;
+
+  /**
+   * @type {Object|undefined}
+   * @private
+   */
+  this._thisArg = thisArg;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._prev = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._next = null;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._first = this;
+
+  /**
+   * @type {vs.async.Task}
+   * @private
+   */
+  this._last = this;
+};
+
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+
+Object.defineProperties(vs.async.Task.prototype, {
+  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
+  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
+  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
+  'prev': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
+  },
+  'next': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
+  },
+  'first': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
+  },
+  'last': {
+    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
+    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
+  }
+});
+
+/**
+ * @type {number}
+ * @private
+ */
+vs.async.Task._nextId = 0;
+
+/**
+ * @returns {number}
+ */
+vs.async.Task.nextId = function() {
+  return vs.async.Task._nextId++;
+};
+
+
+goog.provide('vs.async.TaskService');
+
+goog.require('vs.async.Task');
+
+/**
+ * @param {function(Function, number)} $timeout Angular timeout service
+ * @constructor
+ */
+vs.async.TaskService = function($timeout) {
+  /**
+   * @type {function(Function, number)}
+   * @private
+   */
+  this._timeout = $timeout || setTimeout;
+
+  /**
+   * @type {Object.<number, vs.async.Task>}
+   * @private
+   */
+  this._tasks = {};
+};
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ */
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {
+  var ret = new vs.async.Task(func, thisArg);
+  this._tasks[ret['id']] = ret;
+  return ret;
+};
+
+/**
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
+ * @returns {vs.async.Task}
+ */
+vs.async.TaskService.prototype.chain = function(t1, t2) {
+  if (typeof t1 == 'function') {
+    return this.chain(new vs.async.Task(t1), t2);
   }
 
-  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
+  if (typeof t2 == 'function') {
+    return this.chain(t1, new vs.async.Task(t2));
+  }
+
+  t1['next'] = t1['next'] || t2['first'];
+  t1['last']['next'] = t2['first'];
+  t1['last'] = t2['last'];
+
+  t2['prev'] = t2['prev'] || t1['last'];
+  t2['first']['prev'] = t1['last'];
+  t2['first'] = t1['first'];
+
+  return t1['first'];
+};
+
+/**
+ * TODO: test!
+ * @param {vs.async.Task} task
+ * @param {boolean} [sequential] If true, the tasks will run sequentially
+ * @returns {Promise}
+ */
+vs.async.TaskService.prototype.runChain = function(task, sequential) {
+  // TODO: test!
+  var current = task['first'];
+  if (sequential) {
+    return new Promise(function(resolve, reject) {
+      for (; !!current; current = current['next']) {
+        current['func'].apply(current['thisArg']);
+      }
+      resolve();
+    });
+  }
+
+  var tasks = [];
+  for (; !!current; current = current['next']) {
+    tasks.push(current);
+  }
+
+  return u.async.each(tasks, function(task) {
+    return task['func'].apply(task['thisArg']);
+  }, true);
 };
 
 
@@ -871,421 +1063,6 @@ vs.models.DataRow.prototype.info = function(label) {
 
 
 
-goog.provide('vs.ui.VisualContext');
-
-/**
- * @param {{render: string, type: string}} construct
- * @param {Object.<string, *>} [options]
- * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
- * @constructor
- */
-vs.ui.VisualContext = function(construct, options, decorators) {
-  /**
-   * @type {{render: string, type: string}}
-   */
-  this['construct'] = construct;
-
-  /**
-   * @type {Object.<string, *>}
-   */
-  this['options'] = options || {};
-
-  /**
-   * @type {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}|Array}
-   */
-  this['decorators'] = decorators || [];
-};
-
-
-goog.provide('vs.ui.DataHandler');
-
-goog.require('vs.models.DataSource');
-goog.require('vs.ui.VisualContext');
-goog.require('vs.models.Query');
-
-/**
- * @param {vs.ui.DataHandler|{data: vs.models.DataSource, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
- * @constructor
- */
-vs.ui.DataHandler = function(options) {
-  /**
-   * @type {vs.models.DataSource}
-   * @private
-   */
-  this._data = options['data'];
-
-  /**
-   * @type {Array.<vs.ui.VisualContext>}
-   * @private
-   */
-  this._visualizations = options['visualizations'] || [];
-
-  /**
-   * @type {Array.<vs.ui.DataHandler>}
-   * @private
-   */
-  this._children = options['children'] || [];
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this._name = options['name'] || '';
-};
-
-/**
- * @type {string}
- * @name vs.ui.DataHandler#name
- */
-vs.ui.DataHandler.prototype.name;
-
-/**
- * @type {vs.models.DataSource}
- * @name vs.ui.DataHandler#data
- */
-vs.ui.DataHandler.prototype.data;
-
-/**
- * @type {u.Event.<vs.models.DataSource>}
- * @name vs.ui.DataHandler#dataChanged
- */
-vs.ui.DataHandler.prototype.dataChanged;
-
-/**
- * @type {Array.<vs.ui.DataHandler>}
- * @name vs.ui.DataHandler#children
- */
-vs.ui.DataHandler.prototype.children;
-
-/**
- * @type {Array.<vs.ui.VisualContext>}
- * @name vs.ui.DataHandler#visualizations
- */
-vs.ui.DataHandler.prototype.visualizations;
-
-Object.defineProperties(vs.ui.DataHandler.prototype, {
-  'name': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
-
-  'data': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
-    set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
-  },
-
-  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
-
-  'children': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
-  },
-
-  'visualizations': {
-    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
-  }
-});
-
-/**
- * @param {vs.models.Query|Array.<vs.models.Query>} queries
- * @returns {Promise.<vs.models.DataSource>}
- */
-vs.ui.DataHandler.prototype.query = function(queries) {
-  return this.data.applyQuery(queries);
-};
-
-
-goog.provide('vs.directives.DataContext');
-
-goog.require('vs.directives.Directive');
-goog.require('vs.ui.DataHandler');
-
-/**
- * @param {angular.Scope} $scope
- * @param {angular.$templateCache} $templateCache
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.DataContext = function($scope, $templateCache) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * Angular template service
-   * @type {angular.$templateCache}
-   * @private
-   */
-  this._$templateCache = $templateCache;
-
-  /**
-   * @type {vs.ui.DataHandler}
-   * @private
-   */
-  this._handler = null;
-
-  for (var key in $scope) {
-    if (!$scope.hasOwnProperty(key)) { continue; }
-    if ($scope[key] instanceof vs.ui.DataHandler) {
-      this._handler = $scope[key];
-      break;
-    }
-  }
-
-  if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
-  $scope['dataHandler'] = this._handler;
-
-  /**
-   * @type {string|null}
-   * @private
-   */
-  this._template = null;
-
-  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
-  var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
-
-  var t = $('<div></div>');
-  this._handler['visualizations'].forEach(function(visContext, i) {
-    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
-    visContext['decorators']['elem'].forEach(function(decorator, j) {
-      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
-    });
-  });
-  var template = t.html();
-  var templateId = u.generatePseudoGUID(10);
-  this._$templateCache.put(templateId, template);
-  this._template = templateId;
-};
-
-goog.inherits(vs.directives.DataContext, vs.directives.Directive);
-
-/**
- * @type {vs.ui.DataHandler}
- * @name vs.directives.DataContext#handler
- */
-vs.directives.DataContext.prototype.handler;
-
-/**
- * @type {string}
- * @name vs.directives.DataContext#template
- */
-vs.directives.DataContext.prototype.template;
-
-Object.defineProperties(vs.directives.DataContext.prototype, {
-  'handler': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
-  'template': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
-});
-
-
-goog.provide('vs.async.Task');
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- * @constructor
- */
-vs.async.Task = function(func, thisArg) {
-  /**
-   * @type {number}
-   * @private
-   */
-  this._id = vs.async.Task.nextId();
-
-  /**
-   * @type {function(): Promise}
-   * @private
-   */
-  this._func = func;
-
-  /**
-   * @type {Object|undefined}
-   * @private
-   */
-  this._thisArg = thisArg;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._prev = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._next = null;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._first = this;
-
-  /**
-   * @type {vs.async.Task}
-   * @private
-   */
-  this._last = this;
-};
-
-/**
- * @type {number}
- * @name vs.async.Task#id
- */
-vs.async.Task.prototype.id;
-
-/**
- * @type {Object|undefined}
- * @name vs.async.Task#thisArg
- */
-vs.async.Task.prototype.thisArg;
-
-/**
- * @type {function():Promise}
- * @name vs.async.Task#func
- */
-vs.async.Task.prototype.func;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#prev
- */
-vs.async.Task.prototype.prev;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#next
- */
-vs.async.Task.prototype.next;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#first
- */
-vs.async.Task.prototype.first;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#last
- */
-vs.async.Task.prototype.last;
-
-Object.defineProperties(vs.async.Task.prototype, {
-  'id': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._id; })},
-  'thisArg': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._thisArg; })},
-  'func': { get: /** @type {function (this:vs.async.Task)} */ (function() { return this._func; })},
-  'prev': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._prev; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._prev = value; })
-  },
-  'next': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._next; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._next = value; })
-  },
-  'first': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._first; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._first = value; })
-  },
-  'last': {
-    get: /** @type {function (this:vs.async.Task)} */ (function() { return this._last; }),
-    set: /** @type {function (this:vs.async.Task)} */ (function(value) { this._last = value; })
-  }
-});
-
-/**
- * @type {number}
- * @private
- */
-vs.async.Task._nextId = 0;
-
-/**
- * @returns {number}
- */
-vs.async.Task.nextId = function() {
-  return vs.async.Task._nextId++;
-};
-
-
-goog.provide('vs.async.TaskService');
-
-goog.require('vs.async.Task');
-
-/**
- * @param {function(Function, number)} $timeout Angular timeout service
- * @constructor
- */
-vs.async.TaskService = function($timeout) {
-  /**
-   * @type {function(Function, number)}
-   * @private
-   */
-  this._timeout = $timeout || setTimeout;
-
-  /**
-   * @type {Object.<number, vs.async.Task>}
-   * @private
-   */
-  this._tasks = {};
-};
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- */
-vs.async.TaskService.prototype.createTask = function(func, thisArg) {
-  var ret = new vs.async.Task(func, thisArg);
-  this._tasks[ret['id']] = ret;
-  return ret;
-};
-
-/**
- * @param {vs.async.Task|function():Promise} t1
- * @param {vs.async.Task|function():Promise} t2
- * @returns {vs.async.Task}
- */
-vs.async.TaskService.prototype.chain = function(t1, t2) {
-  if (typeof t1 == 'function') {
-    return this.chain(new vs.async.Task(t1), t2);
-  }
-
-  if (typeof t2 == 'function') {
-    return this.chain(t1, new vs.async.Task(t2));
-  }
-
-  t1['next'] = t1['next'] || t2['first'];
-  t1['last']['next'] = t2['first'];
-  t1['last'] = t2['last'];
-
-  t2['prev'] = t2['prev'] || t1['last'];
-  t2['first']['prev'] = t1['last'];
-  t2['first'] = t1['first'];
-
-  return t1['first'];
-};
-
-/**
- * TODO: test!
- * @param {vs.async.Task} task
- * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {Promise}
- */
-vs.async.TaskService.prototype.runChain = function(task, sequential) {
-  // TODO: test!
-  var current = task['first'];
-  if (sequential) {
-    return new Promise(function(resolve, reject) {
-      for (; !!current; current = current['next']) {
-        current['func'].apply(current['thisArg']);
-      }
-      resolve();
-    });
-  }
-
-  var tasks = [];
-  for (; !!current; current = current['next']) {
-    tasks.push(current);
-  }
-
-  return u.async.each(tasks, function(task) {
-    return task['func'].apply(task['thisArg']);
-  }, true);
-};
-
-
 goog.provide('vs.models.Margins');
 
 /**
@@ -1774,7 +1551,15 @@ vs.ui.Setting.PredefinedSettings = {
   'doubleBuffer': new vs.ui.Setting({'key':'doubleBuffer', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'double buffer', 'template':'_switch.html'}),
 
   'xScale': new vs.ui.Setting({'key':'xScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.xScale, 'hidden': true}),
-  'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'hidden': true})
+  'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'hidden': true}),
+
+  'fill': new vs.ui.Setting({'key':'fill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,0.3)', 'label':'object fill'}),
+  'stroke': new vs.ui.Setting({'key':'stroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,1)', 'label':'object stroke'}),
+  'strokeThickness': new vs.ui.Setting({'key':'strokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':1, 'label':'stroke thickness'}),
+
+  'selectFill': new vs.ui.Setting({'key':'selectFill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ff6520', 'label':'selected object fill'}),
+  'selectStroke': new vs.ui.Setting({'key':'selectStroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ffc600', 'label':'selected object stroke'}),
+  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'}),
 };
 
 
@@ -2112,6 +1897,389 @@ vs.ui.VisHandler.prototype.scheduleRedraw = function() {
 };
 
 
+goog.provide('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope Angular scope
+ * @constructor
+ */
+vs.directives.Directive = function($scope) {
+  /**
+   * @type {angular.Scope}
+   * @private
+   */
+  this._$scope = $scope;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$element = null;
+
+  /**
+   * @private
+   */
+  this._$attrs = null;
+};
+
+/**
+ * @type {angular.Scope}
+ * @name vs.directives.Directive#$scope
+ */
+vs.directives.Directive.prototype.$scope;
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Directive#$element
+ */
+vs.directives.Directive.prototype.$element;
+
+/**
+ * @type {angular.Attributes}
+ * @name vs.directives.Directive#$attrs
+ */
+vs.directives.Directive.prototype.$attrs;
+
+Object.defineProperties(vs.directives.Directive.prototype, {
+  '$scope': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$scope; })},
+  '$element': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$element; })},
+  '$attrs': { get: /** @type {function (this:vs.directives.Directive)} */ (function() { return this._$attrs; })}
+});
+
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Directive.prototype.link = {
+
+  'pre': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  },
+
+  'post': function($scope, $element, $attrs, controller) {
+    this._$element = $element;
+    this._$attrs = $attrs;
+  }
+};
+
+/**
+ * @param {string} name
+ * @param {function(new: vs.directives.Directive)} controllerCtor
+ * @param {Array} [args]
+ * @param {Object.<string, *>} [options]
+ * @returns {{controller: (Array|Function), link: Function, restrict: string, transclude: boolean, replace: boolean}}
+ */
+vs.directives.Directive.createNew = function(name, controllerCtor, args, options) {
+  var controller = ['$scope', function($scope) {
+    var params = [].concat(args || []);
+    params.unshift($scope);
+
+    // Usage of 'this' is correct in this scope: we are accessing the 'this' of the controller
+    this['handler'] = u.reflection.applyConstructor(controllerCtor, params);
+  }];
+  var link;
+  if (typeof controllerCtor.prototype.link == 'function') {
+    link = function ($scope, $element, $attrs) {
+      var ctrl = $scope[name];
+      return ctrl['handler'].link($scope, $element, $attrs, ctrl);
+    };
+  } else {
+    link = {};
+    if ('pre' in controllerCtor.prototype.link) {
+      link['pre'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['pre'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+    if ('post' in controllerCtor.prototype.link) {
+      link['post'] = function($scope, $element, $attrs) {
+        var ctrl = $scope[name];
+        ctrl['handler'].link['post'].call(ctrl['handler'], $scope, $element, $attrs, ctrl);
+      };
+    }
+  }
+
+  return u.extend({}, options, { 'link': link, 'controller': controller, 'controllerAs': name });
+};
+
+
+goog.provide('vs.ui.VisualContext');
+
+/**
+ * @param {{render: string, type: string}} construct
+ * @param {Object.<string, *>} [options]
+ * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
+ * @constructor
+ */
+vs.ui.VisualContext = function(construct, options, decorators) {
+  /**
+   * @type {{render: string, type: string}}
+   */
+  this['construct'] = construct;
+
+  /**
+   * @type {Object.<string, *>}
+   */
+  this['options'] = options || {};
+
+  /**
+   * @type {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}|Array}
+   */
+  this['decorators'] = decorators || [];
+};
+
+
+goog.provide('vs.ui.DataHandler');
+
+goog.require('vs.models.DataSource');
+goog.require('vs.ui.VisualContext');
+goog.require('vs.models.Query');
+
+/**
+ * @param {vs.ui.DataHandler|{data: vs.models.DataSource, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
+ * @constructor
+ */
+vs.ui.DataHandler = function(options) {
+  /**
+   * @type {vs.models.DataSource}
+   * @private
+   */
+  this._data = options['data'];
+
+  /**
+   * @type {Array.<vs.ui.VisualContext>}
+   * @private
+   */
+  this._visualizations = options['visualizations'] || [];
+
+  /**
+   * @type {Array.<vs.ui.DataHandler>}
+   * @private
+   */
+  this._children = options['children'] || [];
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this._name = options['name'] || '';
+};
+
+/**
+ * @type {string}
+ * @name vs.ui.DataHandler#name
+ */
+vs.ui.DataHandler.prototype.name;
+
+/**
+ * @type {vs.models.DataSource}
+ * @name vs.ui.DataHandler#data
+ */
+vs.ui.DataHandler.prototype.data;
+
+/**
+ * @type {u.Event.<vs.models.DataSource>}
+ * @name vs.ui.DataHandler#dataChanged
+ */
+vs.ui.DataHandler.prototype.dataChanged;
+
+/**
+ * @type {Array.<vs.ui.DataHandler>}
+ * @name vs.ui.DataHandler#children
+ */
+vs.ui.DataHandler.prototype.children;
+
+/**
+ * @type {Array.<vs.ui.VisualContext>}
+ * @name vs.ui.DataHandler#visualizations
+ */
+vs.ui.DataHandler.prototype.visualizations;
+
+Object.defineProperties(vs.ui.DataHandler.prototype, {
+  'name': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._name; }) },
+
+  'data': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._data; }),
+    set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
+  },
+
+  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
+
+  'children': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
+  },
+
+  'visualizations': {
+    get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._visualizations; })
+  }
+});
+
+/**
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.ui.DataHandler.prototype.query = function(queries) {
+  return this.data.applyQuery(queries);
+};
+
+
+goog.provide('vs.directives.DataContext');
+
+goog.require('vs.directives.Directive');
+goog.require('vs.ui.DataHandler');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {angular.$templateCache} $templateCache
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.DataContext = function($scope, $templateCache) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular template service
+   * @type {angular.$templateCache}
+   * @private
+   */
+  this._$templateCache = $templateCache;
+
+  /**
+   * @type {vs.ui.DataHandler}
+   * @private
+   */
+  this._handler = null;
+
+  for (var key in $scope) {
+    if (!$scope.hasOwnProperty(key)) { continue; }
+    if ($scope[key] instanceof vs.ui.DataHandler) {
+      this._handler = $scope[key];
+      break;
+    }
+  }
+
+  if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
+  $scope['dataHandler'] = this._handler;
+
+  /**
+   * @type {string|null}
+   * @private
+   */
+  this._template = null;
+
+  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
+  var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
+
+  var t = $('<div></div>');
+  this._handler['visualizations'].forEach(function(visContext, i) {
+    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
+    visContext['decorators']['elem'].forEach(function(decorator, j) {
+      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
+    });
+  });
+  var template = t.html();
+  var templateId = u.generatePseudoGUID(10);
+  this._$templateCache.put(templateId, template);
+  this._template = templateId;
+};
+
+goog.inherits(vs.directives.DataContext, vs.directives.Directive);
+
+/**
+ * @type {vs.ui.DataHandler}
+ * @name vs.directives.DataContext#handler
+ */
+vs.directives.DataContext.prototype.handler;
+
+/**
+ * @type {string}
+ * @name vs.directives.DataContext#template
+ */
+vs.directives.DataContext.prototype.template;
+
+Object.defineProperties(vs.directives.DataContext.prototype, {
+  'handler': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._handler; })},
+  'template': { get: /** @type {function (this:vs.directives.DataContext)} */ (function() { return this._template; })}
+});
+
+
+goog.provide('vs.directives.Window');
+
+goog.require('vs.directives.Directive');
+
+/**
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Window = function() {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._$window = null;
+};
+
+goog.inherits(vs.directives.Window, vs.directives.Directive);
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Window#$window
+ */
+vs.directives.Window.prototype.$window;
+
+Object.defineProperties(vs.directives.Window.prototype, {
+  '$window': { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
+});
+
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Window.prototype.link = {
+  'pre': function($scope, $element, $attrs, controller) {
+    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
+    var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
+    var style = $scope.$eval($attrs['vsStyle'] || '{}');
+
+    var box = {
+      'top': style['top'] || ($element.css('top') ? (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px' : undefined),
+      'left': style['left'] || $element.css('left') || undefined,
+      'bottom': style['bottom'] || $element.css('bottom') || undefined,
+      'right': style['right'] || $element.css('right') || undefined,
+      'width': style['width'] || ($element.width() + 'px'),
+      'height': style['height'] || ($element.height() + 'px')
+    };
+
+    /*$window.css({
+      'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
+      'left': $element.css('left'),
+      'bottom': $element.css('bottom'),
+      'right': $element.css('right')
+    });*/
+    $window.css(box);
+
+    $element.css({
+      'top': '',
+      'left': '',
+      'bottom': '',
+      'right': ''
+    });
+
+    $window.append($element);
+
+    // Bring to front when selected
+    $window.on('mousedown', function() {
+      $window.siblings().css('zIndex', 0);
+      $window.css('zIndex', 1);
+    });
+
+    this._$window = $window;
+  },
+  'post': vs.directives.Directive.prototype.link['post']
+};
+
+
 goog.provide('vs.ui.svg.SvgVis');
 
 goog.require('vs.ui.VisHandler');
@@ -2149,6 +2317,82 @@ vs.ui.svg.SvgVis.prototype.beginDraw = function () {
         resolve();
       }, reject);
   });
+};
+
+
+goog.provide('vs.ui.VisualizationFactory');
+
+goog.require('vs.Configuration');
+goog.require('vs.ui.VisHandler');
+goog.require('vs.ui.UiException');
+goog.require('vs.models.DataSource');
+goog.require('vs.async.TaskService');
+goog.require('vs.async.ThreadPoolService');
+
+/**
+ * @param {vs.Configuration} config
+ * @param {vs.async.TaskService} taskService
+ * @param {Function} $timeout
+ * @param {vs.async.ThreadPoolService} threadPool
+ * @constructor
+ */
+vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {
+
+  /**
+   * visualization alias -> rendering type -> fully qualified type
+   * @type {Object.<string, Object.<string, string>>}
+   * @private
+   */
+  this._visMap = config['options']['visualizations'] || {};
+
+  /**
+   * @type {vs.async.TaskService}
+   * @private
+   */
+  this._taskService = taskService;
+
+  /**
+   * @type {Function}
+   * @private
+   */
+  this._$timeout = $timeout;
+
+  /**
+   * @type {vs.async.ThreadPoolService}
+   * @private
+   */
+  this._threadPool = threadPool;
+};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @returns {vs.ui.VisHandler}
+ */
+vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {
+  if (!$attrs['vsContext']) { throw new vs.ui.UiException('No visual context defined for visualization'); }
+  var visualContext = $scope.$eval($attrs['vsContext']);
+  if (!visualContext) { throw new vs.ui.UiException('Undefined visual context reference: ' + $attrs['vsContext']); }
+
+  var type = visualContext['construct']['type'];
+  var render = visualContext['construct']['render'];
+  if (!this._visMap[type]) { throw new vs.ui.UiException('Undefined visualization type: ' + type + '. Did you forget to register it in the configuration?'); }
+  if (!this._visMap[type][render]) {
+    throw new vs.ui.UiException('Unsupported rendering for visualization type ' + type + ': ' + render + '. ' +
+      'Supported are the following: ' + Object.keys(this._visMap[type] || {}).join(', ') + '.');
+  }
+
+  var typeStr = this._visMap[type][render];
+  var visCtor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
+
+  if (!$attrs['vsData']) { throw new vs.ui.UiException('Data source not defined for visualization: ' + type + '/' + render + '.'); }
+  var data = $scope.$eval($attrs['vsData']);
+  if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
+
+  return u.reflection.applyConstructor(visCtor, [
+    {'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout': this._$timeout, 'threadPool': this._threadPool['pool']},
+    visualContext['options'], data]);
 };
 
 
@@ -2642,165 +2886,6 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
 };
 
 
-goog.provide('vs.ui.UiException');
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.ui.UiException = function(message, innerException) {
-  u.Exception.apply(this, arguments);
-
-  this.name = 'UiException';
-};
-
-goog.inherits(vs.ui.UiException, u.Exception);
-
-
-goog.provide('vs.Configuration');
-
-/**
- * @constructor
- */
-vs.Configuration = function() {
-
-  /**
-   * @type {Object.<string, *>}
-   * @private
-   */
-  this._options = {};
-};
-
-/**
- * @type {Object.<string, *>}
- * @name vs.Configuration#options
- */
-vs.Configuration.prototype.options;
-
-Object.defineProperties(vs.Configuration.prototype, {
-  'options': { get: /** @type {function (this:vs.Configuration)} */ (function () { return this._options; })}
-});
-
-/**
- * @param {Object.<string, *>} options
- */
-vs.Configuration.prototype.customize = function(options) {
-  u.extend(this._options, options);
-};
-
-
-goog.provide('vs.async.ThreadPoolService');
-
-goog.require('vs.Configuration');
-goog.require('vs.ui.UiException');
-
-/**
- * @param {vs.Configuration} config
- * @constructor
- */
-vs.async.ThreadPoolService = function(config) {
-  var settings = config['options']['parallel'];
-  if (!settings) { throw new vs.ui.UiException('Parallel settings have not been configured. Make sure you call configuration.customize({parallel: ...})'); }
-  var nthreads = settings['nthreads'] || 16;
-  var worker = settings['worker'];
-  if (!worker) { throw new vs.ui.UiException('Parallel worker path needs to be defined in the configuration: configuration.customize({parallel: {worker: <path to worker>}})'); }
-
-  /**
-   * @type {parallel.ThreadPool}
-   * @private
-   */
-  this._pool = new parallel.ThreadPool(nthreads, worker);
-};
-
-/**
- * @type {parallel.ThreadPool}
- * @name vs.async.ThreadPoolService#pool
- */
-vs.async.ThreadPoolService.prototype.pool;
-
-Object.defineProperties(vs.async.ThreadPoolService.prototype, {
-  'pool': { get: /** @type {function (this:vs.async.ThreadPoolService)} */ (function() { return this._pool; })}
-});
-
-
-goog.provide('vs.ui.VisualizationFactory');
-
-goog.require('vs.Configuration');
-goog.require('vs.ui.VisHandler');
-goog.require('vs.ui.UiException');
-goog.require('vs.models.DataSource');
-goog.require('vs.async.TaskService');
-goog.require('vs.async.ThreadPoolService');
-
-/**
- * @param {vs.Configuration} config
- * @param {vs.async.TaskService} taskService
- * @param {Function} $timeout
- * @param {vs.async.ThreadPoolService} threadPool
- * @constructor
- */
-vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {
-
-  /**
-   * visualization alias -> rendering type -> fully qualified type
-   * @type {Object.<string, Object.<string, string>>}
-   * @private
-   */
-  this._visMap = config['options']['visualizations'] || {};
-
-  /**
-   * @type {vs.async.TaskService}
-   * @private
-   */
-  this._taskService = taskService;
-
-  /**
-   * @type {Function}
-   * @private
-   */
-  this._$timeout = $timeout;
-
-  /**
-   * @type {vs.async.ThreadPoolService}
-   * @private
-   */
-  this._threadPool = threadPool;
-};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @returns {vs.ui.VisHandler}
- */
-vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {
-  if (!$attrs['vsContext']) { throw new vs.ui.UiException('No visual context defined for visualization'); }
-  var visualContext = $scope.$eval($attrs['vsContext']);
-  if (!visualContext) { throw new vs.ui.UiException('Undefined visual context reference: ' + $attrs['vsContext']); }
-
-  var type = visualContext['construct']['type'];
-  var render = visualContext['construct']['render'];
-  if (!this._visMap[type]) { throw new vs.ui.UiException('Undefined visualization type: ' + type + '. Did you forget to register it in the configuration?'); }
-  if (!this._visMap[type][render]) {
-    throw new vs.ui.UiException('Unsupported rendering for visualization type ' + type + ': ' + render + '. ' +
-      'Supported are the following: ' + Object.keys(this._visMap[type] || {}).join(', ') + '.');
-  }
-
-  var typeStr = this._visMap[type][render];
-  var visCtor = u.reflection.evaluateFullyQualifiedTypeName(typeStr);
-
-  if (!$attrs['vsData']) { throw new vs.ui.UiException('Data source not defined for visualization: ' + type + '/' + render + '.'); }
-  var data = $scope.$eval($attrs['vsData']);
-  if (!data) { throw new vs.ui.UiException('Undefined data reference for visualization: ' + type + '/' + render + '.'); }
-
-  return u.reflection.applyConstructor(visCtor, [
-    {'$scope':$scope, '$element':$element, '$attrs':$attrs, 'taskService':this._taskService, '$timeout': this._$timeout, 'threadPool': this._threadPool['pool']},
-    visualContext['options'], data]);
-};
-
-
 goog.provide('vs.directives.Visualization');
 
 goog.require('vs.directives.Directive');
@@ -3108,6 +3193,713 @@ vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, tar
       return new vs.ui.canvas.CanvasAxis($ng, $targetElement, target, options);
   }
   return null;
+};
+
+
+goog.provide('vs.ui.decorators.Grid');
+
+goog.require('vs.ui.Decorator');
+goog.require('vs.ui.Setting');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.Decorator
+ */
+vs.ui.decorators.Grid = function($ng, $targetElement, target, options) {
+  vs.ui.Decorator.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.decorators.Grid, vs.ui.Decorator);
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.decorators.Grid.Settings = {
+  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
+  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
+  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
+};
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Grid#type
+ */
+vs.ui.decorators.Grid.prototype.type;
+
+/**
+ * @type {number}
+ * @name vs.ui.decorators.Grid#ticks
+ */
+vs.ui.decorators.Grid.prototype.ticks;
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Grid#format
+ */
+vs.ui.decorators.Grid.prototype.format;
+
+Object.defineProperties(vs.ui.decorators.Grid.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return vs.ui.decorators.Grid.Settings; })},
+  'type': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('type'); })},
+  'ticks': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
+  'format': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
+});
+
+
+goog.provide('vs.ui.canvas.CanvasGrid');
+
+goog.require('vs.ui.decorators.Grid');
+goog.require('vs.models.Transformer');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Grid
+ */
+vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Grid.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.canvas.CanvasGrid, vs.ui.decorators.Grid);
+
+vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['target']['data']['isReady']) { resolve(); return; }
+
+    var target = self['target'];
+    var type = self.type;
+    var margins = target['margins'];
+    var height = target['height'];
+    var width = target['width'];
+    var intCoords = vs.models.Transformer.intCoords();
+    var translate = vs.models.Transformer
+      .translate({'x': margins['left'], 'y': margins['top']})
+      .intCoords();
+
+    var context = target['pendingCanvas'][0].getContext('2d');
+    var moveTo = context.__proto__.moveTo;
+    var lineTo = context.__proto__.lineTo;
+
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+
+    context.strokeStyle = '#eeeeee';
+    context.lineWidth = 1;
+
+    var ticks = scale.ticks(self['ticks']);
+
+    // Draw ticks
+    var x1 = type == 'x' ? scale : function() { return 0; };
+    var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
+    var y1 = type == 'y' ? scale : function() { return 0; };
+    var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
+
+    ticks.forEach(function(tick) {
+      moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
+      lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
+    });
+
+
+    context.stroke();
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
+  });
+};
+
+
+goog.provide('vs.ui.svg.SvgGrid');
+
+goog.require('vs.ui.decorators.Grid');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Grid
+ */
+vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Grid.apply(this, arguments);
+};
+
+goog.inherits(vs.ui.svg.SvgGrid, vs.ui.decorators.Grid);
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgGrid.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['target']['data']['isReady']) { resolve(); return; }
+
+    var target = self['target'];
+    var svg = d3.select(target['$element'][0]).select('svg');
+
+    var type = self.type;
+    var className = 'grid-' + type;
+    var grid = svg.select('.' + className);
+    if (grid.empty()) {
+      grid = svg.insert('g', '.viewport')
+        .attr('class', className);
+    }
+
+    var height = target['height'];
+    var width = target['width'];
+    var margins = target['margins'];
+    var origins = {'x': margins['left'], 'y': height - margins['bottom']};
+
+    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
+
+    var gridLines = grid
+      .selectAll('.grid-line')
+      .data(scale.ticks(self['ticks']));
+
+    gridLines
+      .enter().append('line')
+      .attr('class', 'grid-line');
+
+    var x1 = type == 'x' ? scale : 0;
+    var x2 = type == 'x' ? scale : width - margins['left'] - margins['right'];
+    var y1 = type == 'y' ? scale : 0;
+    var y2 = type == 'y' ? scale : height - margins['top'] - margins['bottom'];
+
+    gridLines
+      .attr('transform', 'translate(' + margins['left'] + ', ' + margins['top'] + ')')
+      .attr('x1', x1)
+      .attr('x2', x2)
+      .attr('y1', y1)
+      .attr('y2', y2)
+      .style('stroke', '#eeeeee')
+      .style('shape-rendering', 'crispEdges');
+
+    gridLines.exit().remove();
+    resolve();
+  }).then(function() {
+    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
+  });
+};
+
+
+goog.provide('vs.directives.Grid');
+
+goog.require('vs.directives.Visualization');
+goog.require('vs.directives.GraphicDecorator');
+
+goog.require('vs.ui.svg.SvgGrid');
+goog.require('vs.ui.canvas.CanvasGrid');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
+ * @constructor
+ * @extends {vs.directives.GraphicDecorator}
+ */
+vs.directives.Grid = function($scope, taskService, $timeout) {
+  vs.directives.GraphicDecorator.apply(this, arguments);
+};
+
+goog.inherits(vs.directives.Grid, vs.directives.GraphicDecorator);
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @returns {vs.ui.Decorator}
+ * @override
+ */
+vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, target, options) {
+  switch (target['render']) {
+    case 'svg':
+      return new vs.ui.svg.SvgGrid($ng, $targetElement, target, options);
+    case 'canvas':
+      return new vs.ui.canvas.CanvasGrid($ng, $targetElement, target, options);
+  }
+  return null;
+};
+
+
+goog.provide('vs.ui.BrushingEvent');
+
+goog.require('vs.ui.VisHandler');
+goog.require('vs.models.DataSource');
+
+/**
+ * @param {vs.ui.VisHandler} source
+ * @param {vs.models.DataSource} data
+ * @param {vs.models.DataRow} selectedRow
+ * @param {vs.ui.BrushingEvent.Action} action
+ * @constructor
+ */
+vs.ui.BrushingEvent = function(source, data, selectedRow, action) {
+  /**
+   * @type {vs.ui.VisHandler}
+   */
+  this['source'] = source;
+
+  /**
+   * @type {vs.models.DataSource}
+   */
+  this['data'] = data;
+
+  /**
+   * @type {vs.models.DataRow}
+   */
+  this['selectedRow'] = selectedRow;
+
+  /**
+   * @type {vs.ui.BrushingEvent.Action}
+   */
+  this['action'] = action;
+};
+
+/**
+ * @enum {string}
+ */
+vs.ui.BrushingEvent.Action = {
+  'MOUSEOVER': 'mouseover',
+  'MOUSEOUT': 'mouseout',
+  'SELECT': 'select',
+  'DESELECT': 'deselect'
+};
+
+
+goog.provide('vs.ui.decorators.Brushing');
+
+goog.require('vs.ui.BrushingEvent');
+goog.require('vs.ui.Decorator');
+goog.require('vs.ui.Setting');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.Decorator
+ */
+vs.ui.decorators.Brushing = function($ng, $targetElement, target, options) {
+  vs.ui.Decorator.apply(this, arguments);
+
+  /**
+   * @type {u.Event.<vs.ui.BrushingEvent>}
+   * @private
+   */
+  this._brushing = new u.Event();
+};
+
+goog.inherits(vs.ui.decorators.Brushing, vs.ui.Decorator);
+
+/**
+ * @type {u.Event.<vs.ui.BrushingEvent>}
+ * @name vs.ui.decorators.Brushing#brushing
+ */
+vs.ui.decorators.Brushing.prototype.brushing;
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.decorators.Brushing.Settings = {};
+
+Object.defineProperties(vs.ui.decorators.Brushing.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.decorators.Brushing)} */ (function() { return vs.ui.decorators.Brushing.Settings; })},
+  'brushing': { get: /** @type {function (this:vs.ui.decorators.Brushing)} */ (function() { return this._brushing; })}
+});
+
+/**
+ * @param {vs.ui.BrushingEvent} e
+ */
+vs.ui.decorators.Brushing.prototype.brush = function(e) {};
+
+
+goog.provide('vs.ui.svg.SvgBrushing');
+
+goog.require('vs.ui.decorators.Brushing');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Brushing
+ */
+vs.ui.svg.SvgBrushing = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Brushing.apply(this, arguments);
+
+  /**
+   * @type {Array.<vs.models.DataRow>}
+   * @private
+   */
+  this._newDataItems = null;
+};
+
+goog.inherits(vs.ui.svg.SvgBrushing, vs.ui.decorators.Brushing);
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgBrushing.prototype.beginDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    var target = self['target'];
+    var svg = d3.select(target['$element'][0]).select('svg');
+    var viewport = svg.empty() ? null : svg.select('.viewport');
+    if (viewport == null || viewport.empty()) {
+      // In this case, all items are new, so we return immediately
+      self._newDataItems = null;
+      resolve();
+      return;
+    }
+
+    var items = self['data'].asDataRowArray();
+    var newItems = viewport.selectAll('.vs-item').data(items, vs.models.DataSource.key).enter();
+    self._newDataItems = newItems.empty() ? [] : newItems[0].filter(function(item) { return item; }).map(function(item) { return item['__data__']; });
+    resolve();
+  });
+};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    if (!self['data']['isReady']) { resolve(); return; }
+
+    var target = self['target'];
+    var data = self['data'];
+
+    var newItems = null;
+    var viewport = d3.select(target['$element'][0]).select('svg').select('.viewport');
+    if (!self._newDataItems) {
+      newItems = viewport.selectAll('.vs-item');
+    } else {
+      newItems = viewport.selectAll('.vs-item').data(self._newDataItems, vs.models.DataSource.key);
+    }
+
+    newItems
+      .on('mouseover', function (d) {
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOVER']));
+      })
+      .on('mouseout', function (d) {
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOUT']));
+      })
+      .on('click', function (d) {
+        //self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['SELECT']));
+        d3.event.stopPropagation();
+      });
+
+    resolve();
+  }).then(function() {
+      return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
+    });
+};
+
+/**
+ * @param {vs.ui.BrushingEvent} e
+ */
+vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
+  var target = this['target'];
+  var svg = d3.select(target['$element'][0]).select('svg');
+  var viewport = svg.empty() ? null : svg.select('.viewport');
+  if (viewport == null || viewport.empty()) { return; }
+
+  var fill = /** @type {string} */ (target.optionValue('fill'));
+  var stroke = /** @type {string} */ (target.optionValue('stroke'));
+  var strokeThickness = /** @type {number} */ (target.optionValue('strokeThickness'));
+
+  var selectFill = /** @type {string} */ (target.optionValue('selectFill'));
+  var selectStroke = /** @type {string} */ (target.optionValue('selectStroke'));
+  var selectStrokeThickness = /** @type {number} */ (target.optionValue('selectStrokeThickness'));
+
+  // TODO: Use LinkService!
+
+  if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
+    var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
+    items
+      .style('stroke', selectStroke)
+      .style('stroke-width', selectStrokeThickness)
+      .style('fill', selectFill);
+    $(items[0]).appendTo($(viewport[0]));
+  } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
+    viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
+      .style('stroke', stroke)
+      .style('stroke-width', strokeThickness)
+      .style('fill', fill);
+  }
+};
+
+
+goog.provide('vs.ui.canvas.CanvasBrushing');
+
+goog.require('vs.ui.decorators.Brushing');
+goog.require('vs.models.Transformer');
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Brushing
+ */
+vs.ui.canvas.CanvasBrushing = function($ng, $targetElement, target, options) {
+  vs.ui.decorators.Brushing.apply(this, arguments);
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._initialized = null;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._brushingCanvas = null;
+};
+
+goog.inherits(vs.ui.canvas.CanvasBrushing, vs.ui.decorators.Brushing);
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasBrushing.prototype.beginDraw = function() {
+  var self = this;
+  var args = arguments;
+  return new Promise(function(resolve, reject) {
+    vs.ui.decorators.Brushing.prototype.beginDraw.apply(self, args).then(function() {
+
+      resolve();
+    });
+  });
+};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
+  var self = this;
+  var args = arguments;
+
+  if (this._initialized == null) {
+    this._initialized = new Promise(function(resolve, reject) {
+
+      var target = self['target'];
+
+      if (!self._brushingCanvas) {
+        var canvas = goog.string.format('<canvas width="%s" height="%s" style="display: none; position: absolute; bottom: 0; left: 0;"></canvas>',
+          /** @type {number} */ (target.optionValue('width')), /** @type {number} */ (target.optionValue('height')));
+
+        self._brushingCanvas = $(canvas);
+        self._brushingCanvas.appendTo(target['$element']);
+      }
+
+      var activeCanvas = target['activeCanvas'][0];
+      var selectedItem = null;
+      var mousemove = function(evt) {
+        var rect = activeCanvas.getBoundingClientRect();
+        var mousePos = {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+
+        var data = self['data'];
+
+        var items = target.getItemsAt(mousePos.x, mousePos.y);
+        if (selectedItem && (items.length == 0 || items[0] != selectedItem)) {
+          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, selectedItem, vs.ui.BrushingEvent.Action['MOUSEOUT']));
+          selectedItem = null;
+        }
+        if (items.length > 0 && selectedItem != items[0]) {
+          selectedItem = items[0];
+          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, items[0], vs.ui.BrushingEvent.Action['MOUSEOVER']));
+        }
+      };
+      activeCanvas.addEventListener('mousemove', mousemove);
+      self._brushingCanvas[0].addEventListener('mouseover', mousemove);
+      self._brushingCanvas[0].addEventListener('mousemove', mousemove);
+
+      if (target['doubleBuffer']) {
+        var pendingCanvas = target['pendingCanvas'][0];
+        pendingCanvas.addEventListener('mousemove', mousemove);
+      }
+
+      resolve();
+    });
+  }
+
+  return this._initialized.then(function() {
+    return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
+  });
+};
+
+/**
+ * @param {vs.ui.BrushingEvent} e
+ */
+vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
+  var target = this['target'];
+  this._brushingCanvas
+    .attr('width', target.optionValue('width'))
+    .attr('height', target.optionValue('height'));
+
+  var context = this._brushingCanvas[0].getContext('2d');
+  context.drawImage(target['activeCanvas'][0], 0, 0);
+
+  // TODO: Use LinkService!
+
+  if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
+    target.drawHighlightItem(this._brushingCanvas, e['selectedRow']);
+    this._brushingCanvas.css('display', 'block');
+  } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
+    this._brushingCanvas.css('display', 'none');
+  }
+};
+
+
+goog.provide('vs.directives.Brushing');
+
+goog.require('vs.directives.Visualization');
+goog.require('vs.directives.GraphicDecorator');
+
+goog.require('vs.ui.svg.SvgBrushing');
+goog.require('vs.ui.canvas.CanvasBrushing');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
+ * @param $rootScope Angular root scope
+ * @constructor
+ * @extends {vs.directives.GraphicDecorator}
+ */
+vs.directives.Brushing = function($scope, taskService, $timeout, $rootScope) {
+  vs.directives.GraphicDecorator.apply(this, [$scope, taskService, $timeout, true /* Overrides VisHandler */]);
+
+  /**
+   * Angular root scope
+   * @private
+   */
+  this._$rootScope = $rootScope;
+};
+
+goog.inherits(vs.directives.Brushing, vs.directives.GraphicDecorator);
+
+vs.directives.Brushing.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.GraphicDecorator.prototype.link.apply(this, arguments);
+
+  this['handler']['brushing'].addListener(function(e) {
+    this._$rootScope.$broadcast('brushing', e);
+  }, this);
+
+  var self = this;
+  $scope.$on('brushing', function(e, brushingEvent) {
+    self['handler'].brush(brushingEvent);
+  });
+};
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @returns {vs.ui.Decorator}
+ * @override
+ */
+vs.directives.Brushing.prototype.createDecorator = function($ng, $targetElement, target, options) {
+  switch (target['render']) {
+    case 'svg':
+      return new vs.ui.svg.SvgBrushing($ng, $targetElement, target, options);
+    case 'canvas':
+      return new vs.ui.canvas.CanvasBrushing($ng, $targetElement, target, options);
+  }
+  return null;
+};
+
+
+goog.provide('vs.directives.Movable');
+
+goog.require('vs.directives.Directive');
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {vs.directives.Directive}
+ */
+vs.directives.Movable = function($scope, $document) {
+  vs.directives.Directive.apply(this, arguments);
+
+  /**
+   * Angular document
+   * @private
+   */
+  this._document = $document;
+};
+
+goog.inherits(vs.directives.Movable, vs.directives.Directive);
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  var $window = $scope['vsWindow']['handler']['$window'];
+  $window.css({ 'cursor': 'move' });
+
+  var startX = 0, startY = 0, x, y;
+
+  var $document = this._document;
+  function mousedown(event) {
+    if (event.target != $window[0]) { return; }
+
+    // Prevent default dragging of selected content
+    event.preventDefault();
+    var childOffset = $window.position();
+    x = childOffset.left;
+    y = childOffset.top;
+    startX = event.pageX - x;
+    startY = event.pageY - y;
+    $document.on('mousemove', mousemove);
+    $document.on('mouseup', mouseup);
+  }
+
+  function mousemove(event) {
+    y = event.pageY - startY;
+    x = event.pageX - startX;
+    $window.css({
+      'top': y + 'px',
+      'left':  x + 'px'
+    });
+  }
+
+  function mouseup() {
+    $document.off('mousemove', mousemove);
+    $document.off('mouseup', mouseup);
+  }
+
+  $window.on('mousedown', mousedown);
 };
 
 
@@ -3454,522 +4246,6 @@ Object.defineProperties(vs.directives.Resizable.BoundingBox.prototype, {
 });
 
 
-goog.provide('vs.ui.decorators.Grid');
-
-goog.require('vs.ui.Decorator');
-goog.require('vs.ui.Setting');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.Decorator
- */
-vs.ui.decorators.Grid = function($ng, $targetElement, target, options) {
-  vs.ui.Decorator.apply(this, arguments);
-};
-
-goog.inherits(vs.ui.decorators.Grid, vs.ui.Decorator);
-
-/**
- * @type {Object.<string, vs.ui.Setting>}
- */
-vs.ui.decorators.Grid.Settings = {
-  'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
-  'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
-  'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'})
-};
-
-/**
- * @type {string}
- * @name vs.ui.decorators.Grid#type
- */
-vs.ui.decorators.Grid.prototype.type;
-
-/**
- * @type {number}
- * @name vs.ui.decorators.Grid#ticks
- */
-vs.ui.decorators.Grid.prototype.ticks;
-
-/**
- * @type {string}
- * @name vs.ui.decorators.Grid#format
- */
-vs.ui.decorators.Grid.prototype.format;
-
-Object.defineProperties(vs.ui.decorators.Grid.prototype, {
-  'settings': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return vs.ui.decorators.Grid.Settings; })},
-  'type': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('type'); })},
-  'ticks': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function () { return this.optionValue('ticks'); })},
-  'format': { get: /** @type {function (this:vs.ui.decorators.Grid)} */ (function() { return this.optionValue('format'); })}
-});
-
-
-goog.provide('vs.ui.svg.SvgGrid');
-
-goog.require('vs.ui.decorators.Grid');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Grid
- */
-vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Grid.apply(this, arguments);
-};
-
-goog.inherits(vs.ui.svg.SvgGrid, vs.ui.decorators.Grid);
-
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgGrid.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
-
-    var target = self['target'];
-    var svg = d3.select(target['$element'][0]).select('svg');
-
-    var type = self.type;
-    var className = 'grid-' + type;
-    var grid = svg.select('.' + className);
-    if (grid.empty()) {
-      grid = svg.insert('g', '.viewport')
-        .attr('class', className);
-    }
-
-    var height = target['height'];
-    var width = target['width'];
-    var margins = target['margins'];
-    var origins = {'x': margins['left'], 'y': height - margins['bottom']};
-
-    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
-
-    var gridLines = grid
-      .selectAll('.grid-line')
-      .data(scale.ticks(self['ticks']));
-
-    gridLines
-      .enter().append('line')
-      .attr('class', 'grid-line');
-
-    var x1 = type == 'x' ? scale : 0;
-    var x2 = type == 'x' ? scale : width - margins['left'] - margins['right'];
-    var y1 = type == 'y' ? scale : 0;
-    var y2 = type == 'y' ? scale : height - margins['top'] - margins['bottom'];
-
-    gridLines
-      .attr('transform', 'translate(' + margins['left'] + ', ' + margins['top'] + ')')
-      .attr('x1', x1)
-      .attr('x2', x2)
-      .attr('y1', y1)
-      .attr('y2', y2)
-      .style('stroke', '#eeeeee')
-      .style('shape-rendering', 'crispEdges');
-
-    gridLines.exit().remove();
-    resolve();
-  }).then(function() {
-    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
-  });
-};
-
-
-goog.provide('vs.ui.canvas.CanvasGrid');
-
-goog.require('vs.ui.decorators.Grid');
-goog.require('vs.models.Transformer');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Grid
- */
-vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Grid.apply(this, arguments);
-};
-
-goog.inherits(vs.ui.canvas.CanvasGrid, vs.ui.decorators.Grid);
-
-vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
-
-    var target = self['target'];
-    var type = self.type;
-    var margins = target['margins'];
-    var height = target['height'];
-    var width = target['width'];
-    var intCoords = vs.models.Transformer.intCoords();
-    var translate = vs.models.Transformer
-      .translate({'x': margins['left'], 'y': margins['top']})
-      .intCoords();
-
-    var context = target['pendingCanvas'][0].getContext('2d');
-    var moveTo = context.__proto__.moveTo;
-    var lineTo = context.__proto__.lineTo;
-
-    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
-    if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
-
-    context.strokeStyle = '#eeeeee';
-    context.lineWidth = 1;
-
-    var ticks = scale.ticks(self['ticks']);
-
-    // Draw ticks
-    var x1 = type == 'x' ? scale : function() { return 0; };
-    var x2 = type == 'x' ? scale : function() { return width - margins['left'] - margins['right']; };
-    var y1 = type == 'y' ? scale : function() { return 0; };
-    var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
-
-    ticks.forEach(function(tick) {
-      moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
-      lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
-    });
-
-
-    context.stroke();
-    resolve();
-  }).then(function() {
-    return vs.ui.decorators.Grid.prototype.endDraw.apply(self, args);
-  });
-};
-
-
-goog.provide('vs.directives.Grid');
-
-goog.require('vs.directives.Visualization');
-goog.require('vs.directives.GraphicDecorator');
-
-goog.require('vs.ui.svg.SvgGrid');
-goog.require('vs.ui.canvas.CanvasGrid');
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.async.TaskService} taskService
- * @param {angular.$timeout} $timeout
- * @constructor
- * @extends {vs.directives.GraphicDecorator}
- */
-vs.directives.Grid = function($scope, taskService, $timeout) {
-  vs.directives.GraphicDecorator.apply(this, arguments);
-};
-
-goog.inherits(vs.directives.Grid, vs.directives.GraphicDecorator);
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @returns {vs.ui.Decorator}
- * @override
- */
-vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, target, options) {
-  switch (target['render']) {
-    case 'svg':
-      return new vs.ui.svg.SvgGrid($ng, $targetElement, target, options);
-    case 'canvas':
-      return new vs.ui.canvas.CanvasGrid($ng, $targetElement, target, options);
-  }
-  return null;
-};
-
-
-goog.provide('vs.directives.Window');
-
-goog.require('vs.directives.Directive');
-
-/**
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Window = function() {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * @type {jQuery}
-   * @private
-   */
-  this._$window = null;
-};
-
-goog.inherits(vs.directives.Window, vs.directives.Directive);
-
-/**
- * @type {jQuery}
- * @name vs.directives.Window#$window
- */
-vs.directives.Window.prototype.$window;
-
-Object.defineProperties(vs.directives.Window.prototype, {
-  '$window': { get: /** @type {function (this:vs.directives.Window)} */ (function() { return this._$window; })}
-});
-
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Window.prototype.link = {
-  'pre': function($scope, $element, $attrs, controller) {
-    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
-    var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
-    var style = $scope.$eval($attrs['vsStyle'] || '{}');
-
-    var box = {
-      'top': style['top'] || ($element.css('top') ? (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px' : undefined),
-      'left': style['left'] || $element.css('left') || undefined,
-      'bottom': style['bottom'] || $element.css('bottom') || undefined,
-      'right': style['right'] || $element.css('right') || undefined,
-      'width': style['width'] || ($element.width() + 'px'),
-      'height': style['height'] || ($element.height() + 'px')
-    };
-
-    /*$window.css({
-      'top': (parseInt($element.css('top'), 10) + parseInt($window.css('padding-top'), 10)) + 'px',
-      'left': $element.css('left'),
-      'bottom': $element.css('bottom'),
-      'right': $element.css('right')
-    });*/
-    $window.css(box);
-
-    $element.css({
-      'top': '',
-      'left': '',
-      'bottom': '',
-      'right': ''
-    });
-
-    $window.append($element);
-
-    // Bring to front when selected
-    $window.on('mousedown', function() {
-      $window.siblings().css('zIndex', 0);
-      $window.css('zIndex', 1);
-    });
-
-    this._$window = $window;
-  },
-  'post': vs.directives.Directive.prototype.link['post']
-};
-
-
-goog.provide('vs.directives.Movable');
-
-goog.require('vs.directives.Directive');
-
-/**
- * @param {angular.Scope} $scope
- * @param $document
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.Movable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * Angular document
-   * @private
-   */
-  this._document = $document;
-};
-
-goog.inherits(vs.directives.Movable, vs.directives.Directive);
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
-  $window.css({ 'cursor': 'move' });
-
-  var startX = 0, startY = 0, x, y;
-
-  var $document = this._document;
-  function mousedown(event) {
-    if (event.target != $window[0]) { return; }
-
-    // Prevent default dragging of selected content
-    event.preventDefault();
-    var childOffset = $window.position();
-    x = childOffset.left;
-    y = childOffset.top;
-    startX = event.pageX - x;
-    startY = event.pageY - y;
-    $document.on('mousemove', mousemove);
-    $document.on('mouseup', mouseup);
-  }
-
-  function mousemove(event) {
-    y = event.pageY - startY;
-    x = event.pageX - startX;
-    $window.css({
-      'top': y + 'px',
-      'left':  x + 'px'
-    });
-  }
-
-  function mouseup() {
-    $document.off('mousemove', mousemove);
-    $document.off('mouseup', mouseup);
-  }
-
-  $window.on('mousedown', mousedown);
-};
-
-
-goog.provide('vs.directives.LoadingDecorator');
-
-goog.require('vs.directives.Directive');
-goog.require('vs.async.TaskService');
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.async.TaskService} taskService
- * @param {angular.$timeout} $timeout
- * @constructor
- * @extends {vs.directives.Directive}
- */
-vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {
-  vs.directives.Directive.apply(this, arguments);
-
-  /**
-   * @type {vs.async.TaskService}
-   * @private
-   */
-  this._taskService = taskService;
-
-  /**
-   * @type {angular.$timeout}
-   * @private
-   */
-  this._$timeout = $timeout;
-};
-
-goog.inherits(vs.directives.LoadingDecorator, vs.directives.Directive);
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-
-  /** @type {vs.directives.Visualization} */
-  var vis = $scope['visualization']['handler'];
-
-  /** @type {vs.ui.VisHandler} */
-  var target = vis['handler'];
-
-  var startTimeout = null;
-  var endTimeout = null;
-  var progressInterval = null;
-
-  var $overlay = $('<div class="vs-loading-overlay" style="opacity: 0;"></div>').appendTo($element);
-
-  var $container = $('<div class="vs-loading-container" style="opacity: 0;"></div>').appendTo($element);
-
-  var $progress = $('<div class="progress" ></div>').appendTo($container);
-  var $progressBar = $(
-    '<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" ' +
-          'aria-valuemin="0" aria-valuemax="100" style="width:0"> ' +
-    '</div>').appendTo($progress);
-
-  var updateProgress = function() {
-    $progressBar.css({
-     '-webkit-transition': '',
-     '-o-transition': '',
-     'transition': ''
-     });
-    var w = $progressBar.css('width');
-    var p = (w == undefined || w.indexOf('px') >= 0) ? ($progressBar.width() / $progress.width() * 100) : parseInt(w, 10);
-    if (p >= 99) { return; }
-    var remaining = 100 - p;
-    p = Math.min(p + Math.ceil(remaining * 0.25), 99);
-    $progressBar.css('width', p + '%');
-  };
-
-  $element.on('resizestart', function(e) {
-    $overlay.css('opacity', '1');
-  });
-  $element.on('resizeend', function(e) {
-    target.scheduleRedraw()
-      .then(function() {
-        $overlay.css('opacity', '0');
-      });
-  });
-
-  var afterDraw = function() {
-    if (endTimeout != null) { return Promise.resolve(); }
-    if (startTimeout != null) {
-      clearTimeout(startTimeout);
-      startTimeout = null;
-      return Promise.resolve();
-    }
-
-    endTimeout = setTimeout(function() {
-      endTimeout = null;
-      clearInterval(progressInterval);
-      $container.css('opacity', 0);
-      $progressBar.css('width', '100%');
-    }, 500);
-    return Promise.resolve();
-  };
-
-  var beforeDraw = function() {
-    if (startTimeout != null) { return Promise.resolve(); }
-    if (endTimeout != null) {
-      clearTimeout(endTimeout);
-      endTimeout = null;
-      return Promise.resolve();
-    }
-    startTimeout = setTimeout(function() {
-      startTimeout = null;
-      $progressBar.css({
-        '-webkit-transition': 'none',
-        '-o-transition': 'none',
-        'transition': 'none'
-      });
-      $progressBar.css('width', '0');
-      $container.css('opacity', '1');
-
-      progressInterval = setInterval(updateProgress, 500)
-    }, 500);
-
-    // In this case, it's ok to resolve the promise before the timeout is done; we don't want the visualization to wait
-    return Promise.resolve();
-  };
-
-  target['data']['changing'].addListener(beforeDraw);
-  target['data']['changed'].addListener(afterDraw);
-
-  this._taskService.chain(target['endDrawTask'], this._taskService.createTask(afterDraw));
-  this._taskService.chain(this._taskService.createTask(beforeDraw), target['beginDrawTask']);
-};
-
-
 goog.provide('vs.models.ModelsException');
 
 /**
@@ -4130,399 +4406,136 @@ vs.models.GenomicRangeQuery.extract = function(query) {
 };
 
 
-goog.provide('vs.ui.BrushingEvent');
+goog.provide('vs.directives.LoadingDecorator');
 
-goog.require('vs.ui.VisHandler');
-goog.require('vs.models.DataSource');
-
-/**
- * @param {vs.ui.VisHandler} source
- * @param {vs.models.DataSource} data
- * @param {vs.models.DataRow} selectedRow
- * @param {vs.ui.BrushingEvent.Action} action
- * @constructor
- */
-vs.ui.BrushingEvent = function(source, data, selectedRow, action) {
-  /**
-   * @type {vs.ui.VisHandler}
-   */
-  this['source'] = source;
-
-  /**
-   * @type {vs.models.DataSource}
-   */
-  this['data'] = data;
-
-  /**
-   * @type {vs.models.DataRow}
-   */
-  this['selectedRow'] = selectedRow;
-
-  /**
-   * @type {vs.ui.BrushingEvent.Action}
-   */
-  this['action'] = action;
-};
-
-/**
- * @enum {string}
- */
-vs.ui.BrushingEvent.Action = {
-  'MOUSEOVER': 'mouseover',
-  'MOUSEOUT': 'mouseout',
-  'SELECT': 'select',
-  'DESELECT': 'deselect'
-};
-
-
-goog.provide('vs.ui.decorators.Brushing');
-
-goog.require('vs.ui.BrushingEvent');
-goog.require('vs.ui.Decorator');
-goog.require('vs.ui.Setting');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.Decorator
- */
-vs.ui.decorators.Brushing = function($ng, $targetElement, target, options) {
-  vs.ui.Decorator.apply(this, arguments);
-
-  /**
-   * @type {u.Event.<vs.ui.BrushingEvent>}
-   * @private
-   */
-  this._brushing = new u.Event();
-};
-
-goog.inherits(vs.ui.decorators.Brushing, vs.ui.Decorator);
-
-/**
- * @type {u.Event.<vs.ui.BrushingEvent>}
- * @name vs.ui.decorators.Brushing#brushing
- */
-vs.ui.decorators.Brushing.prototype.brushing;
-
-/**
- * @type {Object.<string, vs.ui.Setting>}
- */
-vs.ui.decorators.Brushing.Settings = {};
-
-Object.defineProperties(vs.ui.decorators.Brushing.prototype, {
-  'settings': { get: /** @type {function (this:vs.ui.decorators.Brushing)} */ (function() { return vs.ui.decorators.Brushing.Settings; })},
-  'brushing': { get: /** @type {function (this:vs.ui.decorators.Brushing)} */ (function() { return this._brushing; })}
-});
-
-/**
- * @param {vs.ui.BrushingEvent} e
- */
-vs.ui.decorators.Brushing.prototype.brush = function(e) {};
-
-
-goog.provide('vs.ui.svg.SvgBrushing');
-
-goog.require('vs.ui.decorators.Brushing');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Brushing
- */
-vs.ui.svg.SvgBrushing = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Brushing.apply(this, arguments);
-
-  /**
-   * @type {Array.<vs.models.DataRow>}
-   * @private
-   */
-  this._newDataItems = null;
-};
-
-goog.inherits(vs.ui.svg.SvgBrushing, vs.ui.decorators.Brushing);
-
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgBrushing.prototype.beginDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    var target = self['target'];
-    var svg = d3.select(target['$element'][0]).select('svg');
-    var viewport = svg.empty() ? null : svg.select('.viewport');
-    if (viewport == null || viewport.empty()) {
-      // In this case, all items are new, so we return immediately
-      self._newDataItems = null;
-      resolve();
-      return;
-    }
-
-    var items = self['data'].asDataRowArray();
-    var newItems = viewport.selectAll('.vs-item').data(items, vs.models.DataSource.key).enter();
-    self._newDataItems = newItems.empty() ? [] : newItems[0].filter(function(item) { return item; }).map(function(item) { return item['__data__']; });
-    resolve();
-  });
-};
-
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    if (!self['data']['isReady']) { resolve(); return; }
-
-    var target = self['target'];
-    var data = self['data'];
-
-    var newItems = null;
-    var viewport = d3.select(target['$element'][0]).select('svg').select('.viewport');
-    if (!self._newDataItems) {
-      newItems = viewport.selectAll('.vs-item');
-    } else {
-      newItems = viewport.selectAll('.vs-item').data(self._newDataItems, vs.models.DataSource.key);
-    }
-
-    newItems
-      .on('mouseover', function (d) {
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOVER']));
-      })
-      .on('mouseout', function (d) {
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['MOUSEOUT']));
-      })
-      .on('click', function (d) {
-        //self['brushing'].fire(new vs.ui.BrushingEvent(target, data, d, vs.ui.BrushingEvent.Action['SELECT']));
-        d3.event.stopPropagation();
-      });
-
-    resolve();
-  }).then(function() {
-      return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
-    });
-};
-
-/**
- * @param {vs.ui.BrushingEvent} e
- */
-vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
-  var target = this['target'];
-  var svg = d3.select(target['$element'][0]).select('svg');
-  var viewport = svg.empty() ? null : svg.select('.viewport');
-  if (viewport == null || viewport.empty()) { return; }
-
-  // TODO: Use LinkService!
-
-  if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
-    var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
-    items
-      .style('stroke', '#ffc600')
-      .style('stroke-width', '2');
-    $(items[0]).appendTo($(viewport[0]));
-  } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
-    viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
-      .style('stroke', 'none');
-  }
-};
-
-
-goog.provide('vs.ui.canvas.CanvasBrushing');
-
-goog.require('vs.ui.decorators.Brushing');
-goog.require('vs.models.Transformer');
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Brushing
- */
-vs.ui.canvas.CanvasBrushing = function($ng, $targetElement, target, options) {
-  vs.ui.decorators.Brushing.apply(this, arguments);
-
-  /**
-   * @type {Promise}
-   * @private
-   */
-  this._initialized = null;
-
-  /**
-   * @type {jQuery}
-   * @private
-   */
-  this._brushingCanvas = null;
-};
-
-goog.inherits(vs.ui.canvas.CanvasBrushing, vs.ui.decorators.Brushing);
-
-vs.ui.canvas.CanvasBrushing.prototype.beginDraw = function() {
-  var self = this;
-  var args = arguments;
-  return new Promise(function(resolve, reject) {
-    vs.ui.decorators.Brushing.prototype.beginDraw.apply(self, args).then(function() {
-
-      resolve();
-    });
-  });
-};
-
-vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
-  var self = this;
-  var args = arguments;
-
-  if (this._initialized == null) {
-    this._initialized = new Promise(function(resolve, reject) {
-
-      var target = self['target'];
-
-      if (!self._brushingCanvas) {
-        var canvas = goog.string.format('<canvas width="%s" height="%s" style="display: none; position: absolute; bottom: 0; left: 0;"></canvas>',
-          /** @type {number} */ (target.optionValue('width')), /** @type {number} */ (target.optionValue('height')));
-
-        self._brushingCanvas = $(canvas);
-        self._brushingCanvas.appendTo(target['$element']);
-      }
-
-      var activeCanvas = target['activeCanvas'][0];
-      var selectedItem = null;
-      var mousemove = function(evt) {
-        var rect = activeCanvas.getBoundingClientRect();
-        var mousePos = {
-          x: evt.clientX - rect.left,
-          y: evt.clientY - rect.top
-        };
-
-        var data = self['data'];
-
-        var items = target.getItemsAt(mousePos.x, mousePos.y);
-        if (selectedItem && (items.length == 0 || items[0] != selectedItem)) {
-          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, selectedItem, vs.ui.BrushingEvent.Action['MOUSEOUT']));
-          selectedItem = null;
-        }
-        if (items.length > 0 && selectedItem != items[0]) {
-          selectedItem = items[0];
-          self['brushing'].fire(new vs.ui.BrushingEvent(target, data, items[0], vs.ui.BrushingEvent.Action['MOUSEOVER']));
-        }
-      };
-      activeCanvas.addEventListener('mousemove', mousemove);
-      self._brushingCanvas[0].addEventListener('mouseover', mousemove);
-      self._brushingCanvas[0].addEventListener('mousemove', mousemove);
-
-      if (target['doubleBuffer']) {
-        var pendingCanvas = target['pendingCanvas'][0];
-        pendingCanvas.addEventListener('mousemove', mousemove);
-      }
-
-      resolve();
-    });
-  }
-
-  return this._initialized.then(function() {
-    return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
-  });
-};
-
-/**
- * @param {vs.ui.BrushingEvent} e
- */
-vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
-  var target = this['target'];
-  this._brushingCanvas
-    .attr('width', target.optionValue('width'))
-    .attr('height', target.optionValue('height'));
-
-  var context = this._brushingCanvas[0].getContext('2d');
-  context.drawImage(target['activeCanvas'][0], 0, 0);
-
-  /*var target = this['target'];
-  var svg = d3.select(target['$element'][0]).select('svg');
-  var viewport = svg.empty() ? null : svg.select('.viewport');
-  if (viewport == null || viewport.empty()) { return; }*/
-
-  // TODO: Use LinkService!
-
-  if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
-    target.drawHighlightItem(this._brushingCanvas, e['selectedRow']);
-    /*var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
-    items
-      .style('stroke', '#ffc600')
-      .style('stroke-width', '2');
-    $(items[0]).appendTo($(viewport[0]));*/
-    this._brushingCanvas.css('display', 'block');
-  } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
-    //this._brushingCanvas.css({ 'display': 'none' });
-    /*viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
-      .style('stroke', 'none');*/
-  }
-};
-
-
-goog.provide('vs.directives.Brushing');
-
-goog.require('vs.directives.Visualization');
-goog.require('vs.directives.GraphicDecorator');
-
-goog.require('vs.ui.svg.SvgBrushing');
-goog.require('vs.ui.canvas.CanvasBrushing');
+goog.require('vs.directives.Directive');
+goog.require('vs.async.TaskService');
 
 /**
  * @param {angular.Scope} $scope
  * @param {vs.async.TaskService} taskService
  * @param {angular.$timeout} $timeout
- * @param $rootScope Angular root scope
  * @constructor
- * @extends {vs.directives.GraphicDecorator}
+ * @extends {vs.directives.Directive}
  */
-vs.directives.Brushing = function($scope, taskService, $timeout, $rootScope) {
-  vs.directives.GraphicDecorator.apply(this, [$scope, taskService, $timeout, true /* Overrides VisHandler */]);
+vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {
+  vs.directives.Directive.apply(this, arguments);
 
   /**
-   * Angular root scope
+   * @type {vs.async.TaskService}
    * @private
    */
-  this._$rootScope = $rootScope;
+  this._taskService = taskService;
+
+  /**
+   * @type {angular.$timeout}
+   * @private
+   */
+  this._$timeout = $timeout;
 };
 
-goog.inherits(vs.directives.Brushing, vs.directives.GraphicDecorator);
-
-vs.directives.Brushing.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.GraphicDecorator.prototype.link.apply(this, arguments);
-
-  this['handler']['brushing'].addListener(function(e) {
-    this._$rootScope.$broadcast('brushing', e);
-  }, this);
-
-  var self = this;
-  $scope.$on('brushing', function(e, brushingEvent) {
-    self['handler'].brush(brushingEvent);
-  });
-};
+goog.inherits(vs.directives.LoadingDecorator, vs.directives.Directive);
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @returns {vs.ui.Decorator}
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
  * @override
  */
-vs.directives.Brushing.prototype.createDecorator = function($ng, $targetElement, target, options) {
-  switch (target['render']) {
-    case 'svg':
-      return new vs.ui.svg.SvgBrushing($ng, $targetElement, target, options);
-    case 'canvas':
-      return new vs.ui.canvas.CanvasBrushing($ng, $targetElement, target, options);
-  }
-  return null;
+vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {
+  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+
+  /** @type {vs.directives.Visualization} */
+  var vis = $scope['visualization']['handler'];
+
+  /** @type {vs.ui.VisHandler} */
+  var target = vis['handler'];
+
+  var startTimeout = null;
+  var endTimeout = null;
+  var progressInterval = null;
+
+  var $overlay = $('<div class="vs-loading-overlay" style="opacity: 0;"></div>').appendTo($element);
+
+  var $container = $('<div class="vs-loading-container" style="opacity: 0;"></div>').appendTo($element);
+
+  var $progress = $('<div class="progress" ></div>').appendTo($container);
+  var $progressBar = $(
+    '<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" ' +
+          'aria-valuemin="0" aria-valuemax="100" style="width:0"> ' +
+    '</div>').appendTo($progress);
+
+  var updateProgress = function() {
+    $progressBar.css({
+     '-webkit-transition': '',
+     '-o-transition': '',
+     'transition': ''
+     });
+    var w = $progressBar.css('width');
+    var p = (w == undefined || w.indexOf('px') >= 0) ? ($progressBar.width() / $progress.width() * 100) : parseInt(w, 10);
+    if (p >= 99) { return; }
+    var remaining = 100 - p;
+    p = Math.min(p + Math.ceil(remaining * 0.25), 99);
+    $progressBar.css('width', p + '%');
+  };
+
+  $element.on('resizestart', function(e) {
+    $overlay.css('opacity', '1');
+  });
+  $element.on('resizeend', function(e) {
+    target.scheduleRedraw()
+      .then(function() {
+        $overlay.css('opacity', '0');
+      });
+  });
+
+  var afterDraw = function() {
+    if (endTimeout != null) { return Promise.resolve(); }
+    if (startTimeout != null) {
+      clearTimeout(startTimeout);
+      startTimeout = null;
+      return Promise.resolve();
+    }
+
+    endTimeout = setTimeout(function() {
+      endTimeout = null;
+      clearInterval(progressInterval);
+      $container.css('opacity', 0);
+      $progressBar.css('width', '100%');
+    }, 500);
+    return Promise.resolve();
+  };
+
+  var beforeDraw = function() {
+    if (startTimeout != null) { return Promise.resolve(); }
+    if (endTimeout != null) {
+      clearTimeout(endTimeout);
+      endTimeout = null;
+      return Promise.resolve();
+    }
+    startTimeout = setTimeout(function() {
+      startTimeout = null;
+      $progressBar.css({
+        '-webkit-transition': 'none',
+        '-o-transition': 'none',
+        'transition': 'none'
+      });
+      $progressBar.css('width', '0');
+      $container.css('opacity', '1');
+
+      progressInterval = setInterval(updateProgress, 500)
+    }, 500);
+
+    // In this case, it's ok to resolve the promise before the timeout is done; we don't want the visualization to wait
+    return Promise.resolve();
+  };
+
+  target['data']['changing'].addListener(beforeDraw);
+  target['data']['changed'].addListener(afterDraw);
+
+  this._taskService.chain(target['endDrawTask'], this._taskService.createTask(afterDraw));
+  this._taskService.chain(this._taskService.createTask(beforeDraw), target['beginDrawTask']);
 };
 
 
