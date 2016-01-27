@@ -336,3 +336,15 @@ vs.ui.VisHandler.prototype.scheduleRedraw = function() {
   }
   return this._redrawPromise;
 };
+
+/**
+ * @param {HTMLElement} viewport Can be canvas, svg, etc.
+ * @param {vs.models.DataRow} d
+ */
+vs.ui.VisHandler.prototype.highlightItem = function(viewport, d) {};
+
+/**
+ * @param {HTMLElement} viewport Can be canvas, svg, etc.
+ * @param {vs.models.DataRow} d
+ */
+vs.ui.VisHandler.prototype.unhighlightItem = function(viewport, d) {};

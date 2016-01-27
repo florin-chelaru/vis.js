@@ -39,3 +39,21 @@ if (Object.getOwnPropertyDescriptor(vs.ui.VisHandler.prototype, 'endDraw') == un
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { this.endDraw = value; })
   });
 }
+
+if (Object.getOwnPropertyDescriptor(vs.ui.VisHandler.prototype, 'highlightItem') == undefined) {
+  Object.defineProperty(vs.ui.VisHandler.prototype, 'highlightItem', {
+    configurable: true,
+    enumerable: true,
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.highlightItem; }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { this.highlightItem = value; })
+  });
+}
+
+if (Object.getOwnPropertyDescriptor(vs.ui.VisHandler.prototype, 'unhighlightItem') == undefined) {
+  Object.defineProperty(vs.ui.VisHandler.prototype, 'unhighlightItem', {
+    configurable: true,
+    enumerable: true,
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.unhighlightItem; }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { this.unhighlightItem = value; })
+  });
+}

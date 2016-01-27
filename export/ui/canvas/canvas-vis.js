@@ -30,24 +30,6 @@ if (Object.getOwnPropertyDescriptor(vs.ui.canvas.CanvasVis.prototype, 'endDraw')
   });
 }
 
-if (Object.getOwnPropertyDescriptor(vs.ui.canvas.CanvasVis.prototype, 'drawHighlightItem') == undefined) {
-  Object.defineProperty(vs.ui.canvas.CanvasVis.prototype, 'drawHighlightItem', {
-    configurable: true,
-    enumerable: true,
-    get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.drawHighlightItem; }),
-    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { this.drawHighlightItem = value; })
-  });
-}
-
-if (Object.getOwnPropertyDescriptor(vs.ui.canvas.CanvasVis.prototype, 'drawHighlightItem') == undefined) {
-  Object.defineProperty(vs.ui.canvas.CanvasVis.prototype, 'drawHighlightItem', {
-    configurable: true,
-    enumerable: true,
-    get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.drawHighlightItem; }),
-    set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { this.drawHighlightItem = value; })
-  });
-}
-
 if (Object.getOwnPropertyDescriptor(vs.ui.canvas.CanvasVis.prototype, 'getItemsAt') == undefined) {
   Object.defineProperty(vs.ui.canvas.CanvasVis.prototype, 'getItemsAt', {
     configurable: true,

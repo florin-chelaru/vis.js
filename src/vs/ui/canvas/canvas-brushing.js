@@ -123,9 +123,10 @@ vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
   // TODO: Use LinkService!
 
   if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
-    target.drawHighlightItem(this._brushingCanvas, e['selectedRow']);
+    target.highlightItem(this._brushingCanvas[0], e['selectedRow']);
     this._brushingCanvas.css('display', 'block');
   } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
+    target.unhighlightItem(this._brushingCanvas[0], e['selectedRow']);
     this._brushingCanvas.css('display', 'none');
   }
 };

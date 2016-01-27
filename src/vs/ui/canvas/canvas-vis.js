@@ -113,12 +113,6 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
 vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) { return []; };
 
 /**
- * @param {jQuery} canvas
- * @param {vs.models.DataRow} d
- */
-vs.ui.canvas.CanvasVis.prototype.drawHighlightItem = function(canvas, d) {};
-
-/**
  * @param {CanvasRenderingContext2D} context
  * @param {number} cx
  * @param {number} cy

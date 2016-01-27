@@ -96,30 +96,25 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
 vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
   var target = this['target'];
   var svg = d3.select(target['$element'][0]).select('svg');
-  var viewport = svg.empty() ? null : svg.select('.viewport');
-  if (viewport == null || viewport.empty()) { return; }
-
-  var fill = /** @type {string} */ (target.optionValue('fill'));
-  var stroke = /** @type {string} */ (target.optionValue('stroke'));
-  var strokeThickness = /** @type {number} */ (target.optionValue('strokeThickness'));
-
-  var selectFill = /** @type {string} */ (target.optionValue('selectFill'));
-  var selectStroke = /** @type {string} */ (target.optionValue('selectStroke'));
-  var selectStrokeThickness = /** @type {number} */ (target.optionValue('selectStrokeThickness'));
+  var viewport = svg.empty() ? null : $(svg[0][0]).find('.viewport');
+  if (viewport == null || viewport.length == 0) { return; }
 
   // TODO: Use LinkService!
 
   if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
+    target.highlightItem(viewport[0], e['selectedRow']);
+/*
     var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
     items
       .style('stroke', selectStroke)
       .style('stroke-width', selectStrokeThickness)
       .style('fill', selectFill);
-    $(items[0]).appendTo($(viewport[0]));
+    $(items[0]).appendTo($(viewport[0]));*/
   } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
-    viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
+    target.unhighlightItem(viewport[0], e['selectedRow']);
+    /*viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
       .style('stroke', stroke)
       .style('stroke-width', strokeThickness)
-      .style('fill', fill);
+      .style('fill', fill);*/
   }
 };
