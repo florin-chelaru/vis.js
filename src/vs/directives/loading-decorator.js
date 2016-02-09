@@ -6,7 +6,6 @@
 
 goog.provide('vs.directives.LoadingDecorator');
 
-goog.require('vs.directives.Directive');
 goog.require('vs.async.TaskService');
 
 /**
@@ -14,10 +13,10 @@ goog.require('vs.async.TaskService');
  * @param {vs.async.TaskService} taskService
  * @param {angular.$timeout} $timeout
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * @type {vs.async.TaskService}
@@ -32,7 +31,7 @@ vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {
   this._$timeout = $timeout;
 };
 
-goog.inherits(vs.directives.LoadingDecorator, vs.directives.Directive);
+goog.inherits(vs.directives.LoadingDecorator, ngu.Directive);
 
 /**
  * @param {angular.Scope} $scope
@@ -42,10 +41,10 @@ goog.inherits(vs.directives.LoadingDecorator, vs.directives.Directive);
  * @override
  */
 vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  ngu.Directive.prototype.link['post'].apply(this, arguments);
 
   /** @type {vs.directives.Visualization} */
-  var vis = $scope['visualization']['handler'];
+  var vis = $scope['visualization']; //['handler'];
 
   /** @type {vs.ui.VisHandler} */
   var target = vis['handler'];

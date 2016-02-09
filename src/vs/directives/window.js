@@ -6,14 +6,12 @@
 
 goog.provide('vs.directives.Window');
 
-goog.require('vs.directives.Directive');
-
 /**
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Window = function() {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * @type {jQuery}
@@ -22,7 +20,7 @@ vs.directives.Window = function() {
   this._$window = null;
 };
 
-goog.inherits(vs.directives.Window, vs.directives.Directive);
+goog.inherits(vs.directives.Window, ngu.Directive);
 
 /**
  * @type {jQuery}
@@ -39,7 +37,7 @@ Object.defineProperties(vs.directives.Window.prototype, {
  */
 vs.directives.Window.prototype.link = {
   'pre': function($scope, $element, $attrs, controller) {
-    vs.directives.Directive.prototype.link['pre'].apply(this, arguments);
+    ngu.Directive.prototype.link['pre'].apply(this, arguments);
     var $window = $('<div class="vs-window-container"></div>').appendTo($element.parent());
     var style = $scope.$eval($attrs['vsStyle'] || '{}');
 
@@ -77,5 +75,5 @@ vs.directives.Window.prototype.link = {
 
     this._$window = $window;
   },
-  'post': vs.directives.Directive.prototype.link['post']
+  'post': ngu.Directive.prototype.link['post']
 };

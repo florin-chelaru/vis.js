@@ -6,17 +6,16 @@
 
 goog.provide('vs.directives.DataContext');
 
-goog.require('vs.directives.Directive');
 goog.require('vs.ui.DataHandler');
 
 /**
  * @param {angular.Scope} $scope
  * @param {angular.$templateCache} $templateCache
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.DataContext = function($scope, $templateCache) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * Angular template service
@@ -64,7 +63,7 @@ vs.directives.DataContext = function($scope, $templateCache) {
   this._template = templateId;
 };
 
-goog.inherits(vs.directives.DataContext, vs.directives.Directive);
+goog.inherits(vs.directives.DataContext, ngu.Directive);
 
 /**
  * @type {vs.ui.DataHandler}

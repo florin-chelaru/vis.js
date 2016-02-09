@@ -19,10 +19,10 @@ goog.require('vs.async.TaskService');
  * @param {boolean} [overridesVisHandler] If set to true, this flag will allow the decorator's draw methods to execute
  * before and after respectively of the VisHandler's beginDraw/endDraw methods.
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overridesVisHandler) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * @type {vs.async.TaskService}
@@ -49,7 +49,7 @@ vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overrid
   this._overridesVisHandler = !!overridesVisHandler;
 };
 
-goog.inherits(vs.directives.GraphicDecorator, vs.directives.Directive);
+goog.inherits(vs.directives.GraphicDecorator, ngu.Directive);
 
 /**
  * @type {vs.ui.Decorator}
@@ -69,10 +69,10 @@ Object.defineProperties(vs.directives.GraphicDecorator.prototype, {
  * @override
  */
 vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
+  ngu.Directive.prototype.link['post'].apply(this, arguments);
 
   /** @type {vs.directives.Visualization} */
-  var vis = $scope['visualization']['handler'];
+  var vis = $scope['visualization']; //['handler'];
   var options = $attrs['vsOptions'] ? $scope.$eval($attrs['vsOptions']) : {};
 
   this._handler = this.createDecorator(

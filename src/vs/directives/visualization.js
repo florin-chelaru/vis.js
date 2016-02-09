@@ -6,7 +6,6 @@
 
 goog.provide('vs.directives.Visualization');
 
-goog.require('vs.directives.Directive');
 goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.ui.VisHandler');
 goog.require('vs.async.TaskService');
@@ -16,10 +15,10 @@ goog.require('vs.async.TaskService');
  * @param {vs.ui.VisualizationFactory} visualizationFactory
  * @param {vs.async.TaskService} taskService
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Visualization = function($scope, visualizationFactory, taskService) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * @type {vs.ui.VisHandler}
@@ -40,7 +39,7 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
   this._visualizationFactory = visualizationFactory;
 };
 
-goog.inherits(vs.directives.Visualization, vs.directives.Directive);
+goog.inherits(vs.directives.Visualization, ngu.Directive);
 
 
 /**

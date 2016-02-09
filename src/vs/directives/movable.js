@@ -6,16 +6,14 @@
 
 goog.provide('vs.directives.Movable');
 
-goog.require('vs.directives.Directive');
-
 /**
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Movable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * Angular document
@@ -24,7 +22,7 @@ vs.directives.Movable = function($scope, $document) {
   this._document = $document;
 };
 
-goog.inherits(vs.directives.Movable, vs.directives.Directive);
+goog.inherits(vs.directives.Movable, ngu.Directive);
 
 /**
  * @param {angular.Scope} $scope
@@ -34,8 +32,9 @@ goog.inherits(vs.directives.Movable, vs.directives.Directive);
  * @override
  */
 vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
+  ngu.Directive.prototype.link['post'].apply(this, arguments);
+  //var $window = $scope['vsWindow']['handler']['$window'];
+  var $window = $scope['vsWindow']['$window'];
   $window.css({ 'cursor': 'move' });
 
   var startX = 0, startY = 0, x, y;

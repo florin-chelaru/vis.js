@@ -6,16 +6,14 @@
 
 goog.provide('vs.directives.Resizable');
 
-goog.require('vs.directives.Directive');
-
 /**
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Resizable = function($scope, $document) {
-  vs.directives.Directive.apply(this, arguments);
+  ngu.Directive.apply(this, arguments);
 
   /**
    * Angular document
@@ -36,7 +34,7 @@ vs.directives.Resizable = function($scope, $document) {
   this._minHeight = 65;
 };
 
-goog.inherits(vs.directives.Resizable, vs.directives.Directive);
+goog.inherits(vs.directives.Resizable, ngu.Directive);
 
 /**
  * @param {angular.Scope} $scope
@@ -46,8 +44,9 @@ goog.inherits(vs.directives.Resizable, vs.directives.Directive);
  * @override
  */
 vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {
-  vs.directives.Directive.prototype.link['post'].apply(this, arguments);
-  var $window = $scope['vsWindow']['handler']['$window'];
+  ngu.Directive.prototype.link['post'].apply(this, arguments);
+  //var $window = $scope['vsWindow']['handler']['$window'];
+  var $window = $scope['vsWindow']['$window'];
   $window
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-left"></div>')
     .append('<div class="vs-resize-grab vs-grab-diagonal vs-grab-top-right"></div>')

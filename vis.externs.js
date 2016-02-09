@@ -904,7 +904,7 @@ vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $att
  * @param {vs.ui.VisualizationFactory} visualizationFactory
  * @param {vs.async.TaskService} taskService
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Visualization = function($scope, visualizationFactory, taskService) {};
 
@@ -925,7 +925,7 @@ vs.directives.Visualization.prototype.handler;
  * @param {vs.async.TaskService} taskService
  * @param {angular.$timeout} $timeout
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {};
 
@@ -1020,7 +1020,7 @@ vs.ui.Decorator.prototype.endDraw = function() {};
  * @param {angular.$timeout} $timeout
  * @param {boolean} [overridesVisHandler]
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overridesVisHandler) {};
 
@@ -1178,7 +1178,7 @@ vs.ui.DataHandler.prototype.query = function(queries) {};
  * @param {angular.Scope} $scope
  * @param {angular.$templateCache} $templateCache
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.DataContext = function($scope, $templateCache) {};
 
@@ -1472,7 +1472,7 @@ vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, tar
 
 /**
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Window = function() {};
 
@@ -1486,7 +1486,7 @@ vs.directives.Window.prototype.$window;
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Movable = function($scope, $document) {};
 
@@ -1494,7 +1494,7 @@ vs.directives.Movable = function($scope, $document) {};
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
- * @extends {vs.directives.Directive}
+ * @extends {ngu.Directive}
  */
 vs.directives.Resizable = function($scope, $document) {};
 
