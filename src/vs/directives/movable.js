@@ -37,6 +37,7 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
   vs.directives.Directive.prototype.link['post'].apply(this, arguments);
   var $window = $scope['vsWindow']['handler']['$window'];
   $window.css({ 'cursor': 'move' });
+  $window.children().css({ 'cursor': 'auto' });
 
   var startX = 0, startY = 0, x, y;
 

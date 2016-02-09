@@ -34,6 +34,10 @@
   padding-top: 12px;
   overflow: hidden;
 }
+.vs-window-container .vs-window {
+  height: 100%;
+  width: 100%;
+}
 .vs-resize-box {
   border: 1px dashed #aaaaaa;
   position: absolute;
