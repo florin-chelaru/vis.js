@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1de1b1bd-f1f7-4c6c-91a4-59f76e3e30e9" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/css/window.css" afterPath="$PROJECT_DIR$/res/css/window.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/css/window.less" afterPath="$PROJECT_DIR$/res/css/window.less" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/movable.js" afterPath="$PROJECT_DIR$/src/vs/directives/movable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.css" afterPath="$PROJECT_DIR$/vis.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.js" afterPath="$PROJECT_DIR$/vis.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.css" afterPath="$PROJECT_DIR$/vis.min.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.js" afterPath="$PROJECT_DIR$/vis.min.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.js.map" afterPath="$PROJECT_DIR$/vis.min.js.map" />
     </list>
@@ -106,8 +102,8 @@
       <file leaf-file-name="movable.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/vs/directives/movable.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.35382685">
-              <caret line="39" column="36" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
+            <state vertical-scroll-proportion="0.12547052">
+              <caret line="38" column="36" selection-start-line="38" selection-start-column="36" selection-end-line="38" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -785,8 +781,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/directives/movable.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35382685">
-          <caret line="39" column="36" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
+        <state vertical-scroll-proportion="0.12547052">
+          <caret line="38" column="36" selection-start-line="38" selection-start-column="36" selection-end-line="38" selection-end-column="36" />
           <folding />
         </state>
       </provider>
