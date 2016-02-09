@@ -2,24 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1de1b1bd-f1f7-4c6c-91a4-59f76e3e30e9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/externs/ng-utils.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/export/directives/directive.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/vs/directives/directive.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower.json" afterPath="$PROJECT_DIR$/bower.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/deps.js" afterPath="$PROJECT_DIR$/deps.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/data-context.js" afterPath="$PROJECT_DIR$/src/vs/directives/data-context.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/graphic-decorator.js" afterPath="$PROJECT_DIR$/src/vs/directives/graphic-decorator.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/loading-decorator.js" afterPath="$PROJECT_DIR$/src/vs/directives/loading-decorator.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/movable.js" afterPath="$PROJECT_DIR$/src/vs/directives/movable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/resizable.js" afterPath="$PROJECT_DIR$/src/vs/directives/resizable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/visualization.js" afterPath="$PROJECT_DIR$/src/vs/directives/visualization.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/directives/window.js" afterPath="$PROJECT_DIR$/src/vs/directives/window.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/vs.js" afterPath="$PROJECT_DIR$/src/vs/vs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.externs.js" afterPath="$PROJECT_DIR$/vis.externs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.js" afterPath="$PROJECT_DIR$/vis.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.js" afterPath="$PROJECT_DIR$/vis.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.js.map" afterPath="$PROJECT_DIR$/vis.min.js.map" />
     </list>
     <ignored path="vis.js.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -40,21 +23,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="vs.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="vs.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/vs/vs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="64" column="247" selection-start-line="64" selection-start-column="247" selection-end-line="64" selection-end-column="247" />
+            <state vertical-scroll-proportion="0.7316798">
+              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="brushing.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/directives/brushing.js">
+      <file leaf-file-name="visualization-factory.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/vs/ui/visualization-factory.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="43" column="10" selection-start-line="43" selection-start-column="10" selection-end-line="43" selection-end-column="10" />
+              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -136,11 +119,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="data-context.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="data-context.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/vs/directives/data-context.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.25253665">
+            <state vertical-scroll-proportion="0.0">
               <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="task-service.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/vs/async/task-service.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -210,10 +203,10 @@
         <option value="$PROJECT_DIR$/src/vs/directives/visualization.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/window.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/graphic-decorator.js" />
-        <option value="$PROJECT_DIR$/src/vs/vs.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/loading-decorator.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/movable.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/resizable.js" />
+        <option value="$PROJECT_DIR$/src/vs/vs.js" />
       </list>
     </option>
   </component>
@@ -330,7 +323,95 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="models" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="linking" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="directives" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vis.js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="async" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -633,13 +714,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/ui/visualization-factory.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="25" column="5" selection-start-line="25" selection-start-column="5" selection-end-line="25" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/ui/svg/svg-brushing.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -802,14 +876,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/vs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="64" column="247" selection-start-line="64" selection-start-column="247" selection-end-line="64" selection-end-column="247" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/directives/brushing.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -884,8 +950,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/directives/data-context.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.25253665">
+        <state vertical-scroll-proportion="0.0">
           <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/async/task-service.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/ui/visualization-factory.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/vs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7316798">
+          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
           <folding />
         </state>
       </provider>

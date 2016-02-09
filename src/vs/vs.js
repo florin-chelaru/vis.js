@@ -93,38 +93,6 @@ vs.main.directive('vsBrushing', ['taskService', '$timeout', '$rootScope', functi
   return ngu.Directive.createNew('vsBrushing', /** @type {function(new:ngu.Directive)} */ (vs.directives.Brushing), [taskService, $timeout, $rootScope], {restrict: 'C', require: '^visualization'});
 }]);
 
-
-
-/*
-// TODO: Later
-vs.main.directive('vs-input-data', function() {
-  return {
-    require: '^visualization',
-    restrict: 'E',
-    transclude: true,
-    scope: {
-    },
-    link: function(scope, element, attrs, visualizationCtrl) {
-      //visualizationCtrl.addPane(scope);
-    }
-  };
-});
-
-// TODO: Later
-vs.main.directive('vs-options', function() {
-  return {
-    require: '^visualization',
-    restrict: 'E',
-    transclude: true,
-    scope: {
-    },
-    link: function(scope, element, attrs, visualizationCtrl) {
-      //visualizationCtrl.addPane(scope);
-    }
-  };
-});
-*/
-
 vs.main
   .factory('$exceptionHandler', function() {
   return function(exception, cause) {
@@ -132,9 +100,3 @@ vs.main
     //throw exception;
   };
 });
-
-vs.main.run(['$timeout', function($timeout) {
-  // u.Event.TIMEOUT = $timeout;
-}]);
-
-
