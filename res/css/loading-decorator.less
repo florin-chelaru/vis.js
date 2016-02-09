@@ -1,16 +1,19 @@
+@loader-height: 6px;
+
 .vs-loading-container {
   position: absolute;
-  top: 12px;
+  bottom: 0;
   left: 0;
   width: 100%;
-  height: ~'calc(100% - 12px)';
+  /*height: ~'calc(100% - 12px)';*/
+  height: 6px;
 
   transition: opacity .6s ease-in-out;
   -moz-transition: opacity .6s ease-in-out;
   -webkit-transition: opacity .6s ease-in-out;
 
   .progress {
-    height: 6px;
+    height: @loader-height;
     width: 100%;
     border-radius: 0;
     position: absolute;
@@ -21,7 +24,7 @@
 
 .vs-loading-overlay {
   position: absolute;
-  top: 12px;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: ~'calc(100% - 12px)';

@@ -54,9 +54,9 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
   var endTimeout = null;
   var progressInterval = null;
 
-  var $overlay = $('<div class="vs-loading-overlay" style="opacity: 0;"></div>').appendTo($element);
+  var $overlay = $('<div class="vs-loading-overlay" style="opacity: 0; display: none;"></div>').appendTo($element);
 
-  var $container = $('<div class="vs-loading-container" style="opacity: 0;"></div>').appendTo($element);
+  var $container = $('<div class="vs-loading-container" style="opacity: 0; display: none;"></div>').appendTo($element);
 
   var $progress = $('<div class="progress" ></div>').appendTo($container);
   var $progressBar = $(
@@ -79,11 +79,16 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
   };
 
   $element.on('resizestart', function(e) {
+    $overlay.css('display', 'block');
+    $overlay[0].offsetWidth; // reflow for transition
     $overlay.css('opacity', '1');
   });
   $element.on('resizeend', function(e) {
     target.scheduleRedraw()
       .then(function() {
+        $overlay.one('transitionend', function() {
+          $overlay.css('display', 'none');
+        });
         $overlay.css('opacity', '0');
       });
   });
@@ -99,6 +104,15 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
     endTimeout = setTimeout(function() {
       endTimeout = null;
       clearInterval(progressInterval);
+
+      $overlay.one('transitionend', function() {
+        $overlay.css('display', 'none');
+      });
+      $overlay.css('opacity', 0);
+
+      $container.one('transitionend', function() {
+        $container.css('display', 'none');
+      });
       $container.css('opacity', 0);
       $progressBar.css('width', '100%');
     }, 500);
@@ -120,6 +134,13 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
         'transition': 'none'
       });
       $progressBar.css('width', '0');
+
+      $overlay.css('display', 'block');
+      $overlay[0].offsetWidth; // reflow for transition
+      $overlay.css('opacity', '1');
+
+      $container.css('display', 'block');
+      $container[0].offsetWidth; // reflow for transition
       $container.css('opacity', '1');
 
       progressInterval = setInterval(updateProgress, 500)
