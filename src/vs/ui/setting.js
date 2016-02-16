@@ -174,7 +174,7 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
         }
         if (typeof val == 'string') {
           var obj = JSON.parse(val);
-          return u.reflection.wrap(obj, t);
+          return u.reflection.wrap(/** @type {Object} */ (obj), t);
         }
         return defaultValue();
       } catch (err) {

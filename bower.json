@@ -22,9 +22,9 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "1.4.4",
-    "d3": "3.5.6",
-    "jquery": "2.1.4",
+    "angular": "~1.5.0",
+    "d3": "~3.5.6",
+    "jquery": "~2.2.0",
 
     "utils.js": "git://github.com/florin-chelaru/utils.js.git",
     "threadpool.js": "git://github.com/florin-chelaru/threadpool.js.git",
@@ -35,8 +35,8 @@
     "google-closure-library": "git://github.com/google/closure-library.git#56712dfced32778fc8435a4bea6a2e422e5f03c1",
     "closure-compiler": "0.2.7",
     "bigwig.js": "git://github.com/florin-chelaru/bigwig.js.git",
-    "angular-bootstrap": "0.14.2",
+    "angular-bootstrap": "~1.1.2",
     "qunit": "1.19.0",
-    "bootstrap": "3.3.6"
+    "bootstrap": "~3.3.6"
   }
 }

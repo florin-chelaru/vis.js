@@ -79,7 +79,7 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
 
   $element.on('resizestart', function(e) {
     $overlay.css('display', 'block');
-    $overlay[0].offsetWidth; // reflow for transition
+    u.reflowForTransition($overlay[0]);
     $overlay.css('opacity', '1');
   });
   $element.on('resizeend', function(e) {
@@ -135,11 +135,11 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
       $progressBar.css('width', '0');
 
       $overlay.css('display', 'block');
-      $overlay[0].offsetWidth; // reflow for transition
+      u.reflowForTransition($overlay[0]);
       $overlay.css('opacity', '1');
 
       $container.css('display', 'block');
-      $container[0].offsetWidth; // reflow for transition
+      u.reflowForTransition($container[0]);
       $container.css('opacity', '1');
 
       progressInterval = setInterval(updateProgress, 500)

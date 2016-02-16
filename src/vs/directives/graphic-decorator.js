@@ -97,4 +97,4 @@ vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attr
  * @param {Object.<string, *>} options
  * @returns {vs.ui.Decorator}
  */
-vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) { throw new u.AbstractMethodException(); };
+vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) { throw new u.AbstractMethodException('Method not implemented'); };

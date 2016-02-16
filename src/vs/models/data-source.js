@@ -206,7 +206,7 @@ vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
   var ret = this;
   return new Promise(function(resolve, reject) {
     self['ready'].then(function() {
-      u.async.each(queries, function(query) {
+      u.async.each(/** @type {Array.<vs.models.Query>} */ (queries), function(query) {
         return new Promise(function(itResolve, itReject) {
           vs.models.DataSource.singleQuery(ret, query)
             .then(function (data) { ret = data; itResolve(); }, itReject);
