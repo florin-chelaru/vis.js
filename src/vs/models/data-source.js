@@ -5,9 +5,7 @@
  */
 
 goog.provide('vs.models.DataSource');
-goog.provide('vs.models.DataRow');
 
-goog.require('vs.models.DataArray');
 goog.require('vs.models.Query');
 
 /**
@@ -25,24 +23,6 @@ vs.models.DataSource = function() {
    * @private
    */
   this._state = null;
-
-  /**
-   * @type {Object.<string, number>}
-   * @private
-   */
-  this._valsIndexMap = null;
-
-  /**
-   * @type {Object.<string, number>}
-   * @private
-   */
-  this._rowsIndexMap = null;
-
-  /**
-   * @type {Object.<string, number>}
-   * @private
-   */
-  this._colsIndexMap = null;
 
   /**
    * @type {u.Event.<vs.models.DataSource>}
@@ -67,18 +47,6 @@ vs.models.DataSource = function() {
    * @private
    */
   this._isReady = null;
-
-  /**
-   * @type {Array.<vs.models.DataRow>}
-   * @private
-   */
-  this._dataRowArray = null;
-
-  /**
-   * @type {u.EventListener.<vs.models.DataSource>}
-   * @private
-   */
-  this._dataRowArrayChangedListener = null;
 };
 
 /**
@@ -88,11 +56,10 @@ vs.models.DataSource = function() {
 vs.models.DataSource.prototype.id;
 
 /**
- * Two data sources are identical if their id + state are identical
  * @type {string}
- * @name vs.models.DataSource#state
+ * @name vs.models.DataSource#label;
  */
-vs.models.DataSource.prototype.state;
+vs.models.DataSource.prototype.label;
 
 /**
  * @type {Array.<vs.models.Query>}
@@ -101,34 +68,22 @@ vs.models.DataSource.prototype.state;
 vs.models.DataSource.prototype.query;
 
 /**
- * @type {number}
- * @name vs.models.DataSource#nrows
+ * @type {Array.<{label: string, type: (string|undefined), boundaries: (undefined|{min:number, max:number})}>}
+ * @name vs.models.DataSource#rowMetadata
  */
-vs.models.DataSource.prototype.nrows;
+vs.models.DataSource.prototype.rowMetadata;
 
 /**
- * @type {number}
- * @name vs.models.DataSource#ncols
+ * @type {Array.<Object>}
+ * @name vs.models.DataSource#d
  */
-vs.models.DataSource.prototype.ncols;
+vs.models.DataSource.prototype.d;
 
 /**
- * @type {Array.<vs.models.DataArray>}
- * @name vs.models.DataSource#rows
+ * @type {Object}
+ * @name vs.models.DataSource#metadata
  */
-vs.models.DataSource.prototype.rows;
-
-/**
- * @type {Array.<vs.models.DataArray>}
- * @name vs.models.DataSource#cols
- */
-vs.models.DataSource.prototype.cols;
-
-/**
- * @type {Array.<vs.models.DataArray>}
- * @name vs.models.DataSource#vals
- */
-vs.models.DataSource.prototype.vals;
+vs.models.DataSource.prototype.metadata;
 
 /**
  * @type {Promise}
@@ -159,17 +114,6 @@ Object.defineProperties(vs.models.DataSource.prototype, {
     get: /** @type {function (this:vs.models.DataSource)} */ (function() {
       if (!this._id) { this._id = u.generatePseudoGUID(6); }
       return this._id;
-    })
-  },
-  'state': {
-    get: /** @type {function (this:vs.models.DataSource)} */ (function() {
-      if (!this._state) {
-        this._state = u.generatePseudoGUID(6);
-        this['changing'].addListener(function() {
-          this._state = u.generatePseudoGUID(6);
-        }, this);
-      }
-      return this._state;
     })
   },
   'changed': {
@@ -215,12 +159,12 @@ vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
         .then(function() {
           if (copy) { resolve(ret); }
           else {
+            self['id'] = ret['id'];
             self['query'] = ret['query'];
-            self['nrows'] = ret['nrows'];
-            self['ncols'] = ret['ncols'];
-            self['rows'] = ret['rows'];
-            self['cols'] = ret['cols'];
-            self['vals'] = ret['vals'];
+            self['rowMetadata'] = ret['rowMetadata'];
+            self['d'] = ret['d'];
+            self['metadata'] = ret['metadata'];
+            self['label'] = ret['label'];
             resolve(self);
             self['changed'].fire(self);
           }
@@ -249,28 +193,13 @@ vs.models.DataSource.singleQuery = function(data, q) {
   var ret = data;
   return new Promise(function(resolve, reject) {
     try {
-      /**
-       * @type {vs.models.DataArray}
-       */
-      var targetArr = null;
-      switch (q['target']) {
-        case vs.models.Query.Target['VALS']:
-          targetArr = q['targetLabel'] != undefined ? ret.getVals(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.nrows * ret.ncols));
-          break;
-        case vs.models.Query.Target['ROWS']:
-          targetArr = q['targetLabel'] != undefined ? ret.getRow(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.nrows));
-          break;
-        case vs.models.Query.Target['COLS']:
-          targetArr = q['targetLabel'] != undefined ? ret.getCol(q['targetLabel']) : new vs.models.DataArray(u.array.range(ret.ncols));
-          break;
-      }
+      /** @type {Array} */
+      var targetArr = data['d'];
 
-      /** @type {Array.<number>} */
-      var initialIndices = q['targetLabel'] != undefined ? u.array.range(targetArr['d'].length) : targetArr['d'];
-      var indices = initialIndices
-        .filter(function (i) {
+      var filtered = targetArr
+        .filter(function (record, i) {
           var test = true;
-          var item = targetArr['d'][i];
+          var item = q['target'] != undefined ? record[q['target']] : i;
 
           try {
             switch (q['test']) {
@@ -295,6 +224,9 @@ vs.models.DataSource.singleQuery = function(data, q) {
               case vs.models.Query.Test['IN']:
                 test = (item in q['testArgs']);
                 break;
+              case vs.models.Query.Test['DEFINED']:
+                test = (item !== undefined);
+                break;
               default:
                 test = false;
                 break;
@@ -306,80 +238,14 @@ vs.models.DataSource.singleQuery = function(data, q) {
           return (!q['negate'] && test) || (q['negate'] && !test);
         });
 
-      switch (q['target']) {
-        case vs.models.Query.Target['ROWS']:
-          ret = u.reflection.wrap({
-            'query': ret['query'].concat([q]),
-            'nrows': indices.length,
-            'ncols': ret['ncols'],
-            'rows': ret['rows'].map(function (arr) {
-              return new vs.models.DataArray(
-                indices.map(function (i) {
-                  return arr['d'][i]
-                }),
-                arr['label'],
-                arr['boundaries']);
-            }),
-            'cols': ret['cols'],
-            'vals': ret['vals'].map(function (arr) {
-              return new vs.models.DataArray(
-                u.array.range(ret['ncols']).map(function (j) {
-                  return indices.map(function (i) {
-                    return arr['d'][j * ret['nrows'] + i];
-                  })
-                }).reduce(function (arr1, arr2) {
-                  return arr1.concat(arr2);
-                }),
-                arr['label'],
-                arr['boundaries']);
-            })
-          }, vs.models.DataSource);
-          break;
-
-        case vs.models.Query.Target['COLS']:
-          ret = u.reflection.wrap({
-            'query': ret['query'].concat([q]),
-            'nrows': ret['nrows'],
-            'ncols': indices.length,
-            'rows': ret['rows'],
-            'cols': ret['cols'].map(function (arr) {
-              return new vs.models.DataArray(
-                indices.map(function (i) {
-                  return arr['d'][i]
-                }),
-                arr['label'],
-                arr['boundaries']);
-            }),
-            'vals': ret['vals'].map(function (arr) {
-              return new vs.models.DataArray(
-                indices.map(function (i) {
-                  return arr['d'].slice(i * ret['nrows'], (i + 1) * ret['nrows']);
-                }).reduce(function (arr1, arr2) {
-                  return arr1.concat(arr2);
-                }),
-                arr['label'],
-                arr['boundaries']);
-            })
-          }, vs.models.DataSource);
-          break;
-
-        case vs.models.Query.Target['VALS']:
-          ret = u.reflection.wrap({
-            'query': ret['query'].concat([q]),
-            'nrows': ret['nrows'],
-            'ncols': ret['ncols'],
-            'rows': ret['rows'],
-            'cols': ret['cols'],
-            'vals': ret['vals'].map(function (arr) {
-              var filtered = u.array.fill(arr['d'].length, undefined);
-              indices.forEach(function (i) {
-                filtered[i] = arr['d'][i];
-              });
-              return new vs.models.DataArray(filtered, arr['label'], arr['boundaries']);
-            })
-          }, vs.models.DataSource);
-          break;
-      }
+      ret = u.reflection.wrap({
+        'id': ret['id'].concat([q]),
+        'query': ret['query'].concat([q]),
+        'rowMetadata': ret['rowMetadata'],
+        'metadata': ret['metadata'],
+        'd': filtered,
+        'label': ret['label']
+      }, vs.models.DataSource);
 
       resolve(ret);
     } catch (err) {
@@ -389,204 +255,36 @@ vs.models.DataSource.singleQuery = function(data, q) {
 };
 
 /**
- * @param {string} label
- * @returns {vs.models.DataArray}
- */
-vs.models.DataSource.prototype.getVals = function(label) {
-  this._calcValsMap();
-  return this['vals'][this._valsIndexMap[label]];
-};
-
-/**
- * @param {string} label
- * @returns {vs.models.DataArray}
- */
-vs.models.DataSource.prototype.getRow = function(label) {
-  this._calcRowsMap();
-  return this['rows'][this._rowsIndexMap[label]];
-};
-
-/**
- * @param {string} label
- * @returns {vs.models.DataArray}
- */
-vs.models.DataSource.prototype.getCol = function(label) {
-  this._calcColsMap();
-  return this['cols'][this._colsIndexMap[label]];
-};
-
-/**
- * @param {string} label
- * @returns {number}
- */
-vs.models.DataSource.prototype.valsIndex = function(label) {
-  this._calcValsMap();
-  return this._valsIndexMap[label];
-};
-
-/**
- * @param {string} label
- * @returns {number}
- */
-vs.models.DataSource.prototype.colIndex = function(label) {
-  this._calcColsMap();
-  return this._colsIndexMap[label];
-};
-
-/**
- * @param {string} label
- * @returns {number}
- */
-vs.models.DataSource.prototype.rowIndex = function(label) {
-  this._calcRowsMap();
-  return this._rowsIndexMap[label];
-};
-
-/**
- * @private
- */
-vs.models.DataSource.prototype._calcValsMap = function() {
-  if (!this._valsIndexMap) {
-    var map = {};
-    this['vals'].forEach(function(d, i) {
-      map[d['label']] = i;
-    });
-    this._valsIndexMap = map;
-  }
-};
-
-/**
- * @private
- */
-vs.models.DataSource.prototype._calcColsMap = function() {
-  if (!this._colsIndexMap) {
-    var map = {};
-    this['cols'].forEach(function(d, i) {
-      map[d['label']] = i;
-    });
-    this._colsIndexMap = map;
-  }
-};
-
-/**
- * @private
- */
-vs.models.DataSource.prototype._calcRowsMap = function() {
-  if (!this._rowsIndexMap) {
-    var map = {};
-    this['rows'].forEach(function(d, i) {
-      map[d['label']] = i;
-    });
-    this._rowsIndexMap = map;
-  }
-};
-
-/**
  * @returns {{query: *, nrows: *, ncols: *, rows: *, cols: *, vals: *, isReady: *}}
  */
 vs.models.DataSource.prototype.raw = function() {
   return {
+    'id': this['id'],
+    'label': this['label'],
     'query': this['query'],
-    'nrows': this['nrows'],
-    'ncols': this['ncols'],
-    'rows': this['rows'],
-    'cols': this['cols'],
-    'vals': this['vals'],
-    'isReady': this['isReady']
+    'rowMetadata': this['rowMetadata'],
+    'metadata': this['metadata'],
+    'd': this['d']
   };
 };
 
 /**
- * @returns {Array.<vs.models.DataRow>}
+ * @param {string} label
+ * @returns {{label: string, type: (string|undefined), boundaries: (undefined|{min:number, max:number})}|null}
  */
-vs.models.DataSource.prototype.asDataRowArray = function() {
-  if (this._dataRowArrayChangedListener == undefined) {
-    this._dataRowArrayChangedListener = this['changed'].addListener(function() { this._dataRowArray = null; }, this);
-  }
-  if (this._dataRowArray == undefined) {
-    var self = this;
-    this._dataRowArray = u.array.range(this['nrows']).map(function(i) { return new vs.models.DataRow(self, i); });
-  }
-
-  return this._dataRowArray;
+vs.models.DataSource.prototype.getRowMetadata = function(label) {
+  var metadata;
+  var some = this['rowMetadata'].some(function(m) {
+    metadata = m;
+    return m['label'] == label;
+  });
+  return some ? metadata : null;
 };
 
 /**
- * @param {number} i
- * @returns {string}
+ * @param {Array.<vs.models.DataSource>} datas
+ * @returns {Array.<string>}
  */
-vs.models.DataSource.prototype.key = function(i) {
-  return '' + this['id'] + this['state'] + i;
+vs.models.DataSource.combinedArrayMetadata = function(datas) {
+  return u.array.uniqueFast(datas.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
 };
-
-/**
- * @param {vs.models.DataRow} d
- * @param {number} [i]
- * @returns {string}
- */
-vs.models.DataSource.key = function(d, i) {
-  return d['data'].key(d['index']);
-};
-
-/**
- * @param {vs.models.DataSource} data
- * @param {number} index
- * @constructor
- */
-vs.models.DataRow = function(data, index) {
-  /**
-   * @type {vs.models.DataSource}
-   * @private
-   */
-  this._data = data;
-
-  /**
-   * @type {number}
-   * @private
-   */
-  this._index = index;
-};
-
-/**
- * @type {number}
- * @name vs.models.DataRow#index
- */
-vs.models.DataRow.prototype.index;
-
-/**
- * @type {vs.models.DataSource}
- * @name vs.models.DataRow#data
- */
-vs.models.DataRow.prototype.data;
-
-Object.defineProperties(vs.models.DataRow.prototype, {
-  'index': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._index; })},
-  'data': { get: /** @type {function (this:vs.models.DataRow)} */ (function() { return this._data; })}
-});
-
-/**
- * @param {string|number} colIndexOrLabel
- * @param {string} [valsLabel]
- * @returns {number}
- */
-vs.models.DataRow.prototype.val = function(colIndexOrLabel, valsLabel) {
-  /**
-   * @type {vs.models.DataArray}
-   */
-  var vals = valsLabel ? this['data'].getVals(valsLabel) : this['data']['vals'][0];
-
-  var index = (typeof colIndexOrLabel == 'number') ? colIndexOrLabel : this['data'].colIndex(colIndexOrLabel);
-
-  return vals['d'][index * this['data']['nrows'] + this['index']];
-};
-
-/**
- * @param label
- * @returns {*}
- */
-vs.models.DataRow.prototype.info = function(label) {
-  var arr = this['data'].getRow(label);
-  if (!arr) { return undefined; }
-  return arr['d'][this['index']];
-};
-

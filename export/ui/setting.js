@@ -12,11 +12,11 @@ goog.exportProperty(vs.ui.Setting.prototype, 'possibleValues', vs.ui.Setting.pro
 
 goog.exportSymbol('vs.ui.Setting.Type', vs.ui.Setting.Type);
 
-goog.exportProperty(vs.ui.Setting, 'valueBoundaries', vs.ui.Setting.valueBoundaries);
-goog.exportProperty(vs.ui.Setting, 'rowBoundaries', vs.ui.Setting.rowBoundaries);
-goog.exportProperty(vs.ui.Setting, 'firstColsLabel', vs.ui.Setting.firstColsLabel);
+goog.exportProperty(vs.ui.Setting, 'boundaries', vs.ui.Setting.boundaries);
+goog.exportProperty(vs.ui.Setting, 'xBoundaries', vs.ui.Setting.xBoundaries);
+goog.exportProperty(vs.ui.Setting, 'yBoundaries', vs.ui.Setting.yBoundaries);
+goog.exportProperty(vs.ui.Setting, 'firstColsId', vs.ui.Setting.firstColsId);
 goog.exportProperty(vs.ui.Setting, 'firstRowsLabel', vs.ui.Setting.firstRowsLabel);
-goog.exportProperty(vs.ui.Setting, 'firstValsLabel', vs.ui.Setting.firstValsLabel);
 goog.exportProperty(vs.ui.Setting, 'xScale', vs.ui.Setting.xScale);
 goog.exportProperty(vs.ui.Setting, 'yScale', vs.ui.Setting.yScale);
 

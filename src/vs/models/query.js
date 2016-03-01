@@ -85,5 +85,6 @@ vs.models.Query.Test = {
   'GREATER_OR_EQUALS': '>=',
   'LESS_OR_EQUALS': '<=',
   'CONTAINS': 'contains',
-  'IN': 'in'
+  'IN': 'in',
+  'DEFINED': 'defined'
 };

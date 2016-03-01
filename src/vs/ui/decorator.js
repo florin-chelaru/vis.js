@@ -97,7 +97,7 @@ vs.ui.Decorator.prototype.$attrs;
 vs.ui.Decorator.prototype.$targetElement;
 
 /**
- * @type {vs.models.DataSource}
+ * @type {Array.<vs.models.DataSource>}
  * @name vs.ui.Decorator#data
  */
 vs.ui.Decorator.prototype.data;

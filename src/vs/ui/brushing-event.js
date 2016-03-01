@@ -12,11 +12,11 @@ goog.require('vs.models.DataSource');
 /**
  * @param {vs.ui.VisHandler} source
  * @param {vs.models.DataSource} data
- * @param {vs.models.DataRow} selectedRow
+ * @param {Object} item
  * @param {vs.ui.BrushingEvent.Action} action
  * @constructor
  */
-vs.ui.BrushingEvent = function(source, data, selectedRow, action) {
+vs.ui.BrushingEvent = function(source, data, item, action) {
   /**
    * @type {vs.ui.VisHandler}
    */
@@ -28,9 +28,9 @@ vs.ui.BrushingEvent = function(source, data, selectedRow, action) {
   this['data'] = data;
 
   /**
-   * @type {vs.models.DataRow}
+   * @type {number}
    */
-  this['selectedRow'] = selectedRow;
+  this['item'] = item;
 
   /**
    * @type {vs.ui.BrushingEvent.Action}

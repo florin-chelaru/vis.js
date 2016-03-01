@@ -108,7 +108,7 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
 /**
  * @param {number} x
  * @param {number} y
- * @returns {Array.<vs.models.DataRow>}
+ * @returns {Array.<Object>}
  */
 vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) { return []; };
 

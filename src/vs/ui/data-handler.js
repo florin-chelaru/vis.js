@@ -11,15 +11,24 @@ goog.require('vs.ui.VisualContext');
 goog.require('vs.models.Query');
 
 /**
- * @param {vs.ui.DataHandler|{data: vs.models.DataSource, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
+ * @param {vs.ui.DataHandler|{data: Array.<vs.models.DataSource>, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
  * @constructor
  */
 vs.ui.DataHandler = function(options) {
   /**
-   * @type {vs.models.DataSource}
+   * @type {Array.<vs.models.DataSource>}
    * @private
    */
   this._data = options['data'];
+
+  /**
+   * @type {u.Event.<vs.models.DataSource>}
+   * @private
+   */
+  this._dataChanged = new u.Event();
+
+  var listener = new u.EventListener(function(d) { this._dataChanged.fire(d); }, this);
+  this._data.forEach(function(d) { d['changed'].addListener(listener); });
 
   /**
    * @type {Array.<vs.ui.VisualContext>}
@@ -47,7 +56,7 @@ vs.ui.DataHandler = function(options) {
 vs.ui.DataHandler.prototype.name;
 
 /**
- * @type {vs.models.DataSource}
+ * @type {Array.<vs.models.DataSource>}
  * @name vs.ui.DataHandler#data
  */
 vs.ui.DataHandler.prototype.data;
@@ -78,7 +87,7 @@ Object.defineProperties(vs.ui.DataHandler.prototype, {
     set: /** @type {function (this:vs.ui.DataHandler)} */ (function(value) { this._data = value; })
   },
 
-  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this['data']['changed']; })},
+  'dataChanged': { get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._dataChanged; })},
 
   'children': {
     get: /** @type {function (this:vs.ui.DataHandler)} */ (function() { return this._children; })
@@ -94,5 +103,5 @@ Object.defineProperties(vs.ui.DataHandler.prototype, {
  * @returns {Promise.<vs.models.DataSource>}
  */
 vs.ui.DataHandler.prototype.query = function(queries) {
-  return this.data.applyQuery(queries);
+  return this._data.applyQuery(queries);
 };

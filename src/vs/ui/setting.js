@@ -16,11 +16,11 @@ goog.require('vs.models.Margins');
  * @param {{
  *  key: string,
  *  type: (vs.ui.Setting.Type|string),
- *  defaultValue: (function(Object.<string, *>, *, vs.models.DataSource, Object.<string, vs.ui.Setting>)|*),
+ *  defaultValue: (function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*),
  *  label: (string|undefined),
  *  template: (string|undefined),
  *  hidden: (boolean|undefined),
- *  possibleValues: (Array|function(Object.<string, *>, *, vs.models.DataSource, Object.<string, vs.ui.Setting>)|undefined)
+ *  possibleValues: (Array|function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|undefined)
  * }} args
  * @constructor
  */
@@ -36,7 +36,7 @@ vs.ui.Setting = function(args) { //key, type, defaultValue, label, template, hid
   this['type'] = args['type'];
 
   /**
-   * @type {function(Object.<string, *>, *, vs.models.DataSource, Object.<string, vs.ui.Setting>)|*}
+   * @type {function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*}
    */
   this['defaultValue'] = args['defaultValue'];
 
@@ -46,7 +46,7 @@ vs.ui.Setting = function(args) { //key, type, defaultValue, label, template, hid
   this['label'] = args['label'] || this['key'];
 
   /**
-   * @type {Array|function(Object.<string, *>, *, (vs.models.DataSource|undefined), (Object.<string, vs.ui.Setting>|undefined))|null}
+   * @type {Array|function(Object.<string, *>, *, (Array.<vs.models.DataSource>|undefined), (Object.<string, vs.ui.Setting>|undefined))|null}
    * @private
    */
   this._possibleValues = args['possibleValues'] || null;
@@ -66,7 +66,7 @@ vs.ui.Setting = function(args) { //key, type, defaultValue, label, template, hid
  * Extracts value from a set of raw options and element attributes
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
@@ -186,7 +186,7 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
@@ -199,13 +199,13 @@ vs.ui.Setting.prototype.possibleValues = function(options, $attrs, data, setting
 
   switch (this['type']) {
     case vs.ui.Setting.Type['DATA_ROW_LABEL']:
-      return data['rows'].map(/** @param {vs.models.DataArray} row */ function(row) { return row['label'] });
+      return u.array.uniqueFast(data.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
 
     case vs.ui.Setting.Type['DATA_COL_LABEL']:
-      return data['cols'].map(/** @param {vs.models.DataArray} col */ function(col) { return col['label'] });
+      return data.map(function(d) { return d['label']; });
 
-    case vs.ui.Setting.Type['DATA_VAL_LABEL']:
-      return data['vals'].map(/** @param {vs.models.DataArray} arr */ function(arr) { return arr['label'] });
+    case vs.ui.Setting.Type['DATA_COL_ID']:
+      return data.map(function(d) { return d['id']; });
 
     default: return null;
   }
@@ -222,8 +222,8 @@ vs.ui.Setting.Type = {
   'OBJECT': 'object',
   'CATEGORICAL': 'categorical',
   'DATA_COL_LABEL': 'dataColLbl',
+  'DATA_COL_ID': 'dataColId',
   'DATA_ROW_LABEL': 'dataRowLbl',
-  'DATA_VAL_LABEL': 'dataValLbl',
   'FUNCTION': 'function'
 };
 
@@ -233,21 +233,59 @@ vs.ui.Setting.Type = {
 vs.ui.Setting['DEFAULT'] = 'default';
 
 /**
+ * @param {Array.<vs.models.DataSource>} data
+ */
+vs.ui.Setting.getAllRowMetadata = function(data) {
+  return u.array.uniqueFast(data.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
+};
+
+/**
+ * @param {string} dep
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
-vs.ui.Setting.valueBoundaries = function (options, $attrs, data, settings) {
+vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
   var boundaries;
+  if (!settings || !(dep in settings)) { throw new vs.ui.UiException('Missing dependency for "' + dep + '" in the "boundaries" defaultValue function'); }
 
-  if (!settings || !('vals' in settings)) { throw new vs.ui.UiException('Missing dependency for "vals" in the "boundaries" defaultValue function'); }
+  var depMetadata = /** @type {string} */ (settings[dep].getValue(options, $attrs, data, settings));
 
-  var valsArr = data.getVals(/** @type {string} */ (settings['vals'].getValue(options, $attrs, data, settings)));
-  boundaries = valsArr['boundaries'] || new vs.models.Boundaries(
-      Math.min.apply(null, valsArr['d']),
-      Math.max.apply(null, valsArr['d']));
+  var min, max;
+  if (depMetadata) {
+    data.forEach(function (d) {
+      var m = d.getRowMetadata(depMetadata);
+      if (m == null || !('boundaries' in m)) { return; }
+      if (min == undefined || min > m['boundaries']['min']) { min = m['boundaries']['min']; }
+      if (max == undefined || max < m['boundaries']['max']) { max = m['boundaries']['max']; }
+    });
+
+    if (min != undefined && max != undefined) {
+      boundaries = new vs.models.Boundaries(min, max);
+    }
+  }
+
+  if (boundaries == undefined) {
+    var values = data.map(function(d) {
+      return d['d'].map(function(record) { return record[depMetadata]; });
+    });
+    min = values.reduce(function(arr1, arr2) {
+      return Math.min(Math.min.apply(null, arr1), Math.min.apply(null, arr2));
+    });
+
+    max = values.reduce(function(arr1, arr2) {
+      return Math.max(Math.max.apply(null, arr1), Math.max.apply(null, arr2));
+    });
+    if (min != undefined && max != undefined) {
+      boundaries = new vs.models.Boundaries(min, max);
+    }
+  }
+
+  if (boundaries == undefined) {
+    throw new vs.ui.UiException('Boundaries could not be determined');
+  }
 
   return boundaries;
 };
@@ -255,74 +293,51 @@ vs.ui.Setting.valueBoundaries = function (options, $attrs, data, settings) {
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
-vs.ui.Setting.rowBoundaries = function (options, $attrs, data, settings) {
-  var boundaries;
-
-  if (!settings || !('rows' in settings)) { throw new vs.ui.UiException('Missing dependency for "row" in the "boundaries" defaultValue function'); }
-
-  var min, max;
-  var rows = settings['rows'].getValue(options, $attrs, data, settings);
-
-  rows.forEach(function(label) {
-    var row = data.getRow(label);
-    if (!row['boundaries'] && !data['nrows']) {
-      return;
-    }
-    var b = row['boundaries'] || new vs.models.Boundaries(
-        Math.min.apply(null, row['d']),
-        Math.max.apply(null, row['d']));
-    if (min == undefined || b['min'] < min) { min = b['min']; }
-    if (max == undefined || b['max'] > max) { max = b['max']; }
-  });
-
-  if (min == undefined && max == undefined) { min = max = 0; }
-  if (min == undefined) { min = max; }
-  if (max == undefined) { max = min; }
-
-  return new vs.models.Boundaries(min, max);
+vs.ui.Setting.xBoundaries = function (options, $attrs, data, settings) {
+  return vs.ui.Setting.boundaries('x', options, $attrs, data, settings);
 };
 
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
-vs.ui.Setting.firstColsLabel = function (options, $attrs, data, settings) {
-  return data['cols'][0]['label']
+vs.ui.Setting.yBoundaries = function (options, $attrs, data, settings) {
+  return vs.ui.Setting.boundaries('y', options, $attrs, data, settings);
 };
 
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ */
+vs.ui.Setting.firstColsId = function (options, $attrs, data, settings) {
+  return data.length ? data[0]['id'] : null;
+};
+
+/**
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
 vs.ui.Setting.firstRowsLabel = function (options, $attrs, data, settings) {
-  return data['rows'][0]['label']
+  return data.length ? data[0]['rowMetadata'][0]['label'] : null;
 };
 
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
- * @param {Object.<string, vs.ui.Setting>} [settings]
- * @returns {*}
- */
-vs.ui.Setting.firstValsLabel = function (options, $attrs, data, settings) {
-  return data['vals'][0]['label'];
-};
-
-/**
- * @param {Object.<string, *>} options
- * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
@@ -346,7 +361,7 @@ vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
 /**
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
- * @param {vs.models.DataSource} [data]
+ * @param {Array.<vs.models.DataSource>} [data]
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
@@ -371,20 +386,21 @@ vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
  * @const {Object.<string, vs.ui.Setting>}
  */
 vs.ui.Setting.PredefinedSettings = {
-  'col': new vs.ui.Setting({'key':'col', 'type':vs.ui.Setting.Type['DATA_COL_LABEL'], 'defaultValue':vs.ui.Setting.firstColsLabel, 'label':'column', 'template':'_categorical.html'}),
-  'row': new vs.ui.Setting({'key':'row', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'row', 'template':'_categorical.html'}),
+  'col': new vs.ui.Setting({'key':'col', 'type':vs.ui.Setting.Type['DATA_COL_ID'], 'defaultValue':vs.ui.Setting.firstColsId, 'label':'column', 'template':'_categorical.html'}),
 
-  'vals': new vs.ui.Setting({'key':'vals', 'type':vs.ui.Setting.Type['DATA_VAL_LABEL'], 'defaultValue':vs.ui.Setting.firstValsLabel, 'label':'values set', 'template':'_categorical.html'}),
-  'xBoundaries': new vs.ui.Setting({'key':'xBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.valueBoundaries, 'label':'x boundaries', 'template':'_boundaries.html'}),
-  'yBoundaries': new vs.ui.Setting({'key':'yBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.valueBoundaries, 'label':'y boundaries', 'template':'_boundaries.html'}),
+  'x': new vs.ui.Setting({'key':'x', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'x values', 'template':'_categorical.html'}),
+  'y': new vs.ui.Setting({'key':'y', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'y values', 'template':'_categorical.html'}),
+  'xBoundaries': new vs.ui.Setting({'key':'xBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.xBoundaries, 'label':'x boundaries', 'template':'_boundaries.html'}),
+  'yBoundaries': new vs.ui.Setting({'key':'yBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.yBoundaries, 'label':'y boundaries', 'template':'_boundaries.html'}),
 
   // TODO: Margins + width and height could well go in a single template that looks pretty. For the future.
   'margins': new vs.ui.Setting({'key':'margins', 'type':'vs.models.Margins', 'defaultValue':new vs.models.Margins(0, 0, 0, 0), 'template':'_margins.html'}),
   'width': new vs.ui.Setting({'key':'width', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
   'height': new vs.ui.Setting({'key':'height', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
 
-  'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return u.array.range(data['ncols']); }, 'label':'columns', 'template':'_multiselect-tbl.html'}),
-  'rows': new vs.ui.Setting({'key':'rows', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return u.array.range(data['nrows']); }, 'label':'rows', 'template':'_multiselect-tbl.html'}),
+  'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return data.map(function(d) { return d['id']; }); }, 'label':'columns', 'template':'_multiselect-tbl.html'}),
+  'xs': new vs.ui.Setting({'key':'xs', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
+  'ys': new vs.ui.Setting({'key':'ys', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
 
   'rowsOrderBy': new vs.ui.Setting({'key':'rowsOrderBy', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'order rows by', 'template':'_categorical.html'}),
   'rowsScale': new vs.ui.Setting({'key':'rowsScale', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'scale rows axis', 'template':'_switch.html'}),

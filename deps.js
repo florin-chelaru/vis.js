@@ -18,8 +18,7 @@ goog.addDependency('../../../../src/vs/linking/key.js', ['vs.linking.Key'], [], 
 goog.addDependency('../../../../src/vs/linking/link-service.js', ['vs.linking.LinkService'], ['vs.linking.Link', 'vs.models.DataSource'], false);
 goog.addDependency('../../../../src/vs/linking/link.js', ['vs.linking.Link'], ['vs.linking.Key', 'vs.models.DataSource'], false);
 goog.addDependency('../../../../src/vs/models/boundaries.js', ['vs.models.Boundaries'], [], false);
-goog.addDependency('../../../../src/vs/models/data-array.js', ['vs.models.DataArray'], ['vs.models.Boundaries'], false);
-goog.addDependency('../../../../src/vs/models/data-source.js', ['vs.models.DataRow', 'vs.models.DataSource'], ['vs.models.DataArray', 'vs.models.Query'], false);
+goog.addDependency('../../../../src/vs/models/data-source.js', ['vs.models.DataSource'], ['vs.models.Query'], false);
 goog.addDependency('../../../../src/vs/models/genomic-range-query.js', ['vs.models.GenomicRangeQuery'], ['vs.models.ModelsException', 'vs.models.Query'], false);
 goog.addDependency('../../../../src/vs/models/margins.js', ['vs.models.Margins'], [], false);
 goog.addDependency('../../../../src/vs/models/models-exception.js', ['vs.models.ModelsException'], [], false);
@@ -45,4 +44,4 @@ goog.addDependency('../../../../src/vs/ui/ui-exception.js', ['vs.ui.UiException'
 goog.addDependency('../../../../src/vs/ui/vis-handler.js', ['vs.ui.VisHandler'], ['vs.async.Task', 'vs.async.TaskService', 'vs.models.DataSource', 'vs.ui.Setting'], false);
 goog.addDependency('../../../../src/vs/ui/visual-context.js', ['vs.ui.VisualContext'], [], false);
 goog.addDependency('../../../../src/vs/ui/visualization-factory.js', ['vs.ui.VisualizationFactory'], ['vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.models.DataSource', 'vs.ui.UiException', 'vs.ui.VisHandler'], false);
-goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.directives.Axis', 'vs.directives.Brushing', 'vs.directives.DataContext', 'vs.directives.Grid', 'vs.directives.LoadingDecorator', 'vs.directives.Movable', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.models.DataRow', 'vs.models.GenomicRangeQuery', 'vs.models.Transformer', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis', 'vs.ui.svg.SvgVis'], false);
+goog.addDependency('../../../../src/vs/vs.js', ['vs'], ['vs.Configuration', 'vs.async.TaskService', 'vs.async.ThreadPoolService', 'vs.directives.Axis', 'vs.directives.Brushing', 'vs.directives.DataContext', 'vs.directives.Grid', 'vs.directives.LoadingDecorator', 'vs.directives.Movable', 'vs.directives.Resizable', 'vs.directives.Visualization', 'vs.directives.Window', 'vs.models.GenomicRangeQuery', 'vs.models.Transformer', 'vs.ui.VisHandler', 'vs.ui.VisualizationFactory', 'vs.ui.canvas.CanvasVis', 'vs.ui.svg.SvgVis'], false);

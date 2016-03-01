@@ -86,27 +86,6 @@
     </concat>
   </target>
 
-  <!-- CSS -->
-
-  <!--<target name="concat.css" description="Concatenate css files">
-    <echo message="Generating concatenated stylesheet: vis.css" />
-    <concat destfile="${rootpath}/vis.css">
-      <fileset dir="${rootpath}/res/css" includes="*.css" excludes="*.min.css" />
-    </concat>
-  </target>
-
-  <target name="compress.css" depends="concat.css" description="Compress vis.css to vis.min.css">
-    <echo message="Minify vis.css -> vis.min.css" />
-    <java jar="node_modules/yuicompressor/build/yuicompressor-2.4.8.jar" fork="true">
-      <arg value="${rootpath}/vis.css" /> &lt;!&ndash; input path for CSS files &ndash;&gt;
-      &lt;!&ndash;<arg value="-v" />&ndash;&gt; &lt;!&ndash; Turn on verbose &ndash;&gt;
-      <arg value="-o" />
-      <arg value="${rootpath}/vis.min.css" /> &lt;!&ndash; output path for CSS files &ndash;&gt;
-    </java>
-  </target>-->
-
-  <!-- End CSS -->
-
   <target name="compile" depends="deps,concat,concat.externs" description="">
     <local name="outfile"/>
     <property name="outfile" value="${compiledmin}"/>

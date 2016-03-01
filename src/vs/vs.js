@@ -21,7 +21,6 @@ goog.require('vs.ui.canvas.CanvasVis');
 
 goog.require('vs.directives.Visualization');
 
-goog.require('vs.models.DataRow');
 goog.require('vs.models.Transformer');
 goog.require('vs.models.GenomicRangeQuery');
 

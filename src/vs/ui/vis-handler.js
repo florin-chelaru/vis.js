@@ -15,7 +15,7 @@ goog.require('vs.async.TaskService');
 /**
  * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService, threadPool: parallel.ThreadPool}} $ng
  * @param {Object.<string, *>} options
- * @param {vs.models.DataSource} data
+ * @param {Array.<vs.models.DataSource>} data
  * @constructor
  */
 vs.ui.VisHandler = function($ng, options, data) {
@@ -62,7 +62,7 @@ vs.ui.VisHandler = function($ng, options, data) {
   this._options = options;
 
   /**
-   * @type {vs.models.DataSource}
+   * @type {Array.<vs.models.DataSource>}
    * @private
    */
   this._data = data;
@@ -106,6 +106,7 @@ vs.ui.VisHandler = function($ng, options, data) {
   // Redraw if:
 
   // Data changed
+  // Old code. Needs updating if uncomment!
   /*var self = this;
   var onDataChanged = function() {
     self._threadPool.queue(function(thread) {
@@ -135,11 +136,11 @@ vs.ui.VisHandler = function($ng, options, data) {
    */
   this._redrawPromise = Promise.resolve();
 
-  this._data['changed'].addListener(this.scheduleRedraw, this);
+  var self = this;
+  this._data.forEach(function(d) { d['changed'].addListener(self.scheduleRedraw, self); });
 
   // Data ready for the first time
-  var self = this;
-  this._data['ready'].then(function() { self.scheduleRedraw(); });
+  Promise.all(this._data.map(function(d) { return d['ready']; })).then(function() { self.scheduleRedraw(); });
 
   // Options changed
   this._$scope.$watch(
@@ -196,7 +197,7 @@ vs.ui.VisHandler.prototype.$attrs;
 vs.ui.VisHandler.prototype.options;
 
 /**
- * @type {vs.models.DataSource}
+ * @type {Array.<vs.models.DataSource>}
  * @name vs.ui.VisHandler#data
  */
 vs.ui.VisHandler.prototype.data;
@@ -339,12 +340,12 @@ vs.ui.VisHandler.prototype.scheduleRedraw = function() {
 
 /**
  * @param {HTMLElement} viewport Can be canvas, svg, etc.
- * @param {vs.models.DataRow} d
+ * @param {Object} d
  */
 vs.ui.VisHandler.prototype.highlightItem = function(viewport, d) {};
 
 /**
  * @param {HTMLElement} viewport Can be canvas, svg, etc.
- * @param {vs.models.DataRow} d
+ * @param {Object} d
  */
 vs.ui.VisHandler.prototype.unhighlightItem = function(viewport, d) {};
