@@ -26,20 +26,17 @@ vs.models.GenomicRangeQuery = function(chr, start, end) {
    */
   this._query = [
     new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'chr',
+      'target': 'chr',
       'test': vs.models.Query.Test['EQUALS'],
       'testArgs': chr
     }),
     new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'start',
+      'target': 'start',
       'test': vs.models.Query.Test['LESS_THAN'],
       'testArgs': end
     }),
     new vs.models.Query({
-      'target': vs.models.Query.Target['ROWS'],
-      'targetLabel': 'end',
+      'target': 'end',
       'test': vs.models.Query.Test['GREATER_OR_EQUALS'],
       'testArgs': start
     })
@@ -105,25 +102,24 @@ vs.models.GenomicRangeQuery.extract = function(query) {
   var bpValidTests = ['<', '>='];
 
   var rowQueries = query.filter(function(q) {
-    if (q['target'] != vs.models.Query.Target['ROWS']) { return false; }
-    if (rowLabels.indexOf(q['targetLabel']) < 0) { return false; }
-    if ((q['targetLabel'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
+    if (rowLabels.indexOf(q['target']) < 0) { return false; }
+    if ((q['target'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
       throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
     }
-    if ((q['targetLabel'] == 'start' || q['targetLabel'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
+    if ((q['target'] == 'start' || q['target'] == 'end') && bpValidTests.indexOf(q['test']) < 0) {
       throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for start/end positions by the bigwig library; supported operations are: ' + JSON.stringify(bpValidTests));
     }
-    if (q['targetLabel'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
+    if (q['target'] == 'start' && (q['test'] == '>=' || (q['test'] == '<' && q['negate']))) {
       throw new vs.models.ModelsException('The only supported test for "start" is "<"');
     }
-    if (q['targetLabel'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
+    if (q['target'] == 'end' && (q['test'] == '<' || (q['test'] == '>=' && q['negate']))) {
       throw new vs.models.ModelsException('The only supported test for "end" is ">="');
     }
     return true;
   });
 
-  var chrQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'chr' && !q['negate']; });
-  var startEndQueries = rowQueries.filter(function(q) { return q['targetLabel'] == 'start' || q['targetLabel'] == 'end' });
+  var chrQueries = rowQueries.filter(function(q) { return q['target'] == 'chr' && !q['negate']; });
+  var startEndQueries = rowQueries.filter(function(q) { return q['target'] == 'start' || q['target'] == 'end' });
   var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
   var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
 
@@ -139,8 +135,8 @@ vs.models.GenomicRangeQuery.extract = function(query) {
 
   var range = rowQueries.length == 0 ? undefined : {
     chr: chrQueries[0]['testArgs'],
-    end: startEndQueries.filter(function(q) { return q['targetLabel'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
-    start: startEndQueries.filter(function(q) { return q['targetLabel'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
+    end: startEndQueries.filter(function(q) { return q['target'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
+    start: startEndQueries.filter(function(q) { return q['target'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
   };
 
   return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);

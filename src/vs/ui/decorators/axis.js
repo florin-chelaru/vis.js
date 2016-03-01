@@ -34,7 +34,7 @@ vs.ui.decorators.Axis.Settings = {
 };
 
 /**
- * @type {{x: string, y: string}}
+ * @enum {string}
  */
 vs.ui.decorators.Axis.Orientation = {
   'x': 'bottom',

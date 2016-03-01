@@ -17,6 +17,7 @@
   <property name="compiledmin" value="vis.min.js"/>
   <property name="genexterns" value="vis.externs.js" />
 
+  <loadfile property="dirstruct" srcfile="vis.dirstruct.js"/>
   <loadfile property="license" srcfile="LICENSE"/>
 
   <target name="deps" description="">
@@ -79,11 +80,38 @@
   </target>
 
   <target name="gen.externs" depends="concat" description="">
-    <copy file="${compiled}" tofile="${genexterns}" force="true" />
+    <!--<exec executable="python" failonerror="true">
+      <arg line="${closurebuilder}"/>
+      <arg line="&#45;&#45;root=&quot;${closure_src}&quot;"/>
+      <arg line="&#45;&#45;root=&quot;${closure_tp_src}&quot;"/>
+      <arg line="&#45;&#45;root=&quot;${src}/vs&quot;"/>
+      <arg line="&#45;&#45;namespace=&quot;vs&quot;"/>
+      <redirector outputproperty="libfiles" errorproperty="depserr">
+        <outputfilterchain>
+          <linecontains negate="true">
+            <contains value="bower_components"/>
+          </linecontains>
+        </outputfilterchain>
+      </redirector>
+    </exec>
+
+    <concat destfile="${genexterns}" fixlastline="yes" eol="lf">
+      <header filtering="no" trimleading="yes">${dirstruct}</header>
+      <filelist files="${libfiles}"/>
+      <filterchain>
+        <replaceregex pattern="\/\*((?!\*\/).)+Created by((?!\*\/).)+\*\/" replace="" flags="gs" byline="false"/>
+      </filterchain>
+    </concat>-->
+    <concat destfile="${genexterns}" fixlastline="yes" eol="lf">
+      <header filtering="no" trimleading="yes">${dirstruct}</header>
+      <path path="${compiled}"/>
+    </concat>
+    <!--<copy file="${compiled}" tofile="${genexterns}" force="true" />-->
 
     <!-- Replace function contents -->
     <replaceregexp file="${genexterns}" replace="\1 {};" byline="false" flags="gs"
-                   match="([\$0-9a-zA-Z\.]+\s=\sfunction\s*?\([\$0-9a-zA-Z\,\s]*\))\s\{(.)*?\n\};" />
+                   match="([\$0-9a-zA-Z\.]+\s=\sfunction\s*?\([\$0-9a-zA-Z\,\s]*\))\s\{(\};|[^\n]+|.+?\n\};)" />
+                   <!--match="([\$0-9a-zA-Z\.]+\s=\sfunction\s*?\([\$0-9a-zA-Z\,\s]*\))\s\{(\};|.+?\n\};)" />-->
 
     <!-- Replace Object.defineProperties blocks -->
     <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
@@ -91,7 +119,7 @@
 
     <!-- Replace enum contents -->
     <replaceregexp file="${genexterns}" replace="\1 {};" byline="false" flags="gs"
-                   match="([\$0-9a-zA-Z\.]+\s=)\s\{(.)*?\n\};" />
+                   match="(\n[\$0-9a-zA-Z\.]+\s=)\s\{(.)*?\n\};" />
 
     <!-- Replace goog.provide/goog.require blocks -->
     <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
@@ -104,6 +132,10 @@
     <!-- Replace Angular blocks: provider/factory/directive -->
     <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
                    match="[\$0-9a-zA-Z\.]+\s*?\.(provider|factory|directive)\(.*?\n\}\]?\);[\n\r]*" />
+
+    <!-- Replace Angular directive link = {}; with link; -->
+    <replaceregexp file="${genexterns}" replace="\1.link;" byline="false" flags="gs"
+                   match="([\$0-9a-zA-Z\.]+?)\.link\s=\s\{\};" />
   </target>
 
   <target name="concat.externs" description="">
@@ -119,23 +151,20 @@
     <local name="outfile"/>
     <property name="outfile" value="${compiledmin}"/>
     <java jar="${compiler}" fork="true" failonerror="true">
-      <arg line="&#45;&#45;compilation_level=${level}"/>
-      <arg line="&#45;&#45;warning_level=VERBOSE"/>
-      <arg line="&#45;&#45;define=goog.DEBUG=false"/>
-      <arg line="&#45;&#45;summary_detail_level=3"/>
-      <arg line="&#45;&#45;language_in=ECMASCRIPT5_STRICT"/>
-      <arg line="&#45;&#45;source_map_format=V3"/>
+      <arg line="--compilation_level=${level}"/>
+      <arg line="--warning_level=VERBOSE"/>
+      <arg line="--define=goog.DEBUG=false"/>
+      <arg line="--summary_detail_level=3"/>
+      <arg line="--language_in=ECMASCRIPT5_STRICT"/>
+      <arg line="--source_map_format=V3"/>
       <arg line="--output_wrapper='(function(){%output%}).call(this); //# sourceMappingURL=${compiledmin}.map'"/>
-      <!--<arg line="&#45;&#45;output_wrapper='%output% //@ sourceMappingURL=${compiledmin}.map'"/>-->
-      <arg line="&#45;&#45;js_output_file=${outfile}"/>
-      <arg line="&#45;&#45;create_source_map=${outfile}.map"/>
-      <arg line="&#45;&#45;manage_closure_dependencies"/>
-      <arg line="&#45;&#45;externs=${rootpath}/externs.js"/>
-      <arg line="&#45;&#45;js ${rootpath}/LICENSE"/>
+      <arg line="--js_output_file=${outfile}"/>
+      <arg line="--create_source_map=${outfile}.map"/>
+      <arg line="--manage_closure_dependencies"/>
+      <arg line="--externs=${rootpath}/externs.js"/>
+      <arg line="--js ${rootpath}/LICENSE"/>
       <arg line="${srcfiles}"/>
       <arg line="${exportfiles}"/>
     </java>
-    <!--<loadfile srcfile="${compiledmin}" property="minimized"/>
-    <concat destfile="${compiledmin}" eol="lf"><header filtering="no" trimleading="yes">${license}</header>${minimized}</concat>-->
   </target>
 </project>

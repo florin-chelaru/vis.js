@@ -24,7 +24,7 @@ goog.require('vs.models.Margins');
  * }} args
  * @constructor
  */
-vs.ui.Setting = function(args) { //key, type, defaultValue, label, template, hidden, possibleValues) {
+vs.ui.Setting = function(args) {
   /**
    * @type {string}
    */

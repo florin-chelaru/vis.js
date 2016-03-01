@@ -143,7 +143,14 @@ var migrateData2 = function(d) {
         ret['__d__'] = id;
         return ret;
       }),
-      query: d.query,
+      query: d.query.map(function(q) {
+        return {
+          target: q.targetLabel,
+          test: q.test,
+          testArgs: q.testArgs,
+          negate: q.negate
+        };
+      }) ,
       metadata: {}
     };
 
