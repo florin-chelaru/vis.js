@@ -15,6 +15,7 @@
 
   <property name="compiled" value="vis.js"/>
   <property name="compiledmin" value="vis.min.js"/>
+  <property name="genexterns" value="vis.externs.js" />
 
   <loadfile property="license" srcfile="LICENSE"/>
 
@@ -77,6 +78,34 @@
     </concat>
   </target>
 
+  <target name="gen.externs" depends="concat" description="">
+    <copy file="${compiled}" tofile="${genexterns}" force="true" />
+
+    <!-- Replace function contents -->
+    <replaceregexp file="${genexterns}" replace="\1 {};" byline="false" flags="gs"
+                   match="([\$0-9a-zA-Z\.]+\s=\sfunction\s*?\([\$0-9a-zA-Z\,\s]*\))\s\{(.)*?\n\};" />
+
+    <!-- Replace Object.defineProperties blocks -->
+    <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
+                   match="\nObject\.defineProperties(.)*?\n\}\);[\n\r]*" />
+
+    <!-- Replace enum contents -->
+    <replaceregexp file="${genexterns}" replace="\1 {};" byline="false" flags="gs"
+                   match="([\$0-9a-zA-Z\.]+\s=)\s\{(.)*?\n\};" />
+
+    <!-- Replace goog.provide/goog.require blocks -->
+    <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
+                   match="goog\.[0-9a-zA-Z]+\(.*?\);[\n\r]*" />
+
+    <!-- Replace Angular blocks: module -->
+    <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
+                   match="[\$0-9a-zA-Z\.]+\s*?=\s*?angular\.module.*?;" />
+
+    <!-- Replace Angular blocks: provider/factory/directive -->
+    <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
+                   match="[\$0-9a-zA-Z\.]+\s*?\.(provider|factory|directive)\(.*?\n\}\]?\);[\n\r]*" />
+  </target>
+
   <target name="concat.externs" description="">
     <concat destfile="${rootpath}/externs.js" fixlastline="yes" eol="lf">
       <fileset dir="${externs}"/>
@@ -86,7 +115,7 @@
     </concat>
   </target>
 
-  <target name="compile" depends="deps,concat,concat.externs" description="">
+  <target name="compile" depends="deps,concat,concat.externs,gen.externs" description="">
     <local name="outfile"/>
     <property name="outfile" value="${compiledmin}"/>
     <java jar="${compiler}" fork="true" failonerror="true">
