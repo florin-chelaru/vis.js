@@ -30,7 +30,7 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
+    if (!vs.models.DataSource.allDataIsReady(self['target']['data'])) { resolve(); return; }
 
     var target = self['target'];
     var type = self.type;

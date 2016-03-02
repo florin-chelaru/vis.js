@@ -60,7 +60,7 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    if (!self['data'].every(function(d) { return d['isReady']; })) { resolve(); return; }
+    if (!vs.models.DataSource.allDataIsReady(self['data'])) { resolve(); return; }
 
     var target = self['target'];
     var data = self['data'];

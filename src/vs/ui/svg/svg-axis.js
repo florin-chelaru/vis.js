@@ -29,7 +29,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
   var self = this;
   var args = arguments;
   return new Promise(function(resolve, reject) {
-    if (!self['target']['data']['isReady']) { resolve(); return; }
+    if (!vs.models.DataSource.allDataIsReady(self['target']['data'])) { resolve(); return; }
 
     var target = self['target'];
     var svg = d3.select(target['$element'][0]).select('svg');

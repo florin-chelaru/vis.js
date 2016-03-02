@@ -105,6 +105,7 @@
     <concat destfile="${genexterns}" fixlastline="yes" eol="lf">
       <header filtering="no" trimleading="yes">${dirstruct}</header>
       <path path="${compiled}"/>
+      <!--<path path="test.js"/>-->
     </concat>
     <!--<copy file="${compiled}" tofile="${genexterns}" force="true" />-->
 
@@ -117,9 +118,11 @@
     <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"
                    match="\nObject\.defineProperties(.)*?\n\}\);[\n\r]*" />
 
-    <!-- Replace enum contents -->
+    <!-- Replace const contents -->
     <replaceregexp file="${genexterns}" replace="\1 {};" byline="false" flags="gs"
-                   match="(\n[\$0-9a-zA-Z\.]+\s=)\s\{(.)*?\n\};" />
+                   match="(\/\*\*((?!\*\/).)*?(@const|@type)((?!\*\/).)*?\*\/\n+[\$0-9a-zA-Z\.]+\s=)\s\{(\};|[^\r\n]+|.+?\n\};)" />
+                   <!--match="(\/\*\*((?!\*\/).)*?@const.*?\*\/\n+[\$0-9a-zA-Z\.]+\s=)\s\{(\};|[^\r\n]+|.+?\n\};)" />-->
+                   <!--match="(\n[\$0-9a-zA-Z\.]+\s=)\s\{(\};|[^\n]+|.+?\n\};)" />-->
 
     <!-- Replace goog.provide/goog.require blocks -->
     <replaceregexp file="${genexterns}" replace="" byline="false" flags="gs"

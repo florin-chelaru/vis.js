@@ -298,7 +298,7 @@ vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
  * @returns {*}
  */
 vs.ui.Setting.xBoundaries = function (options, $attrs, data, settings) {
-  return vs.ui.Setting.boundaries('x', options, $attrs, data, settings);
+  return vs.ui.Setting.boundaries('xVal', options, $attrs, data, settings);
 };
 
 /**
@@ -309,7 +309,7 @@ vs.ui.Setting.xBoundaries = function (options, $attrs, data, settings) {
  * @returns {*}
  */
 vs.ui.Setting.yBoundaries = function (options, $attrs, data, settings) {
-  return vs.ui.Setting.boundaries('y', options, $attrs, data, settings);
+  return vs.ui.Setting.boundaries('yVal', options, $attrs, data, settings);
 };
 
 /**
@@ -383,13 +383,18 @@ vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
 };
 
 /**
+ * @const {function(*):string}
+ */
+vs.ui.Setting.defaultPalette = d3.scale.category20();
+
+/**
  * @const {Object.<string, vs.ui.Setting>}
  */
 vs.ui.Setting.PredefinedSettings = {
   'col': new vs.ui.Setting({'key':'col', 'type':vs.ui.Setting.Type['DATA_COL_ID'], 'defaultValue':vs.ui.Setting.firstColsId, 'label':'column', 'template':'_categorical.html'}),
 
-  'x': new vs.ui.Setting({'key':'x', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'x values', 'template':'_categorical.html'}),
-  'y': new vs.ui.Setting({'key':'y', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'y values', 'template':'_categorical.html'}),
+  'xVal': new vs.ui.Setting({'key':'xVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'x values', 'template':'_categorical.html'}),
+  'yVal': new vs.ui.Setting({'key':'yVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'y values', 'template':'_categorical.html'}),
   'xBoundaries': new vs.ui.Setting({'key':'xBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.xBoundaries, 'label':'x boundaries', 'template':'_boundaries.html'}),
   'yBoundaries': new vs.ui.Setting({'key':'yBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.yBoundaries, 'label':'y boundaries', 'template':'_boundaries.html'}),
 
@@ -399,8 +404,8 @@ vs.ui.Setting.PredefinedSettings = {
   'height': new vs.ui.Setting({'key':'height', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
 
   'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return data.map(function(d) { return d['id']; }); }, 'label':'columns', 'template':'_multiselect-tbl.html'}),
-  'xs': new vs.ui.Setting({'key':'xs', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
-  'ys': new vs.ui.Setting({'key':'ys', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
+  'xVals': new vs.ui.Setting({'key':'xVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
+  'yVals': new vs.ui.Setting({'key':'yVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
 
   'rowsOrderBy': new vs.ui.Setting({'key':'rowsOrderBy', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'order rows by', 'template':'_categorical.html'}),
   'rowsScale': new vs.ui.Setting({'key':'rowsScale', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'scale rows axis', 'template':'_switch.html'}),
@@ -411,10 +416,13 @@ vs.ui.Setting.PredefinedSettings = {
   'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'hidden': true}),
 
   'fill': new vs.ui.Setting({'key':'fill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,0.3)', 'label':'object fill'}),
+  'fills': new vs.ui.Setting({'key':'fills', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue': function() { return vs.ui.Setting.defaultPalette; }, 'label':'object fill'}),
+  'fillOpacity': new vs.ui.Setting({'key':'fillOpacity', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':.3, 'label':'fill opacity'}),
   'stroke': new vs.ui.Setting({'key':'stroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,1)', 'label':'object stroke'}),
+  'strokes': new vs.ui.Setting({'key':'strokes', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':function() { return vs.ui.Setting.defaultPalette; }, 'label':'object stroke'}),
   'strokeThickness': new vs.ui.Setting({'key':'strokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':1, 'label':'stroke thickness'}),
 
   'selectFill': new vs.ui.Setting({'key':'selectFill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ff6520', 'label':'selected object fill'}),
   'selectStroke': new vs.ui.Setting({'key':'selectStroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ffc600', 'label':'selected object stroke'}),
-  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'}),
+  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'})
 };

@@ -7,11 +7,13 @@
 goog.require('vs.models.DataSource');
 
 goog.exportSymbol('vs.models.DataSource', vs.models.DataSource);
-goog.exportProperty(vs.models.DataSource, 'singleQuery', vs.models.DataSource.singleQuery);
-goog.exportProperty(vs.models.DataSource, 'combinedArrayMetadata', vs.models.DataSource.combinedArrayMetadata);
 goog.exportProperty(vs.models.DataSource.prototype, 'filter', vs.models.DataSource.prototype.filter);
 goog.exportProperty(vs.models.DataSource.prototype, 'raw', vs.models.DataSource.prototype.raw);
 goog.exportProperty(vs.models.DataSource.prototype, 'getRowMetadata', vs.models.DataSource.prototype.getRowMetadata);
+
+goog.exportProperty(vs.models.DataSource, 'singleQuery', vs.models.DataSource.singleQuery);
+goog.exportProperty(vs.models.DataSource, 'combinedArrayMetadata', vs.models.DataSource.combinedArrayMetadata);
+goog.exportProperty(vs.models.DataSource, 'allDataIsReady', vs.models.DataSource.allDataIsReady);
 
 // Export for inheritance:
 

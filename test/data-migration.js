@@ -118,6 +118,7 @@ var migrateData2 = function(d) {
     var id = u.generatePseudoGUID(6);
     var data = {
       id: id,
+      state: 'static',
       label: d.cols[0].d[j],
       rowMetadata: d.rows.map(function(row, i) {
         /*if (Object.keys(row).length == 2) {

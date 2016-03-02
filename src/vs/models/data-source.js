@@ -62,6 +62,13 @@ vs.models.DataSource.prototype.id;
 vs.models.DataSource.prototype.label;
 
 /**
+ * An indicator of whether the data has changed or not. Data with the same id and state is considered identical.
+ * @type {string}
+ * @name vs.models.DataSource#state
+ */
+vs.models.DataSource.prototype.state;
+
+/**
  * @type {Array.<vs.models.Query>}
  * @name vs.models.DataSource#query
  */
@@ -165,6 +172,7 @@ vs.models.DataSource.prototype.applyQuery = function(queries, copy) {
             self['d'] = ret['d'];
             self['metadata'] = ret['metadata'];
             self['label'] = ret['label'];
+            self['state'] = ret['state'];
             resolve(self);
             self['changed'].fire(self);
           }
@@ -244,7 +252,8 @@ vs.models.DataSource.singleQuery = function(data, q) {
         'rowMetadata': ret['rowMetadata'],
         'metadata': ret['metadata'],
         'd': filtered,
-        'label': ret['label']
+        'label': ret['label'],
+        'state': u.generatePseudoGUID(6)
       }, vs.models.DataSource);
 
       resolve(ret);
@@ -264,7 +273,8 @@ vs.models.DataSource.prototype.raw = function() {
     'query': this['query'],
     'rowMetadata': this['rowMetadata'],
     'metadata': this['metadata'],
-    'd': this['d']
+    'd': this['d'],
+    'state': this['state']
   };
 };
 
@@ -287,4 +297,12 @@ vs.models.DataSource.prototype.getRowMetadata = function(label) {
  */
 vs.models.DataSource.combinedArrayMetadata = function(datas) {
   return u.array.uniqueFast(datas.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
+};
+
+/**
+ * @param {Array.<vs.models.DataSource>} datas
+ * @returns {boolean}
+ */
+vs.models.DataSource.allDataIsReady = function(datas) {
+  return datas.every(function(d) { return d['isReady']; });
 };

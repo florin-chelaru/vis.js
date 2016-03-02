@@ -190,6 +190,12 @@ vs.ui.VisHandler.prototype.$element;
 vs.ui.VisHandler.prototype.$attrs;
 
 /**
+ * @type {angular.$timeout}
+ * @name vs.ui.VisHandler#$timeout
+ */
+vs.ui.VisHandler.prototype.$timeout;
+
+/**
  * The values for the visualization predefined settings
  * @type {Object.<string, *>}
  * @name vs.ui.VisHandler#options
@@ -250,6 +256,7 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
   '$scope': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$scope; })},
   '$element': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$element; })},
   '$attrs': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$attrs; })},
+  '$timeout': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function () { return this._$timeout; })},
   'options': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._options; })},
   'data': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._data; })},
 
