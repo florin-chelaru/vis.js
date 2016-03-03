@@ -22,3 +22,15 @@ vs.models.Point = function(x, y) {
    */
   this['y'] = y;
 };
+
+/**
+ * @type {number}
+ * @name vs.models.Point#x
+ */
+vs.models.Point.prototype.x;
+
+/**
+ * @type {number}
+ * @name vs.models.Point#y
+ */
+vs.models.Point.prototype.y;

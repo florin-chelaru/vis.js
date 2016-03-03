@@ -4,6 +4,7 @@
  * Time: 2:06 PM
  */
 
+//region goog...
 goog.provide('vs.ui.Setting');
 
 goog.require('vs.models.DataSource');
@@ -11,6 +12,7 @@ goog.require('vs.models.DataSource');
 // for predefined 'settings':
 goog.require('vs.models.Boundaries');
 goog.require('vs.models.Margins');
+//endregion
 
 /**
  * @param {{
@@ -62,6 +64,7 @@ vs.ui.Setting = function(args) {
   this['hidden'] = !!args['hidden'];
 };
 
+//region Methods
 /**
  * Extracts value from a set of raw options and element attributes
  * @param {Object.<string, *>} options
@@ -210,7 +213,9 @@ vs.ui.Setting.prototype.possibleValues = function(options, $attrs, data, setting
     default: return null;
   }
 };
+//endregion
 
+//region Nested Types
 /**
  * @enum {string}
  */
@@ -226,12 +231,9 @@ vs.ui.Setting.Type = {
   'DATA_ROW_LABEL': 'dataRowLbl',
   'FUNCTION': 'function'
 };
+//endregion
 
-/**
- * @const {string}
- */
-vs.ui.Setting['DEFAULT'] = 'default';
-
+//region Static Methods
 /**
  * @param {Array.<vs.models.DataSource>} data
  */
@@ -388,6 +390,59 @@ vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
 vs.ui.Setting.defaultPalette = d3.scale.category20();
 
 /**
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ */
+vs.ui.Setting.mergeColsDefault = function (options, $attrs, data, settings) {
+  if (!settings || !('xVal' in settings)) { throw new vs.ui.UiException('Missing dependency for "xVal" in the "mergeCols" defaultValue function'); }
+
+  var xVal = /** @type {string} */ (settings['xVal'].getValue(options, $attrs, data, settings));
+
+  return vs.ui.Setting.mergeCols;
+};
+
+/**
+ * @param {vs.models.DataSource} d1
+ * @param {vs.models.DataSource} d2
+ * @param {string} xVal
+ * @returns {vs.models.DataSource}
+ */
+vs.ui.Setting.mergeCols = function(d1, d2, xVal) {
+  var map = {};
+  var ret = {
+    'id': d1['id'] + d2['id'],
+    'label': d1['label'] + ' vs ' + d2['label'],
+    'rowMetadata': u.array.unique(d1['rowMetadata'].concat(d2['rowMetadata'])),
+    'query': [],
+    'metadata': {}
+  };
+  d1['d'].forEach(function(item) {
+    map[item[xVal]] = item;
+  });
+
+  var d = [];
+  d2['d'].forEach(function(item) {
+    if (item[xVal] in map) {
+      var item0 = map[item[xVal]];
+      var merged = {};
+      merged[xVal] = item[xVal];
+
+      merged[item0['__d__']] = item0;
+      merged[item['__d__']] = item;
+      merged['__d__'] = ret['id'];
+      d.push(merged);
+    }
+  });
+  ret['d'] = d;
+  return u.reflection.wrap(ret, vs.models.DataSource);
+};
+//endregion
+
+//region Constants
+/**
  * @const {Object.<string, vs.ui.Setting>}
  */
 vs.ui.Setting.PredefinedSettings = {
@@ -424,5 +479,8 @@ vs.ui.Setting.PredefinedSettings = {
 
   'selectFill': new vs.ui.Setting({'key':'selectFill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ff6520', 'label':'selected object fill'}),
   'selectStroke': new vs.ui.Setting({'key':'selectStroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ffc600', 'label':'selected object stroke'}),
-  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'})
+  'selectStrokeThickness': new vs.ui.Setting({'key':'selectStrokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':2, 'label':'selected stroke thickness'}),
+
+  'mergeCols': new vs.ui.Setting({'key': 'mergeCols', 'type': vs.ui.Setting.Type['FUNCTION'], 'defaultValue': vs.ui.Setting.mergeColsDefault, 'hidden': true})
 };
+//endregion

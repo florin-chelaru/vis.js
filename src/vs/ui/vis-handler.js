@@ -4,6 +4,7 @@
  * Time: 3:12 PM
  */
 
+//region goog...
 goog.provide('vs.ui.VisHandler');
 
 goog.require('vs.models.DataSource');
@@ -11,6 +12,7 @@ goog.require('vs.ui.Setting');
 
 goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
+//endregion
 
 /**
  * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService, threadPool: parallel.ThreadPool}} $ng
@@ -137,26 +139,58 @@ vs.ui.VisHandler = function($ng, options, data) {
   this._redrawPromise = Promise.resolve();
 
   var self = this;
-  this._data.forEach(function(d) { d['changed'].addListener(self.scheduleRedraw, self); });
+  this._data.forEach(function(d) {
+    d['changed'].addListener(function() {
+      self.schedulePreProcessData().then(function() {
+        self.scheduleRedraw();
+      });
+    });
+  });
 
   // Data ready for the first time
-  Promise.all(this._data.map(function(d) { return d['ready']; })).then(function() { self.scheduleRedraw(); });
+  Promise.all(this._data.map(function(d) { return d['ready']; })).then(function() {
+    self.schedulePreProcessData().then(function() {
+      self.scheduleRedraw();
+    });
+  });
 
   // Options changed
   this._$scope.$watch(
     function(){ return self._options; },
     function() { self.scheduleRedraw(); },
     true);
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this._preProcessScheduled = false;
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._lastPreProcess = Promise.resolve();
+
+  /**
+   * @type {Promise}
+   * @private
+   */
+  this._preProcessPromise = Promise.resolve();
 };
 
+//region Constants
 /**
- * @type {Object.<string, vs.ui.Setting>}
+ * @const {Object.<string, vs.ui.Setting>}
  */
 vs.ui.VisHandler.Settings = {
   'margins': vs.ui.Setting.PredefinedSettings['margins'],
   'width': vs.ui.Setting.PredefinedSettings['width'],
   'height': vs.ui.Setting.PredefinedSettings['height']
 };
+//endregion
+
+//region Properties
 
 /**
  * @type {string}
@@ -282,6 +316,10 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
   }
 });
 
+//endregion
+
+//region Methods
+
 /**
  * @param {string} optionKey
  * @returns {*}
@@ -356,3 +394,31 @@ vs.ui.VisHandler.prototype.highlightItem = function(viewport, d) {};
  * @param {Object} d
  */
 vs.ui.VisHandler.prototype.unhighlightItem = function(viewport, d) {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.VisHandler.prototype.schedulePreProcessData = function() {
+  // This will trigger an asynchronous angular digest
+  if (!this._preProcessScheduled) {
+    this._preProcessScheduled = true;
+    var lastPreProcess = this._lastPreProcess || Promise.resolve();
+    var self = this;
+
+    this._preProcessPromise = new Promise(function(resolve, reject) {
+      lastPreProcess.then(function() { self.$timeout.call(null, function() {
+        self._preProcessScheduled = false;
+        self._lastPreProcess = self.preProcessData();
+        self._lastPreProcess.then(resolve, reject);
+      }, 0); });
+    });
+  }
+  return this._preProcessPromise;
+};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.VisHandler.prototype.preProcessData = function() { return Promise.resolve(); };
+
+//endregion

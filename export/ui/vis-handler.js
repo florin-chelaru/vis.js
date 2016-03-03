@@ -10,6 +10,7 @@ goog.exportSymbol('vs.ui.VisHandler', vs.ui.VisHandler);
 goog.exportProperty(vs.ui.VisHandler, 'Settings', vs.ui.VisHandler.Settings);
 goog.exportProperty(vs.ui.VisHandler.prototype, 'optionValue', vs.ui.VisHandler.prototype.optionValue);
 goog.exportProperty(vs.ui.VisHandler.prototype, 'scheduleRedraw', vs.ui.VisHandler.prototype.scheduleRedraw);
+goog.exportProperty(vs.ui.VisHandler.prototype, 'schedulePreProcessData', vs.ui.VisHandler.prototype.schedulePreProcessData);
 
 // Export for inheritance:
 
@@ -19,6 +20,15 @@ if (Object.getOwnPropertyDescriptor(vs.ui.VisHandler.prototype, 'draw') == undef
     enumerable: true,
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.draw; }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { this.draw = value; })
+  });
+}
+
+if (Object.getOwnPropertyDescriptor(vs.ui.VisHandler.prototype, 'preProcessData') == undefined) {
+  Object.defineProperty(vs.ui.VisHandler.prototype, 'preProcessData', {
+    configurable: true,
+    enumerable: true,
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.preProcessData; }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { this.preProcessData = value; })
   });
 }
 
