@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1de1b1bd-f1f7-4c6c-91a4-59f76e3e30e9" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/export/ui/vis-handler.js" afterPath="$PROJECT_DIR$/export/ui/vis-handler.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/models/point.js" afterPath="$PROJECT_DIR$/src/vs/models/point.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/models/boundaries.js" afterPath="$PROJECT_DIR$/src/vs/models/boundaries.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/ui/setting.js" afterPath="$PROJECT_DIR$/src/vs/ui/setting.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vs/ui/vis-handler.js" afterPath="$PROJECT_DIR$/src/vs/ui/vis-handler.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.externs.js" afterPath="$PROJECT_DIR$/vis.externs.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.js" afterPath="$PROJECT_DIR$/vis.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vis.min.js" afterPath="$PROJECT_DIR$/vis.min.js" />
@@ -31,11 +29,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="setting.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="setting.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/vs/ui/setting.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.379311">
-              <caret line="28" column="31" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.35091496">
+              <caret line="399" column="148" selection-start-line="399" selection-start-column="148" selection-end-line="399" selection-end-column="148" />
               <folding>
                 <element signature="e#0#119#0" expanded="false" />
                 <element signature="e#121#137#0" expanded="false" />
@@ -75,7 +73,6 @@
                 <element signature="e#6689#6710#0" expanded="false" />
                 <element signature="e#6711#6736#0" expanded="false" />
                 <element signature="e#6758#7026#0" expanded="false" />
-                <element signature="e#7041#7064#0" expanded="false" />
                 <element signature="e#7065#7118#0" expanded="false" />
                 <element signature="e#7168#7343#0" expanded="false" />
                 <element signature="e#7346#7564#0" expanded="false" />
@@ -114,184 +111,7 @@
                 <element signature="e#12467#12499#0" expanded="false" />
                 <element signature="e#12712#12750#0" expanded="false" />
                 <element signature="e#12806#13001#0" expanded="false" />
-                <element signature="e#13078#13363#0" expanded="false" />
-                <element signature="e#13243#13264#0" expanded="false" />
-                <element signature="e#13366#13504#0" expanded="false" />
-                <element signature="e#13554#14242#0" expanded="false" />
-                <element signature="e#13584#13785#0" expanded="false" />
-                <element signature="e#13820#13853#0" expanded="false" />
-                <element signature="e#13904#14167#0" expanded="false" />
-                <element signature="e#13933#14163#0" expanded="false" />
-                <element signature="e#14257#14275#0" expanded="false" />
-                <element signature="e#14276#14326#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="point.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/vs/models/point.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.94551283">
-              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vis-handler.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/export/ui/vis-handler.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="30" column="95" selection-start-line="30" selection-start-column="95" selection-end-line="30" selection-end-column="95" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vis.externs.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vis.externs.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-100.55173">
-              <caret line="650" column="0" selection-start-line="650" selection-start-column="0" selection-end-line="650" selection-end-column="0" />
-              <folding>
-                <marker date="1457035657799" expanded="true" signature="139:1261" placeholder="/** @license vis.js ...*/" />
-                <marker date="1457035657799" expanded="true" signature="1264:1279" placeholder="/** @param {number} [x] ...*/" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="vis-handler.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/ui/vis-handler.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.137931">
-              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#119#0" expanded="false" />
-                <element signature="e#121#137#0" expanded="false" />
-                <element signature="e#668#718#0" expanded="false" />
-                <element signature="e#754#797#0" expanded="false" />
-                <element signature="e#837#892#0" expanded="false" />
-                <element signature="e#928#981#0" expanded="false" />
-                <element signature="e#1021#1078#0" expanded="false" />
-                <element signature="e#1124#1180#0" expanded="false" />
-                <element signature="e#1224#1279#0" expanded="false" />
-                <element signature="e#1310#1375#0" expanded="false" />
-                <element signature="e#1400#1450#0" expanded="false" />
-                <element signature="e#1530#1580#0" expanded="false" />
-                <element signature="e#1656#1700#0" expanded="false" />
-                <element signature="e#1742#1786#0" expanded="false" />
-                <element signature="e#1820#1877#0" expanded="false" />
-                <element signature="e#1904#1985#0" expanded="false" />
-                <element signature="e#2033#2048#0" expanded="false" />
-                <element signature="e#2095#2552#0" expanded="false" />
-                <element signature="e#2556#2600#0" expanded="false" />
-                <element signature="e#2637#2681#0" expanded="false" />
-                <element signature="e#3562#3580#0" expanded="false" />
-                <element signature="e#3845#3864#0" expanded="false" />
-                <element signature="e#3866#3924#0" expanded="false" />
-                <element signature="e#3961#4128#0" expanded="false" />
-                <element signature="e#4167#4232#0" expanded="false" />
-                <element signature="e#4269#4329#0" expanded="false" />
-                <element signature="e#4368#4438#0" expanded="false" />
-                <element signature="e#4475#4545#0" expanded="false" />
-                <element signature="e#4584#4711#0" expanded="false" />
-                <element signature="e#4749#4827#0" expanded="false" />
-                <element signature="e#4862#4962#0" expanded="false" />
-                <element signature="e#5003#5075#0" expanded="false" />
-                <element signature="e#5112#5184#0" expanded="false" />
-                <element signature="e#5228#5298#0" expanded="false" />
-                <element signature="e#5340#5410#0" expanded="false" />
-                <element signature="e#5448#5505#0" expanded="false" />
-                <element signature="e#5541#5599#0" expanded="false" />
-                <element signature="e#5688#7843#0" expanded="false" />
-                <element signature="e#5709#5756#0" expanded="false" />
-                <element signature="e#5884#5931#0" expanded="false" />
-                <element signature="e#6004#6051#0" expanded="false" />
-                <element signature="e#6113#6160#0" expanded="false" />
-                <element signature="e#6222#6269#0" expanded="false" />
-                <element signature="e#6331#6378#0" expanded="false" />
-                <element signature="e#6442#6489#0" expanded="false" />
-                <element signature="e#6548#6595#0" expanded="false" />
-                <element signature="e#6658#6705#0" expanded="false" />
-                <element signature="e#6769#6816#0" expanded="false" />
-                <element signature="e#6884#6931#0" expanded="false" />
-                <element signature="e#7003#7050#0" expanded="false" />
-                <element signature="e#7110#7346#0" expanded="false" />
-                <element signature="e#7121#7168#0" expanded="false" />
-                <element signature="e#7232#7279#0" expanded="false" />
-                <element signature="e#7360#7592#0" expanded="false" />
-                <element signature="e#7371#7418#0" expanded="false" />
-                <element signature="e#7480#7527#0" expanded="false" />
-                <element signature="e#7607#7841#0" expanded="false" />
-                <element signature="e#7618#7665#0" expanded="false" />
-                <element signature="e#7728#7775#0" expanded="false" />
-                <element signature="e#7878#7930#0" expanded="false" />
-                <element signature="e#7992#8164#0" expanded="false" />
-                <element signature="e#8167#8196#0" expanded="false" />
-                <element signature="e#8304#8333#0" expanded="false" />
-                <element signature="e#9527#9705#0" expanded="false" />
-                <element signature="e#9560#9697#0" expanded="false" />
-                <element signature="e#9599#9690#0" expanded="false" />
-                <element signature="e#9746#9832#0" expanded="false" />
-                <element signature="e#9903#9989#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="loading-decorator.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/directives/loading-decorator.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="85" column="11" selection-start-line="85" selection-start-column="11" selection-end-line="85" selection-end-column="11" />
-              <folding>
-                <marker date="1455656492990" expanded="true" signature="1350:1376" placeholder="..." />
-                <marker date="1455656492990" expanded="true" signature="1471:1497" placeholder="..." />
-                <marker date="1455656492990" expanded="true" signature="1805:1812" placeholder="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="visualization.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/directives/visualization.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="80" column="20" selection-start-line="80" selection-start-column="20" selection-end-line="80" selection-end-column="20" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="svg-axis.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/ui/svg/svg-axis.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="88" column="13" selection-start-line="88" selection-start-column="13" selection-end-line="88" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="canvas-vis.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/vs/ui/canvas/canvas-vis.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="110" column="28" selection-start-line="110" selection-start-column="28" selection-end-line="110" selection-end-column="28" />
-              <folding>
-                <marker date="1456856486257" expanded="true" signature="2442:2454" placeholder="..." />
+                <element signature="e#14293#14343#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -315,7 +135,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/export/ui/decorators/brushing.js" />
         <option value="$PROJECT_DIR$/src/vs/directives/brushing.js" />
         <option value="$PROJECT_DIR$/export/ui/canvas/canvas-brushing.js" />
         <option value="$PROJECT_DIR$/vis.min.js" />
@@ -364,8 +183,9 @@
         <option value="$PROJECT_DIR$/test/data-migration.js" />
         <option value="$PROJECT_DIR$/export/ui/vis-handler.js" />
         <option value="$PROJECT_DIR$/src/vs/ui/vis-handler.js" />
-        <option value="$PROJECT_DIR$/src/vs/ui/setting.js" />
         <option value="$PROJECT_DIR$/src/vs/models/point.js" />
+        <option value="$PROJECT_DIR$/src/vs/models/boundaries.js" />
+        <option value="$PROJECT_DIR$/src/vs/ui/setting.js" />
       </list>
     </option>
   </component>
@@ -682,7 +502,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="C:/twinfog/git/twinfog/src/Twinfog.Splash" />
-    <property name="SearchEverywhereHistoryKey" value="setti&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;sett&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;vis-ha&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;vis-&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;mig&#9;FILE&#9;file://C:/mit/git/vis.js/test/data-migration.js&#10;ds-n&#9;FILE&#9;file://C:/mit/git/vis.js/ds-new.json&#10;query&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/query.js&#10;se&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;bui&#9;FILE&#9;file://C:/mit/git/vis.js/build.xml&#10;ds&#9;FILE&#9;file://C:/mit/git/vis.js/ds-new.json&#10;setting&#9;FILE&#9;file://C:/mit/git/vis.js/export/ui/setting.js&#10;que&#9;null&#9;null&#10;data-so&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/data-source.js&#10;graphi&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/graphic-decorator.js&#10;svg&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/svg/svg-brushing.js&#10;can&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/canvas/canvas-brushing.js&#10;s&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/svg/svg-brushing.js&#10;data&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/data-source.js&#10;graph&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/graphic-decorator.js&#10;serv&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/async/task-service.js&#10;visua&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/visualization.js&#10;vish&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;vs.js&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/vs.js&#10;buil&#9;FILE&#9;file://C:/mit/git/vis.js/build.xml&#10;index.&#9;FILE&#9;file://C:/mit/git/vis.js/test/index.html&#10;inde&#9;FILE&#9;file://C:/mit/git/vis.js/test/index-min.html" />
+    <property name="SearchEverywhereHistoryKey" value="sett&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;bru&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/svg/svg-brushing.js&#10;brus&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/canvas/canvas-brushing.js&#10;setti&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;vis-ha&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;vis-&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;mig&#9;FILE&#9;file://C:/mit/git/vis.js/test/data-migration.js&#10;ds-n&#9;FILE&#9;file://C:/mit/git/vis.js/ds-new.json&#10;query&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/query.js&#10;se&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/setting.js&#10;bui&#9;FILE&#9;file://C:/mit/git/vis.js/build.xml&#10;ds&#9;FILE&#9;file://C:/mit/git/vis.js/ds-new.json&#10;setting&#9;FILE&#9;file://C:/mit/git/vis.js/export/ui/setting.js&#10;que&#9;null&#9;null&#10;data-so&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/data-source.js&#10;graphi&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/graphic-decorator.js&#10;svg&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/svg/svg-brushing.js&#10;can&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/canvas/canvas-brushing.js&#10;s&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/svg/svg-brushing.js&#10;data&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/models/data-source.js&#10;graph&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/graphic-decorator.js&#10;serv&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/async/task-service.js&#10;visua&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/directives/visualization.js&#10;vish&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/ui/vis-handler.js&#10;vs.js&#9;FILE&#9;file://C:/mit/git/vis.js/src/vs/vs.js&#10;buil&#9;FILE&#9;file://C:/mit/git/vis.js/build.xml&#10;index.&#9;FILE&#9;file://C:/mit/git/vis.js/test/index.html&#10;inde&#9;FILE&#9;file://C:/mit/git/vis.js/test/index-min.html" />
     <property name="list.type.of.created.stylesheet" value="Less" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
@@ -737,19 +557,19 @@
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16115052" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4813047" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21559268" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293556" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293556" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -786,13 +606,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/vs/directives/resizable.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="48" column="34" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/externs/ng-utils.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -822,13 +635,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/externs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/directives/graphic-decorator.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -847,13 +653,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="44" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/ui/brushing-event.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="32" column="21" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
         </state>
       </provider>
     </entry>
@@ -950,6 +749,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1002,25 +802,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/ui/svg/svg-brushing.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="62" column="58" selection-start-line="62" selection-start-column="58" selection-end-line="62" selection-end-column="58" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/ui/svg/svg-vis.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/ui/canvas/canvas-brushing.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="61" column="14" selection-start-line="61" selection-start-column="14" selection-end-line="61" selection-end-column="14" />
         </state>
       </provider>
     </entry>
@@ -1385,11 +1170,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vis.externs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-100.55173">
-          <caret line="650" column="0" selection-start-line="650" selection-start-column="0" selection-end-line="650" selection-end-column="0" />
+        <state vertical-scroll-proportion="-4.413793">
+          <caret line="486" column="0" selection-start-line="486" selection-start-column="0" selection-end-line="486" selection-end-column="0" />
           <folding>
-            <marker date="1457035657799" expanded="true" signature="139:1261" placeholder="/** @license vis.js ...*/" />
-            <marker date="1457035657799" expanded="true" signature="1264:1279" placeholder="/** @param {number} [x] ...*/" />
+            <marker date="1457048450599" expanded="true" signature="1264:1279" placeholder="/** @param {number} [x] ...*/" />
           </folding>
         </state>
       </provider>
@@ -1402,10 +1186,62 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/models/point.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/ui/brushing-event.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="32" column="21" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/ui/canvas/canvas-brushing.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="61" column="14" selection-start-line="61" selection-start-column="14" selection-end-line="61" selection-end-column="14" />
+          <folding>
+            <marker date="1453924500435" expanded="true" signature="1622:1676" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/ui/svg/svg-brushing.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/vs/models/boundaries.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/externs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33298537">
+          <caret line="282" column="11" selection-start-line="282" selection-start-column="11" selection-end-line="282" selection-end-column="11" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/vs/ui/setting.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.379311">
-          <caret line="28" column="31" selection-start-line="28" selection-start-column="31" selection-end-line="28" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.35091496">
+          <caret line="399" column="148" selection-start-line="399" selection-start-column="148" selection-end-line="399" selection-end-column="148" />
           <folding>
             <element signature="e#0#119#0" expanded="false" />
             <element signature="e#121#137#0" expanded="false" />
@@ -1445,7 +1281,6 @@
             <element signature="e#6689#6710#0" expanded="false" />
             <element signature="e#6711#6736#0" expanded="false" />
             <element signature="e#6758#7026#0" expanded="false" />
-            <element signature="e#7041#7064#0" expanded="false" />
             <element signature="e#7065#7118#0" expanded="false" />
             <element signature="e#7168#7343#0" expanded="false" />
             <element signature="e#7346#7564#0" expanded="false" />
@@ -1484,25 +1319,8 @@
             <element signature="e#12467#12499#0" expanded="false" />
             <element signature="e#12712#12750#0" expanded="false" />
             <element signature="e#12806#13001#0" expanded="false" />
-            <element signature="e#13078#13363#0" expanded="false" />
-            <element signature="e#13243#13264#0" expanded="false" />
-            <element signature="e#13366#13504#0" expanded="false" />
-            <element signature="e#13554#14242#0" expanded="false" />
-            <element signature="e#13584#13785#0" expanded="false" />
-            <element signature="e#13820#13853#0" expanded="false" />
-            <element signature="e#13904#14167#0" expanded="false" />
-            <element signature="e#13933#14163#0" expanded="false" />
-            <element signature="e#14257#14275#0" expanded="false" />
-            <element signature="e#14276#14326#0" expanded="false" />
+            <element signature="e#14293#14343#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/vs/models/point.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.94551283">
-          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>

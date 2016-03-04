@@ -22,3 +22,17 @@ vs.models.Boundaries = function(min, max) {
    */
   this['max'] = max;
 };
+
+/**
+ * @type {number}
+ * @name vs.models.Boundaries#min
+ */
+vs.models.Boundaries.prototype.min;
+
+/**
+ * @type {number}
+ * @name vs.models.Boundaries#max
+ */
+vs.models.Boundaries.prototype.max;
+
+

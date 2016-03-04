@@ -398,45 +398,45 @@ vs.ui.Setting.defaultPalette = d3.scale.category20();
  */
 vs.ui.Setting.mergeColsDefault = function (options, $attrs, data, settings) {
   if (!settings || !('xVal' in settings)) { throw new vs.ui.UiException('Missing dependency for "xVal" in the "mergeCols" defaultValue function'); }
-
-  var xVal = /** @type {string} */ (settings['xVal'].getValue(options, $attrs, data, settings));
-
   return vs.ui.Setting.mergeCols;
 };
 
 /**
- * @param {vs.models.DataSource} d1
- * @param {vs.models.DataSource} d2
  * @param {string} xVal
+ * @param {Array.<vs.models.DataSource>} ds
  * @returns {vs.models.DataSource}
  */
-vs.ui.Setting.mergeCols = function(d1, d2, xVal) {
-  var map = {};
+vs.ui.Setting.mergeCols = function(xVal, ds) {
   var ret = {
-    'id': d1['id'] + d2['id'],
-    'label': d1['label'] + ' vs ' + d2['label'],
-    'rowMetadata': u.array.unique(d1['rowMetadata'].concat(d2['rowMetadata'])),
+    'id': u.generatePseudoGUID(6),
+    'label': ds.map(function(d) { return d['label']; }).join(', '),
+    'rowMetadata': u.array.unique(ds.map(function(d) { return d['rowMetadata']; }).reduce(function(a1, a2) { return a1.concat(a2); })),
     'query': [],
     'metadata': {}
   };
-  d1['d'].forEach(function(item) {
-    map[item[xVal]] = item;
-  });
 
-  var d = [];
-  d2['d'].forEach(function(item) {
-    if (item[xVal] in map) {
-      var item0 = map[item[xVal]];
-      var merged = {};
-      merged[xVal] = item[xVal];
+  var map = {};
+  var data = [];
 
-      merged[item0['__d__']] = item0;
+  ds.forEach(function(d, i) {
+    d['d'].forEach(function(item) {
+      var merged = map[item[xVal]];
+      if (!merged) {
+        merged = {};
+        merged[xVal] = item[xVal];
+        map[item[xVal]] = merged;
+        data.push(merged);
+      }
       merged[item['__d__']] = item;
-      merged['__d__'] = ret['id'];
-      d.push(merged);
-    }
+    });
   });
-  ret['d'] = d;
+
+  data.sort(function(it0, it1) {
+    if (it0[xVal] == it1[xVal]) { return 0; }
+    return (it0[xVal] < it1[xVal]) ? -1 : 1;
+  });
+
+  ret['d'] = data;
   return u.reflection.wrap(ret, vs.models.DataSource);
 };
 //endregion
