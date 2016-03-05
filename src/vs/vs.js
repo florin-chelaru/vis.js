@@ -24,6 +24,8 @@ goog.require('vs.directives.Visualization');
 goog.require('vs.models.Transformer');
 goog.require('vs.models.GenomicRangeQuery');
 
+goog.require('vs.linking.LinkProvider');
+
 goog.require('vs.directives.Axis');
 goog.require('vs.directives.Grid');
 goog.require('vs.directives.Brushing');
@@ -39,9 +41,11 @@ goog.require('vs.directives.DataContext');
 vs.main = angular.module('vs', []);
 
 vs.main.provider('configuration', function() {
-  var self = this;
-  self.__proto__ = new vs.Configuration();
-  self.$get = function() { return self; };
+  return new vs.Configuration();
+});
+
+vs.main.provider('link', function() {
+  return new vs.linking.LinkProvider();
 });
 
 vs.main.factory('taskService', ['$timeout', function($timeout) {
@@ -56,41 +60,41 @@ vs.main.factory('visualizationFactory', ['configuration', 'taskService', '$timeo
   return new vs.ui.VisualizationFactory(configuration, taskService, $timeout, threadPool);
 }]);
 
-vs.main.directive('visualization', ['visualizationFactory', 'taskService', function(visualizationFactory, taskService) {
-  return ngu.Directive.createNew('visualization', /** @type {function(new:ngu.Directive)} */ (vs.directives.Visualization), [visualizationFactory, taskService], {restrict: 'C'});
+vs.main.directive('visualization', ['visualizationFactory', 'taskService', '$rootScope', 'link', function() {
+  return ngu.Directive.createNew('visualization', /** @type {function(new:ngu.Directive)} */ (vs.directives.Visualization), u.array.fromArguments(arguments), {restrict: 'C'});
 }]);
 
-vs.main.directive('vsDataContext', ['$templateCache', function($templateCache) {
-  return ngu.Directive.createNew('vsDataContext', /** @type {function(new:ngu.Directive)} */ (vs.directives.DataContext), [$templateCache], {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.template"></div>'});
+vs.main.directive('vsDataContext', ['$templateCache', function() {
+  return ngu.Directive.createNew('vsDataContext', /** @type {function(new:ngu.Directive)} */ (vs.directives.DataContext), u.array.fromArguments(arguments), {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.template"></div>'});
 }]);
 
 vs.main.directive('vsWindow', function() {
   return ngu.Directive.createNew('vsWindow', /** @type {function(new:ngu.Directive)} */ (vs.directives.Window), null, {restrict: 'C'});
 });
 
-vs.main.directive('vsMovable', ['$document', function($document) {
-  return ngu.Directive.createNew('vsMovable', /** @type {function(new:ngu.Directive)} */ (vs.directives.Movable), [$document], {restrict: 'C', require: 'vsWindow'});
+vs.main.directive('vsMovable', ['$document', function() {
+  return ngu.Directive.createNew('vsMovable', /** @type {function(new:ngu.Directive)} */ (vs.directives.Movable), u.array.fromArguments(arguments), {restrict: 'C', require: 'vsWindow'});
 }]);
 
-vs.main.directive('vsResizable', ['$document', function($document) {
-  return ngu.Directive.createNew('vsResizable', /** @type {function(new:ngu.Directive)} */ (vs.directives.Resizable), [$document], {restrict: 'C', require: 'vsWindow'});
+vs.main.directive('vsResizable', ['$document', function() {
+  return ngu.Directive.createNew('vsResizable', /** @type {function(new:ngu.Directive)} */ (vs.directives.Resizable), u.array.fromArguments(arguments), {restrict: 'C', require: 'vsWindow'});
 }]);
 
-vs.main.directive('vsLoader', ['taskService', '$timeout', function(taskService, $timeout) {
-  return ngu.Directive.createNew('vsLoader', /** @type {function(new:ngu.Directive)} */ (vs.directives.LoadingDecorator), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+vs.main.directive('vsLoader', ['taskService', '$timeout', function() {
+  return ngu.Directive.createNew('vsLoader', /** @type {function(new:ngu.Directive)} */ (vs.directives.LoadingDecorator), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
 }]);
 
-vs.main.directive('vsAxis', ['taskService', '$timeout', function(taskService, $timeout) {
-  return ngu.Directive.createNew('vsAxis', /** @type {function(new:ngu.Directive)} */ (vs.directives.Axis), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+vs.main.directive('vsAxis', ['taskService', '$timeout', function() {
+  return ngu.Directive.createNew('vsAxis', /** @type {function(new:ngu.Directive)} */ (vs.directives.Axis), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
 }]);
 
-vs.main.directive('vsGrid', ['taskService', '$timeout', function(taskService, $timeout) {
-  return ngu.Directive.createNew('vsGrid', /** @type {function(new:ngu.Directive)} */ (vs.directives.Grid), [taskService, $timeout], {restrict: 'C', require: '^visualization'});
+vs.main.directive('vsGrid', ['taskService', '$timeout', function() {
+  return ngu.Directive.createNew('vsGrid', /** @type {function(new:ngu.Directive)} */ (vs.directives.Grid), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
 }]);
 
-vs.main.directive('vsBrushing', ['taskService', '$timeout', '$rootScope', function(taskService, $timeout, $rootScope) {
-  return ngu.Directive.createNew('vsBrushing', /** @type {function(new:ngu.Directive)} */ (vs.directives.Brushing), [taskService, $timeout, $rootScope], {restrict: 'C', require: '^visualization'});
-}]);
+/*vs.main.directive('vsBrushing', ['taskService', '$timeout', '$rootScope', 'link', function() {
+  return ngu.Directive.createNew('vsBrushing', /!** @type {function(new:ngu.Directive)} *!/ (vs.directives.Brushing), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
+}]);*/
 
 vs.main
   .factory('$exceptionHandler', function() {

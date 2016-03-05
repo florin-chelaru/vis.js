@@ -45,9 +45,8 @@ vs.ui.svg.SvgBrushing.prototype.beginDraw = function() {
       return;
     }
 
-    var data = self['data'];
-    var groups = viewport.selectAll('.vs-group').data(data).enter();
-    var newItems = groups.selectAll('.vs-item').data(function(d) { return d; }, JSON.stringify).enter();
+    var items = self['data'].map(function(d) { return d['d']; }).reduce(function(a1, a2) { return a1.concat(a2); });
+    var newItems = viewport.selectAll('.vs-item').data(items, JSON.stringify).enter();
     self._newDataItems = newItems.empty() ? [] : newItems[0].filter(function(item) { return item; }).map(function(item) { return item['__data__']; });
     resolve();
   });
@@ -65,6 +64,9 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
     var target = self['target'];
     var data = self['data'];
 
+    var dataMap = {};
+    data.forEach(function(d) { dataMap[d['id']] = d; });
+
     var newItems = null;
     var viewport = d3.select(target['$element'][0]).select('svg').select('.viewport');
     if (!self._newDataItems) {
@@ -75,16 +77,13 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
 
     newItems
       .on('mouseover', function (d) {
-        var col = d3.select(this.parentNode)['__data__'];
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, col, d, vs.ui.BrushingEvent.Action['MOUSEOVER']));
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, dataMap[d['__d__']], vs.ui.BrushingEvent.Action['MOUSEOVER'], d));
       })
       .on('mouseout', function (d) {
-        var col = d3.select(this.parentNode)['__data__'];
-        self['brushing'].fire(new vs.ui.BrushingEvent(target, col, d, vs.ui.BrushingEvent.Action['MOUSEOUT']));
+        self['brushing'].fire(new vs.ui.BrushingEvent(target, dataMap[d['__d__']], vs.ui.BrushingEvent.Action['MOUSEOUT'], d));
       })
       .on('click', function (d) {
-        var col = d3.select(this.parentNode)['__data__'];
-        //self['brushing'].fire(new vs.ui.BrushingEvent(target, col, d, vs.ui.BrushingEvent.Action['SELECT']));
+        // TODO
         d3.event.stopPropagation();
       });
 
@@ -96,8 +95,9 @@ vs.ui.svg.SvgBrushing.prototype.endDraw = function() {
 
 /**
  * @param {vs.ui.BrushingEvent} e
+ * @param {Array.<Object>} objects
  */
-vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
+vs.ui.svg.SvgBrushing.prototype.brush = function(e, objects) {
   var target = this['target'];
   var svg = d3.select(target['$element'][0]).select('svg');
   var viewport = svg.empty() ? null : $(svg[0][0]).find('.viewport');
@@ -107,7 +107,7 @@ vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
 
   if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOVER']) {
     //target.highlightItem(viewport[0], e['selectedRow']);
-    target.highlightItem(viewport[0], e);
+    target.highlightItem(viewport[0], objects);
 /*
     var items = viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key);
     items
@@ -117,7 +117,7 @@ vs.ui.svg.SvgBrushing.prototype.brush = function(e) {
     $(items[0]).appendTo($(viewport[0]));*/
   } else if (e['action'] == vs.ui.BrushingEvent.Action['MOUSEOUT']) {
     // target.unhighlightItem(viewport[0], e['selectedRow']);
-    target.unhighlightItem(viewport[0], e);
+    target.unhighlightItem(viewport[0], objects);
     /*viewport.selectAll('.vs-item').data([e['selectedRow']], vs.models.DataSource.key)
       .style('stroke', stroke)
       .style('stroke-width', strokeThickness)

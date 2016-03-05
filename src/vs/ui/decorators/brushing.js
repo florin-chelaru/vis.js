@@ -48,5 +48,6 @@ Object.defineProperties(vs.ui.decorators.Brushing.prototype, {
 
 /**
  * @param {vs.ui.BrushingEvent} e
+ * @param {Array.<Object>} objects
  */
-vs.ui.decorators.Brushing.prototype.brush = function(e) {};
+vs.ui.decorators.Brushing.prototype.brush = function(e, objects) {};

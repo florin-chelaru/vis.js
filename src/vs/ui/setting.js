@@ -408,7 +408,7 @@ vs.ui.Setting.mergeColsDefault = function (options, $attrs, data, settings) {
  */
 vs.ui.Setting.mergeCols = function(xVal, ds) {
   var ret = {
-    'id': u.generatePseudoGUID(6),
+    'id': ds.map(function(d) { return d['id']; }).join('-'),
     'label': ds.map(function(d) { return d['label']; }).join(', '),
     'rowMetadata': u.array.unique(ds.map(function(d) { return d['rowMetadata']; }).reduce(function(a1, a2) { return a1.concat(a2); })),
     'query': [],

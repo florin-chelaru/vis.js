@@ -9,6 +9,7 @@ goog.provide('vs.ui.VisHandler');
 
 goog.require('vs.models.DataSource');
 goog.require('vs.ui.Setting');
+goog.require('vs.ui.BrushingEvent');
 
 goog.require('vs.async.Task');
 goog.require('vs.async.TaskService');
@@ -104,6 +105,12 @@ vs.ui.VisHandler = function($ng, options, data) {
    * @private
    */
   this._sharedData = null;
+
+  /**
+   * @type {u.Event.<vs.ui.BrushingEvent>}
+   * @private
+   */
+  this._brushing = new u.Event();
 
   // Redraw if:
 
@@ -284,6 +291,12 @@ vs.ui.VisHandler.prototype.width;
  */
 vs.ui.VisHandler.prototype.height;
 
+/**
+ * @type {u.Event.<vs.ui.BrushingEvent>}
+ * @name vs.ui.VisHandler#brushing
+ */
+vs.ui.VisHandler.prototype.brushing;
+
 Object.defineProperties(vs.ui.VisHandler.prototype, {
   'render': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { throw new u.UnimplementedException('Property "render" does not exist in data source'); })},
   'settings': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return vs.ui.VisHandler.Settings; })},
@@ -304,16 +317,15 @@ Object.defineProperties(vs.ui.VisHandler.prototype, {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('margins'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['margins'] = value; })
   },
-
   'width': {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('width'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['width'] = value; })
   },
-
   'height': {
     get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this.optionValue('height'); }),
     set: /** @type {function (this:vs.ui.VisHandler)} */ (function(value) { return this._options['height'] = value; })
-  }
+  },
+  'brushing': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function () { return this._brushing; })}
 });
 
 //endregion
@@ -384,16 +396,41 @@ vs.ui.VisHandler.prototype.scheduleRedraw = function() {
 };
 
 /**
- * @param {HTMLElement} viewport Can be canvas, svg, etc.
- * @param {Object} d
+ * @param {vs.ui.BrushingEvent} e
+ * @param {Array.<Object>} objects
  */
-vs.ui.VisHandler.prototype.highlightItem = function(viewport, d) {};
+vs.ui.VisHandler.prototype.brush = function(e, objects) {
+  if (!objects || !objects.length) { return; }
+
+  switch (e['action']){
+    case vs.ui.BrushingEvent.Action['MOUSEOVER']:
+      this.highlightItem(e, objects);
+      break;
+    case vs.ui.BrushingEvent.Action['MOUSEOUT']:
+      this.unhighlightItem(e, objects);
+      break;
+    case vs.ui.BrushingEvent.Action['SELECT']:
+      // TODO
+      break;
+    case vs.ui.BrushingEvent.Action['DESELECT']:
+      // TODO
+      break;
+    default:
+      break;
+  }
+};
 
 /**
- * @param {HTMLElement} viewport Can be canvas, svg, etc.
- * @param {Object} d
+ * @param {vs.ui.BrushingEvent} e
+ * @param {Array.<Object>} objects
  */
-vs.ui.VisHandler.prototype.unhighlightItem = function(viewport, d) {};
+vs.ui.VisHandler.prototype.highlightItem = function(e, objects) {};
+
+/**
+ * @param {vs.ui.BrushingEvent} e
+ * @param {Array.<Object>} objects
+ */
+vs.ui.VisHandler.prototype.unhighlightItem = function(e, objects) {};
 
 /**
  * @returns {Promise}

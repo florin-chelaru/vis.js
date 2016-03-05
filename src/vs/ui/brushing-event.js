@@ -6,21 +6,19 @@
 
 goog.provide('vs.ui.BrushingEvent');
 
-goog.require('vs.ui.VisHandler');
 goog.require('vs.models.DataSource');
 
 /**
- * @param {vs.ui.VisHandler} source
  * @param {vs.models.DataSource} data
- * @param {Object} item
  * @param {vs.ui.BrushingEvent.Action} action
+ * @param {...Object} items
  * @constructor
  */
-vs.ui.BrushingEvent = function(source, data, item, action) {
+vs.ui.BrushingEvent = function(data, action, items) {
   /**
-   * @type {vs.ui.VisHandler}
+   * @type {string}
    */
-  this['source'] = source;
+  this['id'] = u.generatePseudoGUID(10);
 
   /**
    * @type {vs.models.DataSource}
@@ -28,9 +26,9 @@ vs.ui.BrushingEvent = function(source, data, item, action) {
   this['data'] = data;
 
   /**
-   * @type {number}
+   * @type {Array.<Object>}
    */
-  this['item'] = item;
+  this['items'] = u.array.fromArguments(arguments).slice(2);
 
   /**
    * @type {vs.ui.BrushingEvent.Action}

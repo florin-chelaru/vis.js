@@ -8,8 +8,10 @@ goog.provide('vs.Configuration');
 
 /**
  * @constructor
+ * @extends {ngu.Configuration}
  */
 vs.Configuration = function() {
+  ngu.Configuration.apply(this, arguments);
 
   /**
    * @type {Object.<string, *>}
@@ -17,6 +19,8 @@ vs.Configuration = function() {
    */
   this._options = {};
 };
+
+goog.inherits(vs.Configuration, ngu.Configuration);
 
 /**
  * @type {Object.<string, *>}

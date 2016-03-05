@@ -9,15 +9,18 @@ goog.provide('vs.directives.Visualization');
 goog.require('vs.ui.VisualizationFactory');
 goog.require('vs.ui.VisHandler');
 goog.require('vs.async.TaskService');
+goog.require('vs.linking.LinkProvider');
 
 /**
  * @param {angular.Scope} $scope
  * @param {vs.ui.VisualizationFactory} visualizationFactory
  * @param {vs.async.TaskService} taskService
+ * @param {angular.Scope} $rootScope
+ * @param {vs.linking.LinkProvider} linkProvider
  * @constructor
  * @extends {ngu.Directive}
  */
-vs.directives.Visualization = function($scope, visualizationFactory, taskService) {
+vs.directives.Visualization = function($scope, visualizationFactory, taskService, $rootScope, linkProvider) {
   ngu.Directive.apply(this, arguments);
 
   /**
@@ -31,6 +34,18 @@ vs.directives.Visualization = function($scope, visualizationFactory, taskService
    * @private
    */
   this._taskService = taskService;
+
+  /**
+   * @type {angular.Scope}
+   * @private
+   */
+  this._$rootScope = $rootScope;
+
+  /**
+   * @type {vs.linking.LinkProvider}
+   * @private
+   */
+  this._linkProvider = linkProvider;
 
   /**
    * @type {vs.ui.VisualizationFactory}
@@ -79,6 +94,20 @@ vs.directives.Visualization.prototype.link = {
       self._handler['options']['width'] = e['width'];
       self._handler['options']['height'] = e['height'];
       self._handler.scheduleRedraw();
+    });
+
+    this['handler']['brushing'].addListener(function(e) {
+      this._$rootScope.$broadcast('brushing', e);
+    }, this);
+
+    $scope.$on('brushing', function(e, brushingEvent) {
+      /**
+       * @type {Array.<vs.models.DataSource>}
+       */
+      var data = self['handler']['data'];
+      var objects = self._linkProvider.brushingObjects(brushingEvent, data);
+
+      self['handler'].brush(brushingEvent, objects);
     });
   }
 };

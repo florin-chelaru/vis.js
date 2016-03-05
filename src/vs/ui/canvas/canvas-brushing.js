@@ -107,10 +107,11 @@ vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
     return vs.ui.decorators.Brushing.prototype.endDraw.apply(self, args);
   });
 };
+/*
 
-/**
+/!**
  * @param {vs.ui.BrushingEvent} e
- */
+ *!/
 vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
   var target = this['target'];
   this._brushingCanvas
@@ -130,3 +131,4 @@ vs.ui.canvas.CanvasBrushing.prototype.brush = function(e) {
     this._brushingCanvas.css('display', 'none');
   }
 };
+*/
