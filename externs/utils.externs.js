@@ -329,6 +329,14 @@ u.map = function(obj, callback, thisArg) {};
 u.copy = function(obj) {};
 
 /**
+ * @param {Array.<T>} arr
+ * @param {function(T): {key: (string|number), value: *}} callback
+ * @returns {Object.<(string|number), *>}
+ * @template T
+ */
+u.mapToObject = function(arr, callback) {};
+
+/**
  * Extends the properties of dst with those of the other arguments of the function;
  * values corresponding to common keys are overriden.
  * @param {Object} dst
@@ -371,6 +379,29 @@ u.reflowForTransition = function(element) {};
  * @returns {string}
  */
 u.gravatar = function(email, options) {};
+
+/**
+ * For more details, see: http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+ * @param {string} hex
+ * @returns {{r:number, g:number, b:number}}
+ */
+u.hex2rgb = function(hex) {};
+
+/**
+ * For more details, see: http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+ * @param {number} r
+ * @param {number} g
+ * @param {number} b
+ * @returns {string}
+ */
+u.rgb2hex = function(r, g, b) {};
+
+/**
+ * @param {string} hex
+ * @param {number} [alpha]
+ * @returns {string}
+ */
+u.hex2rgba = function(hex, alpha) {};
 
 /**
  * @param {number} milliseconds Must be positive
@@ -493,3 +524,25 @@ u.QuadTree.Node = function(x, y, size, parent) {};
  * @constructor
  */
 u.QuadTree.Item = function(x, y, w, h, value) {};
+
+u.fast = {};
+
+/**
+ * @param {Array} arr
+ * @param {function(*, (number|undefined)): *} callback
+ * @returns {Array}
+ */
+u.fast.map = function(arr, callback) {};
+
+/**
+ * @param {Array.<Array>} arrays
+ * @returns {Array}
+ */
+u.fast.concat = function(arrays) {};
+
+/**
+ * @param {Array} arr
+ * @param {function(*, (number|undefined)): boolean} predicate
+ * @returns {Array}
+ */
+u.fast.filter = function(arr, predicate) {};

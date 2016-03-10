@@ -16,6 +16,24 @@ goog.require('goog.string.format');
  */
 vs.ui.canvas.CanvasVis = function () {
   vs.ui.VisHandler.apply(this, arguments);
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._pendingCanvas = null;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._activeCanvas = null;
+
+  /**
+   * @type {jQuery}
+   * @private
+   */
+  this._brushingCanvas = null;
 };
 
 goog.inherits(vs.ui.canvas.CanvasVis, vs.ui.VisHandler);
@@ -45,6 +63,12 @@ vs.ui.canvas.CanvasVis.prototype.activeCanvas;
  */
 vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
 
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#brushingCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.brushingCanvas;
+
 Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
   'render': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return 'canvas'; })},
   'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return vs.ui.canvas.CanvasVis.Settings; })},
@@ -52,8 +76,19 @@ Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
     set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this['options']['doubleBuffer'] = value; })
   },
-  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas'); })},
-  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas'); })}
+  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() {
+    return this._pendingCanvas;
+    //return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas');
+  })},
+  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() {
+    // return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas');
+    return this['doubleBuffer'] ? this._activeCanvas : this._pendingCanvas;
+  })},
+  'brushingCanvas': {
+    get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function () {
+      return this._brushingCanvas;
+    })
+  }
 });
 
 /**
@@ -65,12 +100,23 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   return new Promise(function(resolve, reject) {
     vs.ui.VisHandler.prototype.beginDraw.apply(self, args).then(
       function() {
-        var pendingCanvas = self['pendingCanvas'];
-        if (pendingCanvas.length == 0) {
+        // var pendingCanvas = self['pendingCanvas'];
+        var pendingCanvas = self._pendingCanvas;
+        var activeCanvas = self._activeCanvas;
+        if (!pendingCanvas || !activeCanvas) {
+        //if (pendingCanvas.length == 0) {
           var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>',
             /** @type {number} */ (self.optionValue('width')), /** @type {number} */ (self.optionValue('height')));
-          $(goog.string.format(format, 'block') + (self['doubleBuffer'] ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
-          pendingCanvas = self['pendingCanvas'];
+
+          activeCanvas = $(goog.string.format(format, 'block')).appendTo(self['$element']);
+          pendingCanvas = self['doubleBuffer'] ?  $(goog.string.format(format, 'none')).appendTo(self['$element']) : activeCanvas;
+
+          //pendingCanvas = $(goog.string.format(format, 'block') + (self['doubleBuffer'] ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
+          self._pendingCanvas = pendingCanvas;
+          self._activeCanvas = activeCanvas;
+          // pendingCanvas = self['pendingCanvas'];
+
+          self._initializeBrushing();
         }
 
         pendingCanvas
@@ -95,10 +141,15 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
   var args = arguments;
   return new Promise(function(resolve, reject) {
     if (!self['doubleBuffer']) { resolve(); return; }
-    var activeCanvas = self['activeCanvas'];
-    var pendingCanvas = self['pendingCanvas'];
-    activeCanvas.css({ 'display': 'none' });
-    pendingCanvas.css({ 'display': 'block' });
+    //var activeCanvas = self['activeCanvas'];
+    //var pendingCanvas = self['pendingCanvas'];
+    self._activeCanvas.css({'display': 'none'});
+    self._pendingCanvas.css({ 'display': 'block' });
+    //activeCanvas.css({ 'display': 'none' });
+    //pendingCanvas.css({ 'display': 'block' });
+    var aux = self._activeCanvas;
+    self._activeCanvas = self._pendingCanvas;
+    self._pendingCanvas = aux;
     resolve();
   }).then(function() {
     return vs.ui.VisHandler.prototype.endDraw.apply(self, args);
@@ -111,6 +162,82 @@ vs.ui.canvas.CanvasVis.prototype.endDraw = function() {
  * @returns {Array.<Object>}
  */
 vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) { return []; };
+
+/**
+ * @private
+ */
+vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {
+  var self = this;
+  if (!this._brushingCanvas) {
+    var canvas = goog.string.format('<canvas width="%s" height="%s" style="display: none; position: absolute; bottom: 0; left: 0;"></canvas>',
+      /** @type {number} */ (this.optionValue('width')), /** @type {number} */ (this.optionValue('height')));
+
+    this._brushingCanvas = $(canvas);
+    this._brushingCanvas.appendTo(this['$element']);
+  }
+
+  var activeCanvas = this._activeCanvas[0];
+  var selectedItem = null;
+
+  /** @type {Object.<string, Array.<Object>>|null} */
+  var selectedItems = null;
+
+  /** @type {Array.<vs.models.DataSource>} */
+  var data = this['data'];
+
+  /** @type {Object.<string|number, vs.models.DataSource>} */
+  var dataMap = u.mapToObject(data, function(d) { return {'key': d['id'], 'value': d}});
+
+  /** @param {MouseEvent} evt */
+  var mousemove = function(evt) {
+    var i;
+    if (selectedItems) {
+      u.each(selectedItems, function(dataId, items) {
+        self['brushing'].fire(u.reflection.applyConstructor(/** @type {function(new: vs.ui.BrushingEvent)} */ (vs.ui.BrushingEvent), [dataMap[dataId], vs.ui.BrushingEvent.Action['MOUSEOUT']].concat(items)));
+      });
+      selectedItems = null;
+    }
+
+    /** @type {ClientRect} */
+    var rect = activeCanvas.getBoundingClientRect();
+    var mousePos = {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+
+    var items = self.getItemsAt(mousePos.x, mousePos.y);
+    if (!items.length) { return; }
+
+    selectedItems = {};
+    for (i = 0; i < items.length; ++i) {
+      var item = items[i];
+      var dataId = item['__d__'];
+      var dataItems = selectedItems[dataId];
+      if (!dataItems) {
+        dataItems = [];
+        selectedItems[dataId] = dataItems;
+      }
+      dataItems.push(item);
+    }
+    u.each(selectedItems, function(dataId, items) {
+      self['brushing'].fire(u.reflection.applyConstructor(/** @type {function(new: vs.ui.BrushingEvent)} */ (vs.ui.BrushingEvent), [dataMap[dataId], vs.ui.BrushingEvent.Action['MOUSEOVER']].concat(items)));
+    });
+  };
+
+  activeCanvas.addEventListener('mousemove', mousemove);
+  activeCanvas.addEventListener('mouseover', mousemove);
+  activeCanvas.addEventListener('mouseout', mousemove);
+  this._brushingCanvas[0].addEventListener('mouseover', mousemove);
+  this._brushingCanvas[0].addEventListener('mousemove', mousemove);
+  this._brushingCanvas[0].addEventListener('mouseout', mousemove);
+
+  if (this['doubleBuffer']) {
+    var pendingCanvas = this._pendingCanvas[0];
+    pendingCanvas.addEventListener('mousemove', mousemove);
+    pendingCanvas.addEventListener('mouseover', mousemove);
+    pendingCanvas.addEventListener('mouseout', mousemove);
+  }
+};
 
 /**
  * @param {CanvasRenderingContext2D} context
