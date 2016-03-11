@@ -100,8 +100,8 @@ Object.defineProperties(vs.ui.DataHandler.prototype, {
 
 /**
  * @param {vs.models.Query|Array.<vs.models.Query>} queries
- * @returns {Promise.<vs.models.DataSource>}
+ * @returns {Promise.<Array.<vs.models.DataSource>>}
  */
 vs.ui.DataHandler.prototype.query = function(queries) {
-  return this._data.applyQuery(queries);
+  return /** @type {Promise.<Array.<vs.models.DataSource>>} */ (Promise.all(u.fast.map(this['data'], function(d) { return d.applyQuery(queries); })));
 };

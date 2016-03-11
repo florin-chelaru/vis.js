@@ -43,7 +43,7 @@ vs.models.Query = function(opts) {
 vs.models.Query.prototype.toString = function() {
   var argsStr = (this['testArgs'] === undefined) ? 'undefined' : JSON.stringify(this['testArgs']);
   var ret =
-      this['target'] + '.' +
+      this['target'] + ' ' +
       this['test'] + ' ' +
       argsStr;
   return this['negate'] ? 'not(' + ret + ')' : ret;

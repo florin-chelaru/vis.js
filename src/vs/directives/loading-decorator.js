@@ -149,8 +149,12 @@ vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attr
     return Promise.resolve();
   };
 
-  target['data']['changing'].addListener(beforeDraw);
-  target['data']['changed'].addListener(afterDraw);
+  // TODO: We may still need to figure out when all data has finished changing...
+  //target['data']['changing'].addListener(beforeDraw);
+  //target['data']['changed'].addListener(afterDraw);
+  u.fast.forEach(target['data'], function(d) {
+    d['changing'].addListener(beforeDraw);
+  });
 
   this._taskService.chain(target['endDrawTask'], this._taskService.createTask(afterDraw));
   this._taskService.chain(this._taskService.createTask(beforeDraw), target['beginDrawTask']);

@@ -101,6 +101,9 @@ vs.models.GenomicRangeQuery.extract = function(query) {
   var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
   var bpValidTests = ['<', '>='];
 
+  // Make sure we don't have any repeating queries
+  query = u.array.uniqueKey(query, function(q) { return q.toString(); });
+
   var rowQueries = u.fast.filter(query, function(q) {
     if (rowLabels.indexOf(q['target']) < 0) { return false; }
     if ((q['target'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {

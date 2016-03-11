@@ -247,7 +247,7 @@ vs.models.DataSource.singleQuery = function(data, q) {
         });
 
       ret = u.reflection.wrap({
-        'id': ret['id'].concat([q]),
+        'id': ret['id'],
         'query': ret['query'].concat([q]),
         'rowMetadata': ret['rowMetadata'],
         'metadata': ret['metadata'],
