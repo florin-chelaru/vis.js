@@ -101,7 +101,7 @@ vs.models.GenomicRangeQuery.extract = function(query) {
   var chrValidTests = ['==']; // TODO: Later, add support for all others. Shouldn't be that hard, if we use the ChrTree
   var bpValidTests = ['<', '>='];
 
-  var rowQueries = query.filter(function(q) {
+  var rowQueries = u.fast.filter(query, function(q) {
     if (rowLabels.indexOf(q['target']) < 0) { return false; }
     if ((q['target'] == 'chr' && chrValidTests.indexOf(q['test']) < 0) || q['negate']) {
       throw new vs.models.ModelsException('The ' + q['test'] + ' operation is not yet supported for chromosomes; supported operations are: ' + JSON.stringify(chrValidTests));
@@ -118,10 +118,10 @@ vs.models.GenomicRangeQuery.extract = function(query) {
     return true;
   });
 
-  var chrQueries = rowQueries.filter(function(q) { return q['target'] == 'chr' && !q['negate']; });
-  var startEndQueries = rowQueries.filter(function(q) { return q['target'] == 'start' || q['target'] == 'end' });
-  var greaterThanQueries = startEndQueries.filter(function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
-  var lessThanQueries = startEndQueries.filter(function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
+  var chrQueries = u.fast.filter(rowQueries, function(q) { return q['target'] == 'chr' && !q['negate']; });
+  var startEndQueries = u.fast.filter(rowQueries, function(q) { return q['target'] == 'start' || q['target'] == 'end' });
+  var greaterThanQueries = u.fast.filter(startEndQueries, function(q) { return q['test'] == '>=' || (q['negate'] && q['test'] == '<'); });
+  var lessThanQueries = u.fast.filter(startEndQueries, function(q) { return q['test'] == '<' || (q['negate'] && q['test'] == '>='); });
 
   if (rowQueries.length > 0 && chrQueries.length != 1) {
     throw new vs.models.ModelsException('Valid queries must either be empty, or contain exactly one "chr == " test');
@@ -135,8 +135,8 @@ vs.models.GenomicRangeQuery.extract = function(query) {
 
   var range = rowQueries.length == 0 ? undefined : {
     chr: chrQueries[0]['testArgs'],
-    end: startEndQueries.filter(function(q) { return q['target'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
-    start: startEndQueries.filter(function(q) { return q['target'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
+    end: u.fast.filter(startEndQueries, function(q) { return q['target'] == 'start'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.min(v1, v2); }),
+    start: u.fast.filter(startEndQueries, function(q) { return q['target'] == 'end'; }).map(function(q) { return q['testArgs']; }).reduce(function(v1, v2) { return Math.max(v1, v2); })
   };
 
   return new vs.models.GenomicRangeQuery(range.chr, range.start, range.end);

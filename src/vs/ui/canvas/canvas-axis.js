@@ -67,9 +67,9 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
     context.fillStyle = '#000000';
 
     var ticks = scale.ticks(self['ticks']);
-    var units = ticks.map(scale.tickFormat(self['ticks'], self['format']));
+    var units = u.fast.map(ticks, scale.tickFormat(self['ticks'], self['format']));
 
-    var maxTextSize = Math.max.apply(null, units.map(function(unit) { return context.measureText(unit).width; }));
+    var maxTextSize = Math.max.apply(null, u.fast.map(units, function(unit) { return context.measureText(unit).width; }));
 
     var minXMargin = maxTextSize + 11;
     if (type == 'y' && margins['left'] < minXMargin) {
@@ -96,7 +96,7 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
     var y1 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
     var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom'] + 6; };
 
-    ticks.forEach(function(tick) {
+    u.fast.forEach(ticks, function(tick) {
       moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
       lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
     });
@@ -113,7 +113,7 @@ vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {
       translate = translate.translate({'x': -5, 'y': 0});
     }
 
-    units.forEach(function(unit, i) {
+    u.fast.forEach(units, function(unit, i) {
       var p = translate.calc({'x': x2(ticks[i]), 'y': y2(ticks[i])});
       context.fillText(unit, p['x'], p['y']);
     });

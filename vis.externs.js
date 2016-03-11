@@ -31,6 +31,113 @@ decorators: {}
 
 
 /**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ * @constructor
+ */
+vs.async.Task = function(func, thisArg) {};
+
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+/**
+ * @type {number}
+ * @private
+ */
+vs.async.Task._nextId = 0;
+
+/**
+ * @returns {number}
+ */
+vs.async.Task.nextId = function() {};
+
+
+/**
+ * @param {function(Function, number)} $timeout Angular timeout service
+ * @constructor
+ */
+vs.async.TaskService = function($timeout) {};
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ */
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {};
+
+/**
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
+ * @returns {vs.async.Task}
+ */
+vs.async.TaskService.prototype.chain = function(t1, t2) {};
+
+/**
+ * TODO: test!
+ * @param {vs.async.Task} task
+ * @param {boolean} [sequential] If true, the tasks will run sequentially
+ * @returns {Promise}
+ */
+vs.async.TaskService.prototype.runChain = function(task, sequential) {};
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
+
+
+/**
  * Argument details:
  *  - target: if defined, the label of the row/column/value array to test; if undefined, the index within the current structure is used
  *  - test: the filter to be applied on the data (>, <, ==, etc)
@@ -194,26 +301,75 @@ vs.models.DataSource.allDataIsReady = function(datas) {};
 
 
 /**
+ * @param {{render: string, type: string}} construct
+ * @param {Object.<string, *>} [options]
+ * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
  * @constructor
- * @extends {ngu.Configuration}
  */
-vs.linking.LinkProvider = function() {};
+vs.ui.VisualContext = function(construct, options, decorators) {};
+
 
 /**
- * @param {string} dataId1
- * @param {string} dataId2
- * @param {function(vs.models.DataSource, Array.<Object>, vs.models.DataSource): Array.<Object>} link (d1, obj1, d2) => obj2
+ * @param {vs.ui.DataHandler|{data: Array.<vs.models.DataSource>, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
+ * @constructor
  */
-vs.linking.LinkProvider.prototype.register = function(dataId1, dataId2, link) {};
+vs.ui.DataHandler = function(options) {};
 
 /**
- * @param {vs.ui.BrushingEvent} brushingEvent
- * @param {Array.<vs.models.DataSource>} data
- * @returns {Array.<Object>}
+ * @type {string}
+ * @name vs.ui.DataHandler#name
  */
-vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data) {};
+vs.ui.DataHandler.prototype.name;
+
+/**
+ * @type {Array.<vs.models.DataSource>}
+ * @name vs.ui.DataHandler#data
+ */
+vs.ui.DataHandler.prototype.data;
+
+/**
+ * @type {u.Event.<vs.models.DataSource>}
+ * @name vs.ui.DataHandler#dataChanged
+ */
+vs.ui.DataHandler.prototype.dataChanged;
+
+/**
+ * @type {Array.<vs.ui.DataHandler>}
+ * @name vs.ui.DataHandler#children
+ */
+vs.ui.DataHandler.prototype.children;
+
+/**
+ * @type {Array.<vs.ui.VisualContext>}
+ * @name vs.ui.DataHandler#visualizations
+ */
+vs.ui.DataHandler.prototype.visualizations;
+/**
+ * @param {vs.models.Query|Array.<vs.models.Query>} queries
+ * @returns {Promise.<vs.models.DataSource>}
+ */
+vs.ui.DataHandler.prototype.query = function(queries) {};
 
 
+/**
+ * @param {angular.Scope} $scope
+ * @param {angular.$templateCache} $templateCache
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.DataContext = function($scope, $templateCache) {};
+
+/**
+ * @type {vs.ui.DataHandler}
+ * @name vs.directives.DataContext#handler
+ */
+vs.directives.DataContext.prototype.handler;
+
+/**
+ * @type {string}
+ * @name vs.directives.DataContext#template
+ */
+vs.directives.DataContext.prototype.template;
 /**
  * @param {vs.models.DataSource} data
  * @param {vs.ui.BrushingEvent.Action} action
@@ -370,11 +526,6 @@ vs.ui.Setting.Type = {
 
 //region Static Methods
 /**
- * @param {Array.<vs.models.DataSource>} data
- */
-vs.ui.Setting.getAllRowMetadata = function(data) {};
-
-/**
  * @param {string} dep
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
@@ -466,94 +617,6 @@ vs.ui.Setting.mergeCols = function(xVal, ds) {};
  */
 vs.ui.Setting.PredefinedSettings = {};
 //endregion
-
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- * @constructor
- */
-vs.async.Task = function(func, thisArg) {};
-
-/**
- * @type {number}
- * @name vs.async.Task#id
- */
-vs.async.Task.prototype.id;
-
-/**
- * @type {Object|undefined}
- * @name vs.async.Task#thisArg
- */
-vs.async.Task.prototype.thisArg;
-
-/**
- * @type {function():Promise}
- * @name vs.async.Task#func
- */
-vs.async.Task.prototype.func;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#prev
- */
-vs.async.Task.prototype.prev;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#next
- */
-vs.async.Task.prototype.next;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#first
- */
-vs.async.Task.prototype.first;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#last
- */
-vs.async.Task.prototype.last;
-/**
- * @type {number}
- * @private
- */
-vs.async.Task._nextId = 0;
-
-/**
- * @returns {number}
- */
-vs.async.Task.nextId = function() {};
-
-
-/**
- * @param {function(Function, number)} $timeout Angular timeout service
- * @constructor
- */
-vs.async.TaskService = function($timeout) {};
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- */
-vs.async.TaskService.prototype.createTask = function(func, thisArg) {};
-
-/**
- * @param {vs.async.Task|function():Promise} t1
- * @param {vs.async.Task|function():Promise} t2
- * @returns {vs.async.Task}
- */
-vs.async.TaskService.prototype.chain = function(t1, t2) {};
-
-/**
- * TODO: test!
- * @param {vs.async.Task} task
- * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {Promise}
- */
-vs.async.TaskService.prototype.runChain = function(task, sequential) {};
 
 
 //region goog...
@@ -735,6 +798,14 @@ vs.ui.VisHandler.prototype.preProcessData = function() {};
 
 
 /**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.ui.UiException = function(message, innerException) {};
+
+/**
  * @constructor
  * @extends {ngu.Configuration}
  */
@@ -750,14 +821,6 @@ vs.Configuration.prototype.options;
  */
 vs.Configuration.prototype.customize = function(options) {};
 
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.ui.UiException = function(message, innerException) {};
 
 /**
  * @param {vs.Configuration} config
@@ -789,6 +852,27 @@ vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $att
 
 
 /**
+ * @constructor
+ * @extends {ngu.Configuration}
+ */
+vs.linking.LinkProvider = function() {};
+
+/**
+ * @param {string} dataId1
+ * @param {string} dataId2
+ * @param {function(vs.models.DataSource, Array.<Object>, vs.models.DataSource): Array.<Object>} link (d1, obj1, d2) => obj2
+ */
+vs.linking.LinkProvider.prototype.register = function(dataId1, dataId2, link) {};
+
+/**
+ * @param {vs.ui.BrushingEvent} brushingEvent
+ * @param {Array.<vs.models.DataSource>} data
+ * @returns {Array.<Object>}
+ */
+vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data) {};
+
+
+/**
  * @param {angular.Scope} $scope
  * @param {vs.ui.VisualizationFactory} visualizationFactory
  * @param {vs.async.TaskService} taskService
@@ -817,6 +901,130 @@ vs.directives.Visualization.prototype.link;
 
 
 /**
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.Window = function() {};
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Window#$window
+ */
+vs.directives.Window.prototype.$window;
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Window.prototype.link;
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.Resizable = function($scope, $document) {};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {};
+
+/**
+ * @param {jQuery} $elem
+ * @constructor
+ */
+vs.directives.Resizable.ResizeHandler = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topRight = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.left = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.right = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottom = function($elem) {};
+
+/**
+ * @param {jQuery} $element
+ * @constructor
+ */
+vs.directives.Resizable.BoundingBox = function($element) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {};
+
+/**
+ * @param {vs.directives.Resizable.ResizeHandler} handler
+ * @param {number} [minWidth]
+ * @param {number} [minHeight]
+ */
+vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {};
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#left
+ */
+vs.directives.Resizable.BoundingBox.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#top
+ */
+vs.directives.Resizable.BoundingBox.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#width
+ */
+vs.directives.Resizable.BoundingBox.prototype.width;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#height
+ */
+vs.directives.Resizable.BoundingBox.prototype.height;
+/**
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
@@ -835,12 +1043,96 @@ vs.directives.Movable.prototype.link = function($scope, $element, $attrs, contro
 
 
 /**
+ * @param {number} [x]
+ * @param {number} [y]
  * @constructor
- * @extends vs.ui.VisHandler
  */
-vs.ui.svg.SvgVis = function () {};
+vs.models.Point = function(x, y) {};
 
-vs.ui.svg.SvgVis.prototype.beginDraw = function () {};
+/**
+ * @type {number}
+ * @name vs.models.Point#x
+ */
+vs.models.Point.prototype.x;
+
+/**
+ * @type {number}
+ * @name vs.models.Point#y
+ */
+vs.models.Point.prototype.y;
+
+
+/**
+ * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
+ * @constructor
+ */
+vs.models.Transformer = function(transformation) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {vs.models.Point}
+ */
+vs.models.Transformer.prototype.calc = function(point) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {Array.<number>}
+ */
+vs.models.Transformer.prototype.calcArr = function(point) {};
+
+/**
+ * @param {number} x
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcX = function(x) {};
+
+/**
+ * @param {number} y
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcY = function(y) {};
+
+/**
+ * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.combine = function(transformer) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.translate = function(offset) {};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.scale = function(xScale, yScale) {};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.intCoords = function() {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.translate = function(offset) {};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.scale = function(xScale, yScale) {};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.intCoords = function() {};
 
 
 /**
@@ -969,99 +1261,6 @@ vs.ui.decorators.Axis.prototype.ticks;
  */
 vs.ui.decorators.Axis.prototype.format;
 /**
- * @param {number} [x]
- * @param {number} [y]
- * @constructor
- */
-vs.models.Point = function(x, y) {};
-
-/**
- * @type {number}
- * @name vs.models.Point#x
- */
-vs.models.Point.prototype.x;
-
-/**
- * @type {number}
- * @name vs.models.Point#y
- */
-vs.models.Point.prototype.y;
-
-
-/**
- * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
- * @constructor
- */
-vs.models.Transformer = function(transformation) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {vs.models.Point}
- */
-vs.models.Transformer.prototype.calc = function(point) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {Array.<number>}
- */
-vs.models.Transformer.prototype.calcArr = function(point) {};
-
-/**
- * @param {number} x
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcX = function(x) {};
-
-/**
- * @param {number} y
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcY = function(y) {};
-
-/**
- * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.combine = function(transformer) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.translate = function(offset) {};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.scale = function(xScale, yScale) {};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.intCoords = function() {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.translate = function(offset) {};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.scale = function(xScale, yScale) {};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.intCoords = function() {};
-
-
-/**
  * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
@@ -1146,6 +1345,131 @@ vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, tar
 
 
 /**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.models.ModelsException = function(message, innerException) {};
+
+/**
+ * @param {string} chr
+ * @param {number} start
+ * @param {number} end
+ * @constructor
+ */
+vs.models.GenomicRangeQuery = function(chr, start, end) {};
+
+/**
+ * @type {string}
+ * @name vs.models.GenomicRangeQuery#chr
+ */
+vs.models.GenomicRangeQuery.prototype.chr;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#start
+ */
+vs.models.GenomicRangeQuery.prototype.start;
+
+/**
+ * @type {number}
+ * @name vs.models.GenomicRangeQuery#end
+ */
+vs.models.GenomicRangeQuery.prototype.end;
+
+/**
+ * @type {Array.<vs.models.Query>}
+ * @name vs.models.GenomicRangeQuery#query
+ */
+vs.models.GenomicRangeQuery.prototype.query;
+/**
+ * @param {Array.<vs.models.Query>} query
+ * @returns {vs.models.GenomicRangeQuery}
+ */
+vs.models.GenomicRangeQuery.extract = function(query) {};
+
+
+/**
+ * @constructor
+ * @extends vs.ui.VisHandler
+ */
+vs.ui.svg.SvgVis = function () {};
+
+vs.ui.svg.SvgVis.prototype.beginDraw = function () {};
+
+
+/**
+ * @constructor
+ * @extends {vs.ui.VisHandler}
+ */
+vs.ui.canvas.CanvasVis = function () {};
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.canvas.CanvasVis.Settings = u.extend({}, vs.ui.VisHandler.Settings, {
+  'doubleBuffer': vs.ui.Setting.PredefinedSettings['doubleBuffer']
+});
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#pendingCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.pendingCanvas;
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#activeCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.activeCanvas;
+
+/**
+ * @type {boolean}
+ * @name vs.ui.canvas.CanvasVis#doubleBuffer
+ */
+vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.canvas.CanvasVis#brushingCanvas
+ */
+vs.ui.canvas.CanvasVis.prototype.brushingCanvas;
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasVis.prototype.endDraw = function() {};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @returns {Array.<Object>}
+ */
+vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) {};
+
+/**
+ * @private
+ */
+vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {};
+
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @param {string} [fill]
+ * @param {string} [stroke]
+ * @param {number} [strokeWidth]
+ */
+vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke, strokeWidth) {};
+
+
+/**
  * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
  * @param {jQuery} $targetElement
  * @param {vs.ui.VisHandler} target
@@ -1226,334 +1550,5 @@ vs.directives.Grid = function($scope, taskService, $timeout) {};
 vs.directives.Grid.prototype.createDecorator = function($ng, $targetElement, target, options) {};
 
 
-/**
- * @param {angular.Scope} $scope
- * @param {vs.async.TaskService} taskService
- * @param {angular.$timeout} $timeout
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
-
-
-/**
- * @constructor
- * @extends {vs.ui.VisHandler}
- */
-vs.ui.canvas.CanvasVis = function () {};
-
-/**
- * @type {Object.<string, vs.ui.Setting>}
- */
-vs.ui.canvas.CanvasVis.Settings = u.extend({}, vs.ui.VisHandler.Settings, {
-  'doubleBuffer': vs.ui.Setting.PredefinedSettings['doubleBuffer']
-});
-
-/**
- * @type {jQuery}
- * @name vs.ui.canvas.CanvasVis#pendingCanvas
- */
-vs.ui.canvas.CanvasVis.prototype.pendingCanvas;
-
-/**
- * @type {jQuery}
- * @name vs.ui.canvas.CanvasVis#activeCanvas
- */
-vs.ui.canvas.CanvasVis.prototype.activeCanvas;
-
-/**
- * @type {boolean}
- * @name vs.ui.canvas.CanvasVis#doubleBuffer
- */
-vs.ui.canvas.CanvasVis.prototype.doubleBuffer;
-
-/**
- * @type {jQuery}
- * @name vs.ui.canvas.CanvasVis#brushingCanvas
- */
-vs.ui.canvas.CanvasVis.prototype.brushingCanvas;
-/**
- * @returns {Promise}
- */
-vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {};
-
-/**
- * @returns {Promise}
- */
-vs.ui.canvas.CanvasVis.prototype.endDraw = function() {};
-
-/**
- * @param {number} x
- * @param {number} y
- * @returns {Array.<Object>}
- */
-vs.ui.canvas.CanvasVis.prototype.getItemsAt = function(x, y) {};
-
-/**
- * @private
- */
-vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {number} cx
- * @param {number} cy
- * @param {number} r
- * @param {string} [fill]
- * @param {string} [stroke]
- * @param {number} [strokeWidth]
- */
-vs.ui.canvas.CanvasVis.circle = function(context, cx, cy, r, fill, stroke, strokeWidth) {};
-
-
-/**
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.Window = function() {};
-
-/**
- * @type {jQuery}
- * @name vs.directives.Window#$window
- */
-vs.directives.Window.prototype.$window;
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Window.prototype.link;
-
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.models.ModelsException = function(message, innerException) {};
-
-/**
- * @param {string} chr
- * @param {number} start
- * @param {number} end
- * @constructor
- */
-vs.models.GenomicRangeQuery = function(chr, start, end) {};
-
-/**
- * @type {string}
- * @name vs.models.GenomicRangeQuery#chr
- */
-vs.models.GenomicRangeQuery.prototype.chr;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#start
- */
-vs.models.GenomicRangeQuery.prototype.start;
-
-/**
- * @type {number}
- * @name vs.models.GenomicRangeQuery#end
- */
-vs.models.GenomicRangeQuery.prototype.end;
-
-/**
- * @type {Array.<vs.models.Query>}
- * @name vs.models.GenomicRangeQuery#query
- */
-vs.models.GenomicRangeQuery.prototype.query;
-/**
- * @param {Array.<vs.models.Query>} query
- * @returns {vs.models.GenomicRangeQuery}
- */
-vs.models.GenomicRangeQuery.extract = function(query) {};
-
-
-/**
- * @param {angular.Scope} $scope
- * @param $document
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.Resizable = function($scope, $document) {};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {};
-
-/**
- * @param {jQuery} $elem
- * @constructor
- */
-vs.directives.Resizable.ResizeHandler = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topRight = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.left = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.right = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottom = function($elem) {};
-
-/**
- * @param {jQuery} $element
- * @constructor
- */
-vs.directives.Resizable.BoundingBox = function($element) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {};
-
-/**
- * @param {vs.directives.Resizable.ResizeHandler} handler
- * @param {number} [minWidth]
- * @param {number} [minHeight]
- */
-vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {};
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#left
- */
-vs.directives.Resizable.BoundingBox.prototype.left;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#top
- */
-vs.directives.Resizable.BoundingBox.prototype.top;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#width
- */
-vs.directives.Resizable.BoundingBox.prototype.width;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#height
- */
-vs.directives.Resizable.BoundingBox.prototype.height;
-/**
- * @param {{render: string, type: string}} construct
- * @param {Object.<string, *>} [options]
- * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
- * @constructor
- */
-vs.ui.VisualContext = function(construct, options, decorators) {};
-
-
-/**
- * @param {vs.ui.DataHandler|{data: Array.<vs.models.DataSource>, visualizations: (Array.<vs.ui.VisualContext>|undefined), children: (Array.<vs.ui.DataHandler>|undefined), name: (string|undefined)}} options
- * @constructor
- */
-vs.ui.DataHandler = function(options) {};
-
-/**
- * @type {string}
- * @name vs.ui.DataHandler#name
- */
-vs.ui.DataHandler.prototype.name;
-
-/**
- * @type {Array.<vs.models.DataSource>}
- * @name vs.ui.DataHandler#data
- */
-vs.ui.DataHandler.prototype.data;
-
-/**
- * @type {u.Event.<vs.models.DataSource>}
- * @name vs.ui.DataHandler#dataChanged
- */
-vs.ui.DataHandler.prototype.dataChanged;
-
-/**
- * @type {Array.<vs.ui.DataHandler>}
- * @name vs.ui.DataHandler#children
- */
-vs.ui.DataHandler.prototype.children;
-
-/**
- * @type {Array.<vs.ui.VisualContext>}
- * @name vs.ui.DataHandler#visualizations
- */
-vs.ui.DataHandler.prototype.visualizations;
-/**
- * @param {vs.models.Query|Array.<vs.models.Query>} queries
- * @returns {Promise.<vs.models.DataSource>}
- */
-vs.ui.DataHandler.prototype.query = function(queries) {};
-
-
-/**
- * @param {angular.Scope} $scope
- * @param {angular.$templateCache} $templateCache
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.DataContext = function($scope, $templateCache) {};
-
-/**
- * @type {vs.ui.DataHandler}
- * @name vs.directives.DataContext#handler
- */
-vs.directives.DataContext.prototype.handler;
-
-/**
- * @type {string}
- * @name vs.directives.DataContext#template
- */
-vs.directives.DataContext.prototype.template;
 
 

@@ -204,8 +204,8 @@ vs.models.DataSource.singleQuery = function(data, q) {
       /** @type {Array} */
       var targetArr = data['d'];
 
-      var filtered = targetArr
-        .filter(function (record, i) {
+      var filtered = u.fast.filter(targetArr,
+        function (record, i) {
           var test = true;
           var item = q['target'] != undefined ? record[q['target']] : i;
 
@@ -296,7 +296,7 @@ vs.models.DataSource.prototype.getRowMetadata = function(label) {
  * @returns {Array.<string>}
  */
 vs.models.DataSource.combinedArrayMetadata = function(datas) {
-  return u.array.uniqueFast(datas.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
+  return u.array.uniqueFast(u.fast.concat(u.fast.map(datas, function(d) { return u.fast.map(d['rowMetadata'], function(m) { return m['label']; }); })));
 };
 
 /**

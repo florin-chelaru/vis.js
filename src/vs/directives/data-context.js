@@ -51,9 +51,9 @@ vs.directives.DataContext = function($scope, $templateCache) {
   var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
 
   var t = $('<div></div>');
-  this._handler['visualizations'].forEach(function(visContext, i) {
+  u.fast.forEach(this._handler['visualizations'], function(visContext, i) {
     var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
-    visContext['decorators']['elem'].forEach(function(decorator, j) {
+    u.fast.forEach(visContext['decorators']['elem'], function(decorator, j) {
       var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
     });
   });

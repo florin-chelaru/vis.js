@@ -76,14 +76,8 @@ Object.defineProperties(vs.ui.canvas.CanvasVis.prototype, {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this.optionValue('doubleBuffer'); }),
     set: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function(value) { return this['options']['doubleBuffer'] = value; })
   },
-  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() {
-    return this._pendingCanvas;
-    //return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':hidden') : this['$element'].find('canvas');
-  })},
-  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() {
-    // return this['doubleBuffer'] ? this['$element'].find('canvas').filter(':visible') : this['$element'].find('canvas');
-    return this['doubleBuffer'] ? this._activeCanvas : this._pendingCanvas;
-  })},
+  'pendingCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this._pendingCanvas; })},
+  'activeCanvas': { get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function() { return this['doubleBuffer'] ? this._activeCanvas : this._pendingCanvas; })},
   'brushingCanvas': {
     get: /** @type {function (this:vs.ui.canvas.CanvasVis)} */ (function () {
       return this._brushingCanvas;
@@ -100,21 +94,17 @@ vs.ui.canvas.CanvasVis.prototype.beginDraw = function () {
   return new Promise(function(resolve, reject) {
     vs.ui.VisHandler.prototype.beginDraw.apply(self, args).then(
       function() {
-        // var pendingCanvas = self['pendingCanvas'];
         var pendingCanvas = self._pendingCanvas;
         var activeCanvas = self._activeCanvas;
         if (!pendingCanvas || !activeCanvas) {
-        //if (pendingCanvas.length == 0) {
           var format = goog.string.format('<canvas width="%s" height="%s" style="display: %%s"></canvas>',
             /** @type {number} */ (self.optionValue('width')), /** @type {number} */ (self.optionValue('height')));
 
           activeCanvas = $(goog.string.format(format, 'block')).appendTo(self['$element']);
           pendingCanvas = self['doubleBuffer'] ?  $(goog.string.format(format, 'none')).appendTo(self['$element']) : activeCanvas;
 
-          //pendingCanvas = $(goog.string.format(format, 'block') + (self['doubleBuffer'] ? goog.string.format(format, 'none') : '')).appendTo(self['$element']);
           self._pendingCanvas = pendingCanvas;
           self._activeCanvas = activeCanvas;
-          // pendingCanvas = self['pendingCanvas'];
 
           self._initializeBrushing();
         }

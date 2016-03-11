@@ -146,7 +146,7 @@ vs.ui.VisHandler = function($ng, options, data) {
   this._redrawPromise = Promise.resolve();
 
   var self = this;
-  this._data.forEach(function(d) {
+  u.fast.forEach(this._data, function(d) {
     d['changed'].addListener(function() {
       self.schedulePreProcessData().then(function() {
         self.scheduleRedraw();
@@ -155,7 +155,7 @@ vs.ui.VisHandler = function($ng, options, data) {
   });
 
   // Data ready for the first time
-  Promise.all(this._data.map(function(d) { return d['ready']; })).then(function() {
+  Promise.all(u.fast.map(this._data, function(d) { return d['ready']; })).then(function() {
     self.schedulePreProcessData().then(function() {
       self.scheduleRedraw();
     });

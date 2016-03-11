@@ -202,13 +202,13 @@ vs.ui.Setting.prototype.possibleValues = function(options, $attrs, data, setting
 
   switch (this['type']) {
     case vs.ui.Setting.Type['DATA_ROW_LABEL']:
-      return u.array.uniqueFast(data.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
+      return vs.models.DataSource.combinedArrayMetadata(data);
 
     case vs.ui.Setting.Type['DATA_COL_LABEL']:
-      return data.map(function(d) { return d['label']; });
+      return u.fast.map(data, function(d) { return d['label']; });
 
     case vs.ui.Setting.Type['DATA_COL_ID']:
-      return data.map(function(d) { return d['id']; });
+      return u.fast.map(data, function(d) { return d['id']; });
 
     default: return null;
   }
@@ -235,13 +235,6 @@ vs.ui.Setting.Type = {
 
 //region Static Methods
 /**
- * @param {Array.<vs.models.DataSource>} data
- */
-vs.ui.Setting.getAllRowMetadata = function(data) {
-  return u.array.uniqueFast(data.map(function(d) { return d['rowMetadata'].map(function(m) { return m['label']; }); }).reduce(function(m1, m2) { return m1.concat(m2); }));
-};
-
-/**
  * @param {string} dep
  * @param {Object.<string, *>} options
  * @param $attrs Angular attrs
@@ -257,7 +250,7 @@ vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
 
   var min, max;
   if (depMetadata) {
-    data.forEach(function (d) {
+    u.fast.forEach(/** @type {Array.<vs.models.DataSource>} */ (data), function (d) {
       var m = d.getRowMetadata(depMetadata);
       if (m == null || !('boundaries' in m)) { return; }
       if (min == undefined || min > m['boundaries']['min']) { min = m['boundaries']['min']; }
@@ -270,8 +263,8 @@ vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
   }
 
   if (boundaries == undefined) {
-    var values = data.map(function(d) {
-      return d['d'].map(function(record) { return record[depMetadata]; });
+    var values = u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
+      return u.fast.map(d['d'], function(record) { return record[depMetadata]; });
     });
     min = values.reduce(function(arr1, arr2) {
       return Math.min(Math.min.apply(null, arr1), Math.min.apply(null, arr2));
@@ -346,7 +339,7 @@ vs.ui.Setting.firstRowsLabel = function (options, $attrs, data, settings) {
 vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
   var dependencies = ['xBoundaries', 'width', 'margins'];
   if (!settings) { throw new vs.ui.UiException('Settings not provided for "xScale", which depends on ' + JSON.stringify(dependencies)); }
-  dependencies.forEach(function(dep) {
+  u.fast.forEach(dependencies, function(dep) {
     if (!(dep in settings)) {
       throw new vs.ui.UiException('Missing dependency for "' + dep + '" in the "xScale" defaultValue function');
     }
@@ -370,7 +363,7 @@ vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
 vs.ui.Setting.yScale = function (options, $attrs, data, settings) {
   var dependencies = ['yBoundaries', 'height', 'margins'];
   if (!settings) { throw new vs.ui.UiException('Settings not provided for "yScale", which depends on ' + JSON.stringify(dependencies)); }
-  dependencies.forEach(function(dep) {
+  u.fast.forEach(dependencies, function(dep) {
     if (!(dep in settings)) {
       throw new vs.ui.UiException('Missing dependency for "' + dep + '" in the "yScale" defaultValue function');
     }
@@ -408,9 +401,9 @@ vs.ui.Setting.mergeColsDefault = function (options, $attrs, data, settings) {
  */
 vs.ui.Setting.mergeCols = function(xVal, ds) {
   var ret = {
-    'id': ds.map(function(d) { return d['id']; }).join('-'),
-    'label': ds.map(function(d) { return d['label']; }).join(', '),
-    'rowMetadata': u.array.unique(ds.map(function(d) { return d['rowMetadata']; }).reduce(function(a1, a2) { return a1.concat(a2); })),
+    'id': u.fast.map(ds, function(d) { return d['id']; }).join('-'),
+    'label': u.fast.map(ds, function(d) { return d['label']; }).join(', '),
+    'rowMetadata': u.array.unique(u.fast.concat(u.fast.map(ds, function(d) { return d['rowMetadata']; }))),
     'query': [],
     'metadata': {}
   };
@@ -418,18 +411,22 @@ vs.ui.Setting.mergeCols = function(xVal, ds) {
   var map = {};
   var data = [];
 
-  ds.forEach(function(d, i) {
-    d['d'].forEach(function(item) {
-      var merged = map[item[xVal]];
+  for (var i = 0; i < ds.length; ++i) {
+    var d = ds[i]['d'];
+    for (var j = 0; j < d.length; ++j) {
+      var item = d[j];
+      var key = item[xVal];
+
+      var merged = map[key];
       if (!merged) {
         merged = {};
-        merged[xVal] = item[xVal];
-        map[item[xVal]] = merged;
+        merged[xVal] = key;
+        map[key] = merged;
         data.push(merged);
       }
       merged[item['__d__']] = item;
-    });
-  });
+    }
+  }
 
   data.sort(function(it0, it1) {
     if (it0[xVal] == it1[xVal]) { return 0; }
@@ -458,9 +455,9 @@ vs.ui.Setting.PredefinedSettings = {
   'width': new vs.ui.Setting({'key':'width', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
   'height': new vs.ui.Setting({'key':'height', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
 
-  'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return data.map(function(d) { return d['id']; }); }, 'label':'columns', 'template':'_multiselect-tbl.html'}),
-  'xVals': new vs.ui.Setting({'key':'xVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
-  'yVals': new vs.ui.Setting({'key':'yVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.ui.Setting.getAllRowMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
+  'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return u.fast.map(data, function(d) { return d['id']; }); }, 'label':'columns', 'template':'_multiselect-tbl.html'}),
+  'xVals': new vs.ui.Setting({'key':'xVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.models.DataSource.combinedArrayMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
+  'yVals': new vs.ui.Setting({'key':'yVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(options, $attrs, data) { return vs.models.DataSource.combinedArrayMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
 
   'rowsOrderBy': new vs.ui.Setting({'key':'rowsOrderBy', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'order rows by', 'template':'_categorical.html'}),
   'rowsScale': new vs.ui.Setting({'key':'rowsScale', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'scale rows axis', 'template':'_switch.html'}),

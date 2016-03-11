@@ -57,7 +57,7 @@ vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
     var y1 = type == 'y' ? scale : function() { return 0; };
     var y2 = type == 'y' ? scale : function() { return height - margins['top'] - margins['bottom']; };
 
-    ticks.forEach(function(tick) {
+    u.fast.forEach(ticks, function(tick) {
       moveTo.apply(context, translate.calcArr({'x': x1(tick), 'y': y1(tick)}));
       lineTo.apply(context, translate.calcArr({'x': x2(tick), 'y': y2(tick)}));
     });

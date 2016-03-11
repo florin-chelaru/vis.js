@@ -56,13 +56,13 @@ vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data
   }
 
   var linkMap = this._linkMap;
-  return data.map(function(d) {
+  return u.fast.map(data, function(d) {
     if (brushingEvent['data']['id'] == d['id']) { return brushingEvent['items']; }
 
     var ret = eventCache[d['id']];
     if (ret) { return ret; }
     var link = linkMap[brushingEvent['data']['id']] ? linkMap[brushingEvent['data']['id']][d['id']] : null;
-    if (link) { return link(brushingEvent['data'], brushingEvent['items'], d); }
+    if (link) { return link(brushingEvent['data'], brushingEvent['items'], /** @type {vs.models.DataSource} */ (d)); }
     return [];
   }).reduce(function(a1, a2) { return a1.concat(a2); });
 };

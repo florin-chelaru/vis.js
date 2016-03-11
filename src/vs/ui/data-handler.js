@@ -28,7 +28,7 @@ vs.ui.DataHandler = function(options) {
   this._dataChanged = new u.Event();
 
   var listener = new u.EventListener(function(d) { this._dataChanged.fire(d); }, this);
-  this._data.forEach(function(d) { d['changed'].addListener(listener); });
+  u.fast.forEach(this._data, function(d) { d['changed'].addListener(listener); });
 
   /**
    * @type {Array.<vs.ui.VisualContext>}
