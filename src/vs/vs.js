@@ -28,7 +28,6 @@ goog.require('vs.linking.LinkProvider');
 
 goog.require('vs.directives.Axis');
 goog.require('vs.directives.Grid');
-goog.require('vs.directives.Brushing');
 
 goog.require('vs.directives.Window');
 goog.require('vs.directives.Movable');
@@ -91,10 +90,6 @@ vs.main.directive('vsAxis', ['taskService', '$timeout', function() {
 vs.main.directive('vsGrid', ['taskService', '$timeout', function() {
   return ngu.Directive.createNew('vsGrid', /** @type {function(new:ngu.Directive)} */ (vs.directives.Grid), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
 }]);
-
-/*vs.main.directive('vsBrushing', ['taskService', '$timeout', '$rootScope', 'link', function() {
-  return ngu.Directive.createNew('vsBrushing', /!** @type {function(new:ngu.Directive)} *!/ (vs.directives.Brushing), u.array.fromArguments(arguments), {restrict: 'C', require: '^visualization'});
-}]);*/
 
 vs.main
   .factory('$exceptionHandler', function() {

@@ -177,10 +177,19 @@ vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {
   }
 
   var activeCanvas = this._activeCanvas[0];
-  var selectedItem = null;
 
   /** @type {Object.<string, Array.<Object>>|null} */
-  var selectedItems = null;
+  var selectedItemsMap = null;
+
+  /** @type {Array.<Object>} */
+  var selectedItems = [];
+
+  /**
+   * If the number of selected items is smaller than this number, then we will check to see whether on
+   * mousemove they have changed. Otherwise, we will trigger a MOUSEOUT and MOUSEOVER again.
+   * @type {number}
+   */
+  var maxItemsCountCheck = 10;
 
   /** @type {Array.<vs.models.DataSource>} */
   var data = this['data'];
@@ -190,14 +199,6 @@ vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {
 
   /** @param {MouseEvent} evt */
   var mousemove = function(evt) {
-    var i;
-    if (selectedItems) {
-      u.each(selectedItems, function(dataId, items) {
-        self['brushing'].fire(u.reflection.applyConstructor(/** @type {function(new: vs.ui.BrushingEvent)} */ (vs.ui.BrushingEvent), [dataMap[dataId], vs.ui.BrushingEvent.Action['MOUSEOUT']].concat(items)));
-      });
-      selectedItems = null;
-    }
-
     /** @type {ClientRect} */
     var rect = activeCanvas.getBoundingClientRect();
     var mousePos = {
@@ -206,20 +207,49 @@ vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {
     };
 
     var items = self.getItemsAt(mousePos.x, mousePos.y);
+
+    if (!items.length && !selectedItems.length) { return; }
+
+    var selectedItemsChanged = false;
+    if (items.length > maxItemsCountCheck || selectedItems.length > maxItemsCountCheck ||
+        items.length != selectedItems.length) {
+      selectedItemsChanged = true;
+    }
+
+    var i;
+    if (!selectedItemsChanged) {
+      for (i = 0; i < items.length; ++i) {
+        if (selectedItems.indexOf(items[i]) < 0) {
+          selectedItemsChanged = true;
+          break;
+        }
+      }
+    }
+
+    if (!selectedItemsChanged) { return; }
+
+    if (selectedItemsMap) {
+      u.each(selectedItemsMap, function(dataId, items) {
+        self['brushing'].fire(u.reflection.applyConstructor(/** @type {function(new: vs.ui.BrushingEvent)} */ (vs.ui.BrushingEvent), [dataMap[dataId], vs.ui.BrushingEvent.Action['MOUSEOUT']].concat(items)));
+      });
+      selectedItemsMap = null;
+    }
+
+    selectedItems = items;
     if (!items.length) { return; }
 
-    selectedItems = {};
+    selectedItemsMap = {};
     for (i = 0; i < items.length; ++i) {
       var item = items[i];
       var dataId = item['__d__'];
-      var dataItems = selectedItems[dataId];
+      var dataItems = selectedItemsMap[dataId];
       if (!dataItems) {
         dataItems = [];
-        selectedItems[dataId] = dataItems;
+        selectedItemsMap[dataId] = dataItems;
       }
       dataItems.push(item);
     }
-    u.each(selectedItems, function(dataId, items) {
+    u.each(selectedItemsMap, function(dataId, items) {
       self['brushing'].fire(u.reflection.applyConstructor(/** @type {function(new: vs.ui.BrushingEvent)} */ (vs.ui.BrushingEvent), [dataMap[dataId], vs.ui.BrushingEvent.Action['MOUSEOVER']].concat(items)));
     });
   };
