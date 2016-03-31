@@ -60,7 +60,49 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
 
     axis.call(axisFn);
 
-    var axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
+
+    // Label
+
+    var axisBox;
+
+    var label = self['label'];
+    if (label && label != 'false') {
+      var labelEl = axis.select('.vs-label');
+      if (labelEl.empty()) {
+        axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
+        labelEl = axis.append('text')
+          .attr('class', 'vs-label')
+          .attr('font-weight', 'bold')
+          .attr('fill', '#000000')
+          .attr('text-anchor', 'middle');
+
+        if (type == 'x') {
+          labelEl
+            .attr('alignment-baseline', 'before-edge')
+            .attr('y', axisBox['height']);
+        } else {
+          labelEl
+            .attr('alignment-baseline', 'after-edge')
+            .attr('transform', 'rotate(-90)translate(' + 0 + ',' + (-axisBox['width']) + ')');
+        }
+      }
+
+      var text = (label == 'true') ? target.optionValue('cols')[{'x':0, 'y':1}[type]] : label;
+      labelEl.text(text);
+
+      if (type == 'x') {
+        labelEl.attr('x', (width - margins['left'] - margins['right']) * 0.5);
+      } else {
+        var t = labelEl.attr('transform');
+        labelEl
+          .attr('transform', t.replace(/rotate\(([\d\-\.]+)\)translate\(([\d\-\.]+),\s*([\d\-\.]+)\)/, function(match, angle, x, y) { return 'rotate(' + angle + ')translate(' + (-(height - margins['top'] - margins['bottom']) / 2) + ',' + y + ')'; }));
+      }
+    }
+
+    // End Label
+
+
+    axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
     var axisLocation = type == 'x' ? origins : {'x': margins['left'], 'y': margins['top']};
     axisBox = { 'x': axisBox['x'] + axisLocation['x'], 'y': axisBox['y'] + axisLocation['y'], 'width': axisBox['width'], 'height': axisBox['height']};
 
