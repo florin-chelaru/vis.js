@@ -148,8 +148,10 @@ vs.ui.VisHandler = function($ng, options, data) {
   var self = this;
   u.fast.forEach(this._data, function(d) {
     d['changed'].addListener(function() {
-      self.schedulePreProcessData().then(function() {
-        self.scheduleRedraw();
+      Promise.all(u.fast.map(self._data, function(d) { return d['ready']; })).then(function() {
+        self.schedulePreProcessData().then(function() {
+          self.scheduleRedraw();
+        });
       });
     });
   });

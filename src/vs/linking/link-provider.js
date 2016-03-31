@@ -56,7 +56,7 @@ vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data
   }
 
   var linkMap = this._linkMap;
-  return u.fast.map(data, function(d) {
+  return u.fast.concat(u.fast.map(data, function(d) {
     if (brushingEvent['data']['id'] == d['id']) { return brushingEvent['items']; }
 
     var ret = eventCache[d['id']];
@@ -64,5 +64,5 @@ vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data
     var link = linkMap[brushingEvent['data']['id']] ? linkMap[brushingEvent['data']['id']][d['id']] : null;
     if (link) { return link(brushingEvent['data'], brushingEvent['items'], /** @type {vs.models.DataSource} */ (d)); }
     return [];
-  }).reduce(function(a1, a2) { return a1.concat(a2); });
+  }));
 };

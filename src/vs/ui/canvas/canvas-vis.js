@@ -191,10 +191,15 @@ vs.ui.canvas.CanvasVis.prototype._initializeBrushing = function() {
   var mousemove = function(evt) {
     /** @type {ClientRect} */
     var rect = activeCanvas.getBoundingClientRect();
-    var mousePos = {
+    /*var mousePos = {
       x: evt.clientX - rect.left,
       y: evt.clientY - rect.top
+    };*/
+    var mousePos = {
+      x: evt.offsetX,
+      y: evt.offsetY
     };
+
 
     var items = self.getItemsAt(mousePos.x, mousePos.y);
 

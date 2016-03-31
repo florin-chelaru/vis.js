@@ -263,16 +263,12 @@ vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
   }
 
   if (boundaries == undefined) {
-    var values = u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
+    var values = u.fast.concat(u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
       return u.fast.map(d['d'], function(record) { return record[depMetadata]; });
-    });
-    min = values.reduce(function(arr1, arr2) {
-      return Math.min(Math.min.apply(null, arr1), Math.min.apply(null, arr2));
-    });
+    }));
+    min = Math.min.apply(null, values);
+    max = Math.max.apply(null, values);
 
-    max = values.reduce(function(arr1, arr2) {
-      return Math.max(Math.max.apply(null, arr1), Math.max.apply(null, arr2));
-    });
     if (min != undefined && max != undefined) {
       boundaries = new vs.models.Boundaries(min, max);
     }
