@@ -306,3 +306,13 @@ vs.models.DataSource.combinedArrayMetadata = function(datas) {
 vs.models.DataSource.allDataIsReady = function(datas) {
   return datas.every(function(d) { return d['isReady']; });
 };
+
+/**
+ * @enum {string}
+ */
+vs.models.DataSource.FieldType = {
+  'STRING': 'string',
+  'NUMBER': 'number',
+  'BOOLEAN': 'boolean',
+  'FACTOR': 'factor'
+};

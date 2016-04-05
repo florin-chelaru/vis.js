@@ -76,10 +76,22 @@ vs.models.Margins.prototype.x;
 vs.models.Margins.prototype.y;
 
 Object.defineProperties(vs.models.Margins.prototype, {
-  'top': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._top; })},
-  'left': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._left; })},
-  'bottom': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._bottom; })},
-  'right': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._right; })},
+  'top': {
+    get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._top; }),
+    set: /** @type {function (this:vs.models.Margins)} */ (function(value) { this._top = value; })
+  },
+  'left': {
+    get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._left; }),
+    set: /** @type {function (this:vs.models.Margins)} */ (function(value) { this._left = value; })
+  },
+  'bottom': {
+    get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._bottom; }),
+    set: /** @type {function (this:vs.models.Margins)} */ (function(value) { this._bottom = value; })
+  },
+  'right': {
+    get: /** @type {function (this:vs.models.Margins)} */ (function() { return this._right; }),
+    set: /** @type {function (this:vs.models.Margins)} */ (function(value) { this._right = value; })
+  },
   'x': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['left'], this['right']]; })},
   'y': { get: /** @type {function (this:vs.models.Margins)} */ (function() { return [this['top'], this['bottom']]; })}
 });

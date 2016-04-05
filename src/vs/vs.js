@@ -63,8 +63,9 @@ vs.main.directive('visualization', ['visualizationFactory', 'taskService', '$roo
   return ngu.Directive.createNew('visualization', /** @type {function(new:ngu.Directive)} */ (vs.directives.Visualization), u.array.fromArguments(arguments), {restrict: 'C'});
 }]);
 
-vs.main.directive('vsDataContext', ['$templateCache', function() {
-  return ngu.Directive.createNew('vsDataContext', /** @type {function(new:ngu.Directive)} */ (vs.directives.DataContext), u.array.fromArguments(arguments), {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.template"></div>'});
+vs.main.directive('vsDataContext', ['$templateCache', '$compile', function() {
+  //return ngu.Directive.createNew('vsDataContext', /** @type {function(new:ngu.Directive)} */ (vs.directives.DataContext), u.array.fromArguments(arguments), {restrict: 'C', transclude: true, template: '<ng-transclude></ng-transclude><div ng-include="vsDataContext.template"></div>'});
+  return ngu.Directive.createNew('vsDataContext', /** @type {function(new:ngu.Directive)} */ (vs.directives.DataContext), u.array.fromArguments(arguments), {restrict: 'C'});
 }]);
 
 vs.main.directive('vsWindow', function() {

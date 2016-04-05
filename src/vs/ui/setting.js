@@ -165,7 +165,8 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
       return defaultValue();
 
     case vs.ui.Setting.Type['FUNCTION']:
-      if (typeof val == 'function') { return val.call(null, options, $attrs, data, settings); }
+      // if (typeof val == 'function') { return val.call(null, options, $attrs, data, settings); }
+      if (typeof val == 'function') { return val; }
       return defaultValue();
 
     default:
@@ -234,6 +235,27 @@ vs.ui.Setting.Type = {
 //endregion
 
 //region Static Methods
+
+/**
+ * @param {Array.<vs.models.DataSource>} data
+ * @param {string} rowMetadataLabel
+ * @returns {vs.models.DataSource.FieldType}
+ */
+vs.ui.Setting.metadataType = function(data, rowMetadataLabel) {
+  return u.fast.map(data, function(d) {
+    var m = d.getRowMetadata(rowMetadataLabel);
+    if (m == undefined) { return null; }
+    return m['type'];
+  }).reduce(function(t1, t2) {
+    if (t1 == t2) { return t1; }
+    if (t1 == null) { return t2; }
+    if (t2 == null) { return t1; }
+
+    // If we cannot determine the type, we default to string
+    return vs.models.DataSource.FieldType['STRING'];
+  });
+};
+
 /**
  * @param {string} dep
  * @param {Object.<string, *>} options
@@ -248,31 +270,64 @@ vs.ui.Setting.boundaries = function (dep, options, $attrs, data, settings) {
 
   var depMetadata = /** @type {string} */ (settings[dep].getValue(options, $attrs, data, settings));
 
+  /**
+   * @type {vs.models.DataSource.FieldType}
+   */
+  var metadataType = vs.ui.Setting.metadataType(data, depMetadata);
+
   var min, max;
-  if (depMetadata) {
-    u.fast.forEach(/** @type {Array.<vs.models.DataSource>} */ (data), function (d) {
-      var m = d.getRowMetadata(depMetadata);
-      if (m == null || !('boundaries' in m)) { return; }
-      if (min == undefined || min > m['boundaries']['min']) { min = m['boundaries']['min']; }
-      if (max == undefined || max < m['boundaries']['max']) { max = m['boundaries']['max']; }
-    });
 
-    if (min != undefined && max != undefined) {
+  switch (metadataType) {
+    case vs.models.DataSource.FieldType['NUMBER']:
+      u.fast.forEach(/** @type {Array.<vs.models.DataSource>} */ (data), function (d) {
+        var m = d.getRowMetadata(depMetadata);
+        if (m == null || !('boundaries' in m)) { return; }
+        if (min == undefined || min > m['boundaries']['min']) { min = m['boundaries']['min']; }
+        if (max == undefined || max < m['boundaries']['max']) { max = m['boundaries']['max']; }
+      });
+
+      if (min != undefined && max != undefined) {
+        boundaries = new vs.models.Boundaries(min, max);
+      }
+
+      if (boundaries == undefined) {
+        var values = u.fast.concat(u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
+          return u.fast.map(d['d'], function(record) { return record[depMetadata]; });
+        }));
+        min = Math.min.apply(null, values);
+        max = Math.max.apply(null, values);
+
+        if (min != undefined && max != undefined) {
+          boundaries = new vs.models.Boundaries(min, max);
+        }
+      }
+      break;
+    case vs.models.DataSource.FieldType['BOOLEAN']:
+      boundaries = new vs.models.Boundaries(0, 1);
+      break;
+    case vs.models.DataSource.FieldType['FACTOR']:
+      min = 0;
+      u.fast.forEach(/** @type {Array.<vs.models.DataSource>} */ (data), function (d) {
+        var m = d.getRowMetadata(depMetadata);
+        if (m == null || !('levels' in m)) { return; }
+        if (max == undefined || max < m['levels'].length) { max = m['levels'].length; }
+      });
+
+      if (min != undefined && max != undefined) {
+        boundaries = new vs.models.Boundaries(min, max - 1);
+      }
+      break;
+    case vs.models.DataSource.FieldType['STRING']:
+    default:
+      var uniques = u.array.uniqueFast(u.fast.concat(u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
+        return u.fast.map(d['d'], function(record) { return record[depMetadata]; });
+      })));
+      min = 0;
+      max = uniques.length - 1;
+
       boundaries = new vs.models.Boundaries(min, max);
-    }
   }
 
-  if (boundaries == undefined) {
-    var values = u.fast.concat(u.fast.map(/** @type {Array.<vs.models.DataSource>} */ (data), function(d) {
-      return u.fast.map(d['d'], function(record) { return record[depMetadata]; });
-    }));
-    min = Math.min.apply(null, values);
-    max = Math.max.apply(null, values);
-
-    if (min != undefined && max != undefined) {
-      boundaries = new vs.models.Boundaries(min, max);
-    }
-  }
 
   if (boundaries == undefined) {
     throw new vs.ui.UiException('Boundaries could not be determined');
@@ -332,6 +387,26 @@ vs.ui.Setting.firstRowsLabel = function (options, $attrs, data, settings) {
  * @param {Object.<string, vs.ui.Setting>} [settings]
  * @returns {*}
  */
+vs.ui.Setting.firstRowsLabelNumeric = function (options, $attrs, data, settings) {
+  var ret = null;
+  for (var i = 0; i < data.length; ++i) {
+    var m = data[i]['rowMetadata'];
+    for (var j = 0; j < m.length; ++j) {
+      if (vs.ui.Setting.metadataType(data, m[j]['label']) == vs.models.DataSource.FieldType['NUMBER']) {
+        return m[j]['label'];
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ */
 vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
   var dependencies = ['xBoundaries', 'width', 'margins'];
   if (!settings) { throw new vs.ui.UiException('Settings not provided for "xScale", which depends on ' + JSON.stringify(dependencies)); }
@@ -344,6 +419,7 @@ vs.ui.Setting.xScale = function (options, $attrs, data, settings) {
   var xBoundaries = /** @type {vs.models.Boundaries} */ (settings['xBoundaries'].getValue(options, $attrs, data, settings));
   var width = /** @type {number} */ (settings['width'].getValue(options, $attrs, data, settings));
   var margins = /** @type {vs.models.Margins} */ (settings['margins'].getValue(options, $attrs, data, settings));
+
   return d3.scale.linear()
     .domain([xBoundaries['min'], xBoundaries['max']])
     .range([0, width - margins['left'] - margins['right']]);
@@ -441,13 +517,15 @@ vs.ui.Setting.mergeCols = function(xVal, ds) {
 vs.ui.Setting.PredefinedSettings = {
   'col': new vs.ui.Setting({'key':'col', 'type':vs.ui.Setting.Type['DATA_COL_ID'], 'defaultValue':vs.ui.Setting.firstColsId, 'label':'column', 'template':'_categorical.html'}),
 
-  'xVal': new vs.ui.Setting({'key':'xVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'x values', 'template':'_categorical.html'}),
-  'yVal': new vs.ui.Setting({'key':'yVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabel, 'label':'y values', 'template':'_categorical.html'}),
+  'xVal': new vs.ui.Setting({'key':'xVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabelNumeric, 'label':'x values', 'template':'_categorical.html'}),
+  'yVal': new vs.ui.Setting({'key':'yVal', 'type':vs.ui.Setting.Type['DATA_ROW_LABEL'], 'defaultValue':vs.ui.Setting.firstRowsLabelNumeric, 'label':'y values', 'template':'_categorical.html'}),
   'xBoundaries': new vs.ui.Setting({'key':'xBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.xBoundaries, 'label':'x boundaries', 'template':'_boundaries.html'}),
   'yBoundaries': new vs.ui.Setting({'key':'yBoundaries', 'type':'vs.models.Boundaries', 'defaultValue':vs.ui.Setting.yBoundaries, 'label':'y boundaries', 'template':'_boundaries.html'}),
 
   // TODO: Margins + width and height could well go in a single template that looks pretty. For the future.
-  'margins': new vs.ui.Setting({'key':'margins', 'type':'vs.models.Margins', 'defaultValue':new vs.models.Margins(0, 0, 0, 0), 'template':'_margins.html'}),
+  'x': new vs.ui.Setting({'key':'x', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':0, 'template':'_position.html'}),
+  'y': new vs.ui.Setting({'key':'y', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':0, 'template':'_position.html'}),
+  'margins': new vs.ui.Setting({'key':'margins', 'type':'vs.models.Margins', 'defaultValue':function() { return new vs.models.Margins(0, 0, 0, 0); }, 'template':'_margins.html'}),
   'width': new vs.ui.Setting({'key':'width', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
   'height': new vs.ui.Setting({'key':'height', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300, 'template':'_number.html'}),
 

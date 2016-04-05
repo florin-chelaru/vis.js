@@ -193,9 +193,11 @@ vs.ui.VisHandler = function($ng, options, data) {
  * @const {Object.<string, vs.ui.Setting>}
  */
 vs.ui.VisHandler.Settings = {
-  'margins': vs.ui.Setting.PredefinedSettings['margins'],
+  'x': vs.ui.Setting.PredefinedSettings['x'],
+  'y': vs.ui.Setting.PredefinedSettings['y'],
   'width': vs.ui.Setting.PredefinedSettings['width'],
-  'height': vs.ui.Setting.PredefinedSettings['height']
+  'height': vs.ui.Setting.PredefinedSettings['height'],
+  'margins': vs.ui.Setting.PredefinedSettings['margins']
 };
 //endregion
 
