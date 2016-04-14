@@ -74,8 +74,8 @@ vs.ui.canvas.CanvasBrushing.prototype.endDraw = function() {
       var mousemove = function(evt) {
         var rect = activeCanvas.getBoundingClientRect();
         var mousePos = {
-          x: evt.clientX - rect.left,
-          y: evt.clientY - rect.top
+          x: evt.offsetX,
+          y: evt.offsetY
         };
 
         var data = self['data'];
