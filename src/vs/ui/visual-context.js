@@ -10,9 +10,16 @@ goog.provide('vs.ui.VisualContext');
  * @param {{render: string, type: string}} construct
  * @param {Object.<string, *>} [options]
  * @param {{cls: Array.<string>, elem: Array.<{cls: string, options: Object.<string, *>}>}} [decorators]
+ * @param {string} [id]
  * @constructor
  */
-vs.ui.VisualContext = function(construct, options, decorators) {
+vs.ui.VisualContext = function(construct, options, decorators, id) {
+  /**
+   * @type {string}
+   * @private
+   */
+  this['id'] = id;
+
   /**
    * @type {{render: string, type: string}}
    */

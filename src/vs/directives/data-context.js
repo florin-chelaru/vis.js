@@ -10,22 +10,12 @@ goog.require('vs.ui.DataHandler');
 
 /**
  * @param {angular.Scope} $scope
- * @param {angular.$templateCache} $templateCache
  * @param {angular.$compile} $compile
  * @constructor
  * @extends {ngu.Directive}
  */
-vs.directives.DataContext = function($scope, $templateCache, $compile) {
+vs.directives.DataContext = function($scope, $compile) {
   ngu.Directive.apply(this, arguments);
-/*
-
-  /!**
-   * Angular template service
-   * @type {angular.$templateCache}
-   * @private
-   *!/
-  this._$templateCache = $templateCache;
-*/
 
   /**
    * @type {angular.$compile}
@@ -39,37 +29,11 @@ vs.directives.DataContext = function($scope, $templateCache, $compile) {
    */
   this._handler = null;
 
-  /*for (var key in $scope) {
-    if (!$scope.hasOwnProperty(key)) { continue; }
-    if ($scope[key] instanceof vs.ui.DataHandler) {
-      this._handler = $scope[key];
-      break;
-    }
-  }
-
-  if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
-  $scope['dataHandler'] = this._handler;
-
-  /!**
-   * @type {string|null}
+  /**
+   * @type {Object.<string, vs.ui.VisualContext>}
    * @private
-   *!/
-  this._template = null;
-
-  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
-  var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
-
-  var t = $('<div></div>');
-  u.fast.forEach(this._handler['visualizations'], function(visContext, i) {
-    var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
-    u.fast.forEach(visContext['decorators']['elem'], function(decorator, j) {
-      var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
-    });
-  });*/
-  // var template = t.html();
-  // var templateId = u.generatePseudoGUID(10);
-  // this._$templateCache.put(templateId, template);
-  // this._template = templateId;
+   */
+  this._visMap = {};
 };
 
 goog.inherits(vs.directives.DataContext, ngu.Directive);
@@ -112,7 +76,7 @@ vs.directives.DataContext.prototype.link = function($scope, $element, $attrs, co
   if (!this._handler) { throw new vs.ui.UiException('No vs.ui.DataHandler instance found in current scope'); }
   $scope['dataHandler'] = this._handler;
 
-  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s"></div>';
+  var visCtxtFmt = '<div vs-context="dataHandler.visualizations[%s]" vs-data="dataHandler.data" class="visualization %s" id="vs-%s"></div>';
   var decoratorFmt = '<div class="%s" vs-options="dataHandler.visualizations[%s].decorators.elem[%s].options"></div>';
 
   var self = this;
@@ -120,14 +84,32 @@ vs.directives.DataContext.prototype.link = function($scope, $element, $attrs, co
   $scope.$watchCollection(
     function() { return self._handler['visualizations']; },
     function(visualizations, oldVal) {
-      // var t = $('<div></div>');
       var t = $element;
+
+      var newContexts = {};
+
       u.fast.forEach(visualizations, function(visContext, i) {
-        var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '))).appendTo(t);
-        u.fast.forEach(visContext['decorators']['elem'], function(decorator, j) {
-          var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
-        });
+        var id = visContext['id'];
+        if (id == undefined) {
+          visContext['id'] = id = u.generatePseudoGUID(8);
+        }
+
+        newContexts[id] = visContext;
+
+        if (!(id in self._visMap)) {
+          var v = $(goog.string.format(visCtxtFmt, i, visContext['decorators']['cls'].join(' '), id)).appendTo(t);
+          u.fast.forEach(visContext['decorators']['elem'], function (decorator, j) {
+            var d = $(goog.string.format(decoratorFmt, decorator['cls'], i, j)).appendTo(v);
+          });
+          self._visMap[id] = visContext;
+          $compile(v)($scope);
+        }
       });
-      $compile($element.contents())($scope);
+
+      u.each(self._visMap, function(id) {
+        if (!(id in newContexts)) {
+          $('vs-' + id).remove();
+        }
+      });
     });
 };

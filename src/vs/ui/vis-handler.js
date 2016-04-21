@@ -23,6 +23,12 @@ goog.require('vs.async.TaskService');
  */
 vs.ui.VisHandler = function($ng, options, data) {
   /**
+   * @type {string}
+   * @private
+   */
+  this._id = u.generatePseudoGUID(8);
+
+  /**
    * @type {angular.Scope}
    * @private
    */
@@ -205,6 +211,12 @@ vs.ui.VisHandler.Settings = {
 
 /**
  * @type {string}
+ * @name vs.ui.VisHandler#id
+ */
+vs.ui.VisHandler.prototype.id;
+
+/**
+ * @type {string}
  * @name vs.ui.VisHandler#render
  */
 vs.ui.VisHandler.prototype.render;
@@ -302,6 +314,14 @@ vs.ui.VisHandler.prototype.height;
 vs.ui.VisHandler.prototype.brushing;
 
 Object.defineProperties(vs.ui.VisHandler.prototype, {
+  'id': {
+    get: /** @type {function (this:vs.ui.VisHandler)} */ (function () {
+      return this._id;
+    }),
+    set: /** @type {function (this:vs.ui.VisHandler)} */ (function (value) {
+      this._id = value;
+    })
+  },
   'render': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { throw new u.UnimplementedException('Property "render" does not exist in data source'); })},
   'settings': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return vs.ui.VisHandler.Settings; })},
   '$scope': { get: /** @type {function (this:vs.ui.VisHandler)} */ (function() { return this._$scope; })},

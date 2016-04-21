@@ -31,7 +31,7 @@ vs.ui.decorators.Axis.Settings = {
   'type': new vs.ui.Setting({'key':'type', 'type': vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': 'x', 'possibleValues': ['x', 'y']}),
   'ticks': new vs.ui.Setting({'key':'ticks', 'type': vs.ui.Setting.Type['NUMBER'], 'defaultValue': 10}),
   'format': new vs.ui.Setting({'key':'format', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 's'}),
-  'label': new vs.ui.Setting({'key':'label', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': 'false'})
+  'label': new vs.ui.Setting({'key':'label', 'type': vs.ui.Setting.Type['STRING'], 'defaultValue': null})
 };
 
 /**
@@ -71,5 +71,11 @@ Object.defineProperties(vs.ui.decorators.Axis.prototype, {
   'type': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('type'); })},
   'ticks': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function () { return this.optionValue('ticks'); })},
   'format': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('format'); })},
-  'label': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() { return this.optionValue('label'); })}
+  'label': { get: /** @type {function (this:vs.ui.decorators.Axis)} */ (function() {
+    var ret = this.optionValue('label');
+    if (ret != undefined) { return ret; }
+    var type = this['type'];
+    ret = this['target'].optionValue(type + 'Label');
+    return ret || '';
+  })}
 });

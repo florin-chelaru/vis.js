@@ -69,8 +69,8 @@ vs.directives.Window.prototype.link = {
 
     // Bring to front when selected
     $window.on('mousedown', function() {
-      $window.siblings().css('zIndex', 0);
-      $window.css('zIndex', 1);
+      $window.siblings().css('zIndex', 1031);
+      $window.css('zIndex', 1032);
     });
 
     this._$window = $window;

@@ -9,6 +9,7 @@ goog.require('vs.ui.Setting');
 goog.exportSymbol('vs.ui.Setting', vs.ui.Setting);
 goog.exportProperty(vs.ui.Setting.prototype, 'getValue', vs.ui.Setting.prototype.getValue);
 goog.exportProperty(vs.ui.Setting.prototype, 'possibleValues', vs.ui.Setting.prototype.possibleValues);
+goog.exportProperty(vs.ui.Setting.prototype, 'copy', vs.ui.Setting.prototype.copy);
 
 goog.exportSymbol('vs.ui.Setting.Type', vs.ui.Setting.Type);
 

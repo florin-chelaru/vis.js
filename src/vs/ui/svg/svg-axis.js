@@ -66,7 +66,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
     var axisBox;
 
     var label = self['label'];
-    if (label && label != 'false') {
+    if (label) {
       var labelEl = axis.select('.vs-label');
       if (labelEl.empty()) {
         axisBox = axis[0][0]['getBBox'](); // Closure compiler doesn't recognize the getBBox function
@@ -87,8 +87,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
         }
       }
 
-      var text = (label == 'true') ? target.optionValue('cols')[{'x':0, 'y':1}[type]] : label;
-      labelEl.text(text);
+      labelEl.text(label);
 
       if (type == 'x') {
         labelEl.attr('x', (width - margins['left'] - margins['right']) * 0.5);
