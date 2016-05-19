@@ -24,6 +24,15 @@ vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {
 goog.inherits(vs.ui.canvas.CanvasAxis, vs.ui.decorators.Axis);
 
 /**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.canvas.CanvasAxis.Settings = u.extend({}, vs.ui.decorators.Axis.Settings);
+
+Object.defineProperties(vs.ui.canvas.CanvasAxis.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasAxis)} */ (function() { return vs.ui.canvas.CanvasAxis.Settings; })}
+});
+
+/**
  * @returns {Promise}
  */
 vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {

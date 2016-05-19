@@ -23,6 +23,15 @@ vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {
 
 goog.inherits(vs.ui.canvas.CanvasGrid, vs.ui.decorators.Grid);
 
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.canvas.CanvasGrid.Settings = u.extend({}, vs.ui.decorators.Grid.Settings);
+
+Object.defineProperties(vs.ui.canvas.CanvasGrid.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.canvas.CanvasGrid)} */ (function() { return vs.ui.canvas.CanvasGrid.Settings; })}
+});
+
 vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {
   var self = this;
   var args = arguments;

@@ -31,116 +31,6 @@ decorators: {}
 
 
 /**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- * @constructor
- */
-vs.async.Task = function(func, thisArg) {};
-
-/**
- * @type {number}
- * @name vs.async.Task#id
- */
-vs.async.Task.prototype.id;
-
-/**
- * @type {Object|undefined}
- * @name vs.async.Task#thisArg
- */
-vs.async.Task.prototype.thisArg;
-
-/**
- * @type {function():Promise}
- * @name vs.async.Task#func
- */
-vs.async.Task.prototype.func;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#prev
- */
-vs.async.Task.prototype.prev;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#next
- */
-vs.async.Task.prototype.next;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#first
- */
-vs.async.Task.prototype.first;
-
-/**
- * @type {vs.async.Task}
- * @name vs.async.Task#last
- */
-vs.async.Task.prototype.last;
-/**
- * @type {number}
- * @private
- */
-vs.async.Task._nextId = 0;
-
-/**
- * @returns {number}
- */
-vs.async.Task.nextId = function() {};
-
-
-/**
- * @param {function(Function, number)} $timeout Angular timeout service
- * @constructor
- */
-vs.async.TaskService = function($timeout) {};
-
-/**
- * @param {function():Promise} func
- * @param {Object} [thisArg]
- */
-vs.async.TaskService.prototype.createTask = function(func, thisArg) {};
-
-/**
- * @param {vs.async.Task|function():Promise} t1
- * @param {vs.async.Task|function():Promise} t2
- * @returns {vs.async.Task}
- */
-vs.async.TaskService.prototype.chain = function(t1, t2) {};
-
-/**
- * TODO: test!
- * @param {vs.async.Task} task
- * @param {boolean} [sequential] If true, the tasks will run sequentially
- * @returns {Promise}
- */
-vs.async.TaskService.prototype.runChain = function(task, sequential) {};
-
-
-/**
- * @param {number} [min]
- * @param {number} [max]
- * @constructor
- */
-vs.models.Boundaries = function(min, max) {};
-
-/**
- * @type {number}
- * @name vs.models.Boundaries#min
- */
-vs.models.Boundaries.prototype.min;
-
-/**
- * @type {number}
- * @name vs.models.Boundaries#max
- */
-vs.models.Boundaries.prototype.max;
-
-
-
-
-/**
  * Argument details:
  *  - target: if defined, the label of the row/column/value array to test; if undefined, the index within the current structure is used
  *  - test: the filter to be applied on the data (>, <, ==, etc)
@@ -314,6 +204,116 @@ vs.models.DataSource.FieldType = {
 
 
 /**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ * @constructor
+ */
+vs.async.Task = function(func, thisArg) {};
+
+/**
+ * @type {number}
+ * @name vs.async.Task#id
+ */
+vs.async.Task.prototype.id;
+
+/**
+ * @type {Object|undefined}
+ * @name vs.async.Task#thisArg
+ */
+vs.async.Task.prototype.thisArg;
+
+/**
+ * @type {function():Promise}
+ * @name vs.async.Task#func
+ */
+vs.async.Task.prototype.func;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#prev
+ */
+vs.async.Task.prototype.prev;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#next
+ */
+vs.async.Task.prototype.next;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#first
+ */
+vs.async.Task.prototype.first;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.async.Task#last
+ */
+vs.async.Task.prototype.last;
+/**
+ * @type {number}
+ * @private
+ */
+vs.async.Task._nextId = 0;
+
+/**
+ * @returns {number}
+ */
+vs.async.Task.nextId = function() {};
+
+
+/**
+ * @param {function(Function, number)} $timeout Angular timeout service
+ * @constructor
+ */
+vs.async.TaskService = function($timeout) {};
+
+/**
+ * @param {function():Promise} func
+ * @param {Object} [thisArg]
+ */
+vs.async.TaskService.prototype.createTask = function(func, thisArg) {};
+
+/**
+ * @param {vs.async.Task|function():Promise} t1
+ * @param {vs.async.Task|function():Promise} t2
+ * @returns {vs.async.Task}
+ */
+vs.async.TaskService.prototype.chain = function(t1, t2) {};
+
+/**
+ * TODO: test!
+ * @param {vs.async.Task} task
+ * @param {boolean} [sequential] If true, the tasks will run sequentially
+ * @returns {Promise}
+ */
+vs.async.TaskService.prototype.runChain = function(task, sequential) {};
+
+
+/**
+ * @param {number} [min]
+ * @param {number} [max]
+ * @constructor
+ */
+vs.models.Boundaries = function(min, max) {};
+
+/**
+ * @type {number}
+ * @name vs.models.Boundaries#min
+ */
+vs.models.Boundaries.prototype.min;
+
+/**
+ * @type {number}
+ * @name vs.models.Boundaries#max
+ */
+vs.models.Boundaries.prototype.max;
+
+
+
+
+/**
  * @param {number} top
  * @param {number} left
  * @param {number} bottom
@@ -377,11 +377,11 @@ vs.models.Margins.prototype.equals = function(other) {};
  * @param {{
  *  key: string,
  *  type: (vs.ui.Setting.Type|string),
- *  defaultValue: (function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*),
+ *  defaultValue: (function(vs.ui.Setting, Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*),
  *  label: (string|undefined),
  *  template: (string|undefined),
  *  hidden: (boolean|undefined),
- *  possibleValues: (*|function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|undefined),
+ *  possibleValues: (*|function(vs.ui.Setting, Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|undefined),
  *  dependencies: (Object.<string, string>|undefined)
  * }} args
  * @constructor
@@ -533,9 +533,14 @@ vs.ui.Setting.xScale = function (setting, options, $attrs, data, settings) {};
 vs.ui.Setting.yScale = function (setting, options, $attrs, data, settings) {};
 
 /**
- * @const {function(*):string}
+ * @param {vs.ui.Setting} setting
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
  */
-vs.ui.Setting.defaultPalette = d3.scale.category20();
+vs.ui.Setting.defaultPalette = function (setting, options, $attrs, data, settings) {};
 
 /**
  * @param {vs.ui.Setting} setting
@@ -553,6 +558,28 @@ vs.ui.Setting.mergeColsDefault = function (setting, options, $attrs, data, setti
  * @returns {vs.models.DataSource}
  */
 vs.ui.Setting.mergeCols = function(xField, ds) {};
+//endregion
+
+//region Nested types
+
+/*
+ /**
+ * @param {vs.ui.Setting} setting
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ *
+ */
+
+/**
+ * @param {string} label
+ * @param {Function} func
+ * @constructor
+ */
+vs.ui.Setting.FunctionWrapper = function(label, func) {};
+
 //endregion
 
 //region Constants
@@ -716,6 +743,12 @@ vs.ui.VisHandler.prototype.brushing;
 vs.ui.VisHandler.prototype.optionValue = function(optionKey) {};
 
 /**
+ * @param {string} optionKey
+ * @returns {*}
+ */
+vs.ui.VisHandler.prototype.optionFunctionValue = function(optionKey) {};
+
+/**
  * @returns {Promise}
  */
 vs.ui.VisHandler.prototype.beginDraw = function() {};
@@ -766,6 +799,569 @@ vs.ui.VisHandler.prototype.preProcessData = function() {};
 //endregion
 
 
+/**
+ * @constructor
+ * @extends vs.ui.VisHandler
+ */
+vs.ui.svg.SvgVis = function () {};
+
+vs.ui.svg.SvgVis.prototype.beginDraw = function () {};
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
+
+
+/**
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.Window = function() {};
+
+/**
+ * @type {jQuery}
+ * @name vs.directives.Window#$window
+ */
+vs.directives.Window.prototype.$window;
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Window.prototype.link;
+
+
+/**
+ * @param {string} message
+ * @param {Error} [innerException]
+ * @constructor
+ * @extends u.Exception
+ */
+vs.ui.UiException = function(message, innerException) {};
+
+/**
+ * @constructor
+ * @extends {ngu.Configuration}
+ */
+vs.Configuration = function() {};
+
+/**
+ * @type {Object.<string, *>}
+ * @name vs.Configuration#options
+ */
+vs.Configuration.prototype.options;
+/**
+ * @param {Object.<string, *>} options
+ */
+vs.Configuration.prototype.customize = function(options) {};
+
+
+/**
+ * @param {vs.Configuration} config
+ * @constructor
+ */
+vs.async.ThreadPoolService = function(config) {};
+
+/**
+ * @type {parallel.ThreadPool}
+ * @name vs.async.ThreadPoolService#pool
+ */
+vs.async.ThreadPoolService.prototype.pool;
+/**
+ * @param {vs.Configuration} config
+ * @param {vs.async.TaskService} taskService
+ * @param {Function} $timeout
+ * @param {vs.async.ThreadPoolService} threadPool
+ * @constructor
+ */
+vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @returns {vs.ui.VisHandler}
+ */
+vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {};
+
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ */
+vs.ui.Decorator = function($ng, $targetElement, target, options) {};
+
+/**
+ * @type {angular.Scope}
+ * @name vs.ui.Decorator#$scope
+ */
+vs.ui.Decorator.prototype.$scope;
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.Decorator#$element
+ */
+vs.ui.Decorator.prototype.$element;
+
+/**
+ * @type {angular.Attributes}
+ * @name vs.ui.Decorator#$attrs
+ */
+vs.ui.Decorator.prototype.$attrs;
+
+/**
+ * @type {jQuery}
+ * @name vs.ui.Decorator#$targetElement
+ */
+vs.ui.Decorator.prototype.$targetElement;
+
+/**
+ * @type {Array.<vs.models.DataSource>}
+ * @name vs.ui.Decorator#data
+ */
+vs.ui.Decorator.prototype.data;
+
+/**
+ * @type {vs.ui.VisHandler}
+ * @name vs.ui.Decorator#target
+ */
+vs.ui.Decorator.prototype.target;
+
+/**
+ * @type {Object.<string, *>}
+ * @name vs.ui.Decorator#options
+ */
+vs.ui.Decorator.prototype.options;
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ * @name vs.ui.Decorator#settings
+ */
+vs.ui.Decorator.prototype.settings;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.ui.Decorator#beginDrawTask
+ */
+vs.ui.Decorator.prototype.beginDrawTask;
+
+/**
+ * @type {vs.async.Task}
+ * @name vs.ui.Decorator#endDrawTask
+ */
+vs.ui.Decorator.prototype.endDrawTask;
+/**
+ * @param {string} optionKey
+ * @returns {*}
+ */
+vs.ui.Decorator.prototype.optionValue = function(optionKey) {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.Decorator.prototype.beginDraw = function() {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.Decorator.prototype.endDraw = function() {};
+
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.Decorator
+ */
+vs.ui.decorators.Axis = function($ng, $targetElement, target, options) {};
+
+/**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.decorators.Axis.Settings = {};
+
+/**
+ * @enum {string}
+ */
+vs.ui.decorators.Axis.Orientation = {
+  'x': 'bottom',
+  'y': 'left'
+};
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Axis#type
+ */
+vs.ui.decorators.Axis.prototype.type;
+
+/**
+ * @type {number}
+ * @name vs.ui.decorators.Axis#ticks
+ */
+vs.ui.decorators.Axis.prototype.ticks;
+
+/**
+ * @type {string}
+ * @name vs.ui.decorators.Axis#format
+ */
+vs.ui.decorators.Axis.prototype.format;
+
+/**
+ * @type {string|boolean}
+ * @name vs.ui.decorators.Axis#label
+ */
+vs.ui.decorators.Axis.prototype.label;
+/**
+ * @param {number} [x]
+ * @param {number} [y]
+ * @constructor
+ */
+vs.models.Point = function(x, y) {};
+
+/**
+ * @type {number}
+ * @name vs.models.Point#x
+ */
+vs.models.Point.prototype.x;
+
+/**
+ * @type {number}
+ * @name vs.models.Point#y
+ */
+vs.models.Point.prototype.y;
+
+
+/**
+ * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
+ * @constructor
+ */
+vs.models.Transformer = function(transformation) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {vs.models.Point}
+ */
+vs.models.Transformer.prototype.calc = function(point) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
+ * @returns {Array.<number>}
+ */
+vs.models.Transformer.prototype.calcArr = function(point) {};
+
+/**
+ * @param {number} x
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcX = function(x) {};
+
+/**
+ * @param {number} y
+ * @returns {number}
+ */
+vs.models.Transformer.prototype.calcY = function(y) {};
+
+/**
+ * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.combine = function(transformer) {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.translate = function(offset) {};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.scale = function(xScale, yScale) {};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.prototype.intCoords = function() {};
+
+/**
+ * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.translate = function(offset) {};
+
+/**
+ * @param {function(number):number} xScale
+ * @param {function(number):number} yScale
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.scale = function(xScale, yScale) {};
+
+/**
+ * @returns {vs.models.Transformer}
+ */
+vs.models.Transformer.intCoords = function() {};
+
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Axis
+ */
+vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {};
+
+
+/**
+ * @constructor
+ * @extends {ngu.Configuration}
+ */
+vs.linking.LinkProvider = function() {};
+
+/**
+ * @param {string} dataId1
+ * @param {string} dataId2
+ * @param {function(vs.models.DataSource, Array.<Object>, vs.models.DataSource): Array.<Object>} link (d1, obj1, d2) => obj2
+ */
+vs.linking.LinkProvider.prototype.register = function(dataId1, dataId2, link) {};
+
+/**
+ * @param {vs.ui.BrushingEvent} brushingEvent
+ * @param {Array.<vs.models.DataSource>} data
+ * @returns {Array.<Object>}
+ */
+vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data) {};
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.ui.VisualizationFactory} visualizationFactory
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.Scope} $rootScope
+ * @param {vs.linking.LinkProvider} linkProvider
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.Visualization = function($scope, visualizationFactory, taskService, $rootScope, linkProvider) {};
+
+/**
+ * @type {vs.async.TaskService}
+ * @name vs.directives.Visualization#taskService
+ */
+vs.directives.Visualization.prototype.taskService;
+
+/**
+ * @type {vs.ui.VisHandler}
+ * @name vs.directives.Visualization#handler
+ */
+vs.directives.Visualization.prototype.handler;
+/**
+ * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
+ */
+vs.directives.Visualization.prototype.link;
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {vs.async.TaskService} taskService
+ * @param {angular.$timeout} $timeout
+ * @param {boolean} [overridesVisHandler] If set to true, this flag will allow the decorator's draw methods to execute
+ * before and after respectively of the VisHandler's beginDraw/endDraw methods.
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overridesVisHandler) {};
+
+/**
+ * @type {vs.ui.Decorator}
+ * @name vs.directives.GraphicDecorator#handler
+ */
+vs.directives.GraphicDecorator.prototype.handler;
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @returns {vs.ui.Decorator}
+ */
+vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) {};
+
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @constructor
+ * @extends vs.ui.decorators.Axis
+ */
+vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {};
+
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgAxis.prototype.endDraw = function() {};
+
+
+/**
+ * @constructor
+ * @extends {vs.directives.GraphicDecorator}
+ */
+vs.directives.Axis = function() {};
+
+/**
+ * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
+ * @param {jQuery} $targetElement
+ * @param {vs.ui.VisHandler} target
+ * @param {Object.<string, *>} options
+ * @returns {vs.ui.Decorator}
+ * @override
+ */
+vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {};
+
+
+/**
+ * @param {angular.Scope} $scope
+ * @param $document
+ * @constructor
+ * @extends {ngu.Directive}
+ */
+vs.directives.Resizable = function($scope, $document) {};
+
+/**
+ * @param {angular.Scope} $scope
+ * @param {jQuery} $element
+ * @param {angular.Attributes} $attrs
+ * @param controller
+ * @override
+ */
+vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {};
+
+/**
+ * @param {jQuery} $elem
+ * @constructor
+ */
+vs.directives.Resizable.ResizeHandler = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.topRight = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.left = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.right = function($elem) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.ResizeHandler.bottom = function($elem) {};
+
+/**
+ * @param {jQuery} $element
+ * @constructor
+ */
+vs.directives.Resizable.BoundingBox = function($element) {};
+
+/**
+ * @param {jQuery} $elem
+ * @returns {vs.directives.Resizable.ResizeHandler}
+ */
+vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {};
+
+/**
+ * @param {vs.directives.Resizable.ResizeHandler} handler
+ * @param {number} [minWidth]
+ * @param {number} [minHeight]
+ */
+vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {};
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#left
+ */
+vs.directives.Resizable.BoundingBox.prototype.left;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#top
+ */
+vs.directives.Resizable.BoundingBox.prototype.top;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#width
+ */
+vs.directives.Resizable.BoundingBox.prototype.width;
+
+/**
+ * @type {number}
+ * @name vs.directives.Resizable.BoundingBox#height
+ */
+vs.directives.Resizable.BoundingBox.prototype.height;
 /**
  * @constructor
  * @extends {vs.ui.VisHandler}
@@ -920,60 +1516,6 @@ vs.directives.DataContext.prototype.link = function($scope, $element, $attrs, co
 
 
 /**
- * @constructor
- * @extends {ngu.Configuration}
- */
-vs.Configuration = function() {};
-
-/**
- * @type {Object.<string, *>}
- * @name vs.Configuration#options
- */
-vs.Configuration.prototype.options;
-/**
- * @param {Object.<string, *>} options
- */
-vs.Configuration.prototype.customize = function(options) {};
-
-
-/**
- * @param {string} message
- * @param {Error} [innerException]
- * @constructor
- * @extends u.Exception
- */
-vs.ui.UiException = function(message, innerException) {};
-
-/**
- * @param {vs.Configuration} config
- * @constructor
- */
-vs.async.ThreadPoolService = function(config) {};
-
-/**
- * @type {parallel.ThreadPool}
- * @name vs.async.ThreadPoolService#pool
- */
-vs.async.ThreadPoolService.prototype.pool;
-/**
- * @param {vs.Configuration} config
- * @param {vs.async.TaskService} taskService
- * @param {Function} $timeout
- * @param {vs.async.ThreadPoolService} threadPool
- * @constructor
- */
-vs.ui.VisualizationFactory = function(config, taskService, $timeout, threadPool) {};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @returns {vs.ui.VisHandler}
- */
-vs.ui.VisualizationFactory.prototype.createNew = function($scope, $element, $attrs) {};
-
-
-/**
  * @param {string} message
  * @param {Error} [innerException]
  * @constructor
@@ -1020,363 +1562,6 @@ vs.models.GenomicRangeQuery.extract = function(query) {};
 
 
 /**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- */
-vs.ui.Decorator = function($ng, $targetElement, target, options) {};
-
-/**
- * @type {angular.Scope}
- * @name vs.ui.Decorator#$scope
- */
-vs.ui.Decorator.prototype.$scope;
-
-/**
- * @type {jQuery}
- * @name vs.ui.Decorator#$element
- */
-vs.ui.Decorator.prototype.$element;
-
-/**
- * @type {angular.Attributes}
- * @name vs.ui.Decorator#$attrs
- */
-vs.ui.Decorator.prototype.$attrs;
-
-/**
- * @type {jQuery}
- * @name vs.ui.Decorator#$targetElement
- */
-vs.ui.Decorator.prototype.$targetElement;
-
-/**
- * @type {Array.<vs.models.DataSource>}
- * @name vs.ui.Decorator#data
- */
-vs.ui.Decorator.prototype.data;
-
-/**
- * @type {vs.ui.VisHandler}
- * @name vs.ui.Decorator#target
- */
-vs.ui.Decorator.prototype.target;
-
-/**
- * @type {Object.<string, *>}
- * @name vs.ui.Decorator#options
- */
-vs.ui.Decorator.prototype.options;
-
-/**
- * @type {Object.<string, vs.ui.Setting>}
- * @name vs.ui.Decorator#settings
- */
-vs.ui.Decorator.prototype.settings;
-
-/**
- * @type {vs.async.Task}
- * @name vs.ui.Decorator#beginDrawTask
- */
-vs.ui.Decorator.prototype.beginDrawTask;
-
-/**
- * @type {vs.async.Task}
- * @name vs.ui.Decorator#endDrawTask
- */
-vs.ui.Decorator.prototype.endDrawTask;
-/**
- * @param {string} optionKey
- * @returns {*}
- */
-vs.ui.Decorator.prototype.optionValue = function(optionKey) {};
-
-/**
- * @returns {Promise}
- */
-vs.ui.Decorator.prototype.beginDraw = function() {};
-
-/**
- * @returns {Promise}
- */
-vs.ui.Decorator.prototype.endDraw = function() {};
-
-
-/**
- * @constructor
- * @extends {ngu.Configuration}
- */
-vs.linking.LinkProvider = function() {};
-
-/**
- * @param {string} dataId1
- * @param {string} dataId2
- * @param {function(vs.models.DataSource, Array.<Object>, vs.models.DataSource): Array.<Object>} link (d1, obj1, d2) => obj2
- */
-vs.linking.LinkProvider.prototype.register = function(dataId1, dataId2, link) {};
-
-/**
- * @param {vs.ui.BrushingEvent} brushingEvent
- * @param {Array.<vs.models.DataSource>} data
- * @returns {Array.<Object>}
- */
-vs.linking.LinkProvider.prototype.brushingObjects = function(brushingEvent, data) {};
-
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.ui.VisualizationFactory} visualizationFactory
- * @param {vs.async.TaskService} taskService
- * @param {angular.Scope} $rootScope
- * @param {vs.linking.LinkProvider} linkProvider
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.Visualization = function($scope, visualizationFactory, taskService, $rootScope, linkProvider) {};
-
-/**
- * @type {vs.async.TaskService}
- * @name vs.directives.Visualization#taskService
- */
-vs.directives.Visualization.prototype.taskService;
-
-/**
- * @type {vs.ui.VisHandler}
- * @name vs.directives.Visualization#handler
- */
-vs.directives.Visualization.prototype.handler;
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Visualization.prototype.link;
-
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.async.TaskService} taskService
- * @param {angular.$timeout} $timeout
- * @param {boolean} [overridesVisHandler] If set to true, this flag will allow the decorator's draw methods to execute
- * before and after respectively of the VisHandler's beginDraw/endDraw methods.
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.GraphicDecorator = function($scope, taskService, $timeout, overridesVisHandler) {};
-
-/**
- * @type {vs.ui.Decorator}
- * @name vs.directives.GraphicDecorator#handler
- */
-vs.directives.GraphicDecorator.prototype.handler;
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.GraphicDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @returns {vs.ui.Decorator}
- */
-vs.directives.GraphicDecorator.prototype.createDecorator = function($ng, $targetElement, target, options) {};
-
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.Decorator
- */
-vs.ui.decorators.Axis = function($ng, $targetElement, target, options) {};
-
-/**
- * @type {Object.<string, vs.ui.Setting>}
- */
-vs.ui.decorators.Axis.Settings = {};
-
-/**
- * @enum {string}
- */
-vs.ui.decorators.Axis.Orientation = {
-  'x': 'bottom',
-  'y': 'left'
-};
-
-/**
- * @type {string}
- * @name vs.ui.decorators.Axis#type
- */
-vs.ui.decorators.Axis.prototype.type;
-
-/**
- * @type {number}
- * @name vs.ui.decorators.Axis#ticks
- */
-vs.ui.decorators.Axis.prototype.ticks;
-
-/**
- * @type {string}
- * @name vs.ui.decorators.Axis#format
- */
-vs.ui.decorators.Axis.prototype.format;
-
-/**
- * @type {string|boolean}
- * @name vs.ui.decorators.Axis#label
- */
-vs.ui.decorators.Axis.prototype.label;
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Axis
- */
-vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {};
-
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgAxis.prototype.endDraw = function() {};
-
-
-/**
- * @param {number} [x]
- * @param {number} [y]
- * @constructor
- */
-vs.models.Point = function(x, y) {};
-
-/**
- * @type {number}
- * @name vs.models.Point#x
- */
-vs.models.Point.prototype.x;
-
-/**
- * @type {number}
- * @name vs.models.Point#y
- */
-vs.models.Point.prototype.y;
-
-
-/**
- * @param {function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformation
- * @constructor
- */
-vs.models.Transformer = function(transformation) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {vs.models.Point}
- */
-vs.models.Transformer.prototype.calc = function(point) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} point
- * @returns {Array.<number>}
- */
-vs.models.Transformer.prototype.calcArr = function(point) {};
-
-/**
- * @param {number} x
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcX = function(x) {};
-
-/**
- * @param {number} y
- * @returns {number}
- */
-vs.models.Transformer.prototype.calcY = function(y) {};
-
-/**
- * @param {vs.models.Transformer|function((vs.models.Point|{x: (number|undefined), y: (number|undefined)})): vs.models.Point} transformer
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.combine = function(transformer) {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.translate = function(offset) {};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.scale = function(xScale, yScale) {};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.prototype.intCoords = function() {};
-
-/**
- * @param {vs.models.Point|{x: (number|undefined), y: (number|undefined)}} offset
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.translate = function(offset) {};
-
-/**
- * @param {function(number):number} xScale
- * @param {function(number):number} yScale
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.scale = function(xScale, yScale) {};
-
-/**
- * @returns {vs.models.Transformer}
- */
-vs.models.Transformer.intCoords = function() {};
-
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @constructor
- * @extends vs.ui.decorators.Axis
- */
-vs.ui.canvas.CanvasAxis = function($ng, $targetElement, target, options) {};
-
-/**
- * @returns {Promise}
- */
-vs.ui.canvas.CanvasAxis.prototype.endDraw = function() {};
-
-
-/**
- * @constructor
- * @extends {vs.directives.GraphicDecorator}
- */
-vs.directives.Axis = function() {};
-
-/**
- * @param {{$scope: angular.Scope, $element: jQuery, $attrs: angular.Attributes, $timeout: angular.$timeout, taskService: vs.async.TaskService}} $ng
- * @param {jQuery} $targetElement
- * @param {vs.ui.VisHandler} target
- * @param {Object.<string, *>} options
- * @returns {vs.ui.Decorator}
- * @override
- */
-vs.directives.Axis.prototype.createDecorator = function($ng, $targetElement, target, options) {};
-
-
-/**
  * @param {angular.Scope} $scope
  * @param $document
  * @constructor
@@ -1392,158 +1577,6 @@ vs.directives.Movable = function($scope, $document) {};
  * @override
  */
 vs.directives.Movable.prototype.link = function($scope, $element, $attrs, controller) {};
-
-
-/**
- * @param {angular.Scope} $scope
- * @param $document
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.Resizable = function($scope, $document) {};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.Resizable.prototype.link = function($scope, $element, $attrs, controller) {};
-
-/**
- * @param {jQuery} $elem
- * @constructor
- */
-vs.directives.Resizable.ResizeHandler = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topLeft = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.topRight = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomLeft = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottomRight = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.left = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.right = function($elem) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.ResizeHandler.bottom = function($elem) {};
-
-/**
- * @param {jQuery} $element
- * @constructor
- */
-vs.directives.Resizable.BoundingBox = function($element) {};
-
-/**
- * @param {jQuery} $elem
- * @returns {vs.directives.Resizable.ResizeHandler}
- */
-vs.directives.Resizable.BoundingBox.prototype.getHandler = function($elem) {};
-
-/**
- * @param {vs.directives.Resizable.ResizeHandler} handler
- * @param {number} [minWidth]
- * @param {number} [minHeight]
- */
-vs.directives.Resizable.BoundingBox.prototype.update = function(handler, minWidth, minHeight) {};
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#left
- */
-vs.directives.Resizable.BoundingBox.prototype.left;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#top
- */
-vs.directives.Resizable.BoundingBox.prototype.top;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#width
- */
-vs.directives.Resizable.BoundingBox.prototype.width;
-
-/**
- * @type {number}
- * @name vs.directives.Resizable.BoundingBox#height
- */
-vs.directives.Resizable.BoundingBox.prototype.height;
-/**
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.Window = function() {};
-
-/**
- * @type {jQuery}
- * @name vs.directives.Window#$window
- */
-vs.directives.Window.prototype.$window;
-/**
- * @type {{pre: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))), post: (undefined|function(angular.Scope, jQuery, angular.Attributes, (*|undefined)))}|function(angular.Scope, jQuery, angular.Attributes, (*|undefined))}
- */
-vs.directives.Window.prototype.link;
-
-
-/**
- * @param {angular.Scope} $scope
- * @param {vs.async.TaskService} taskService
- * @param {angular.$timeout} $timeout
- * @constructor
- * @extends {ngu.Directive}
- */
-vs.directives.LoadingDecorator = function($scope, taskService, $timeout) {};
-
-/**
- * @param {angular.Scope} $scope
- * @param {jQuery} $element
- * @param {angular.Attributes} $attrs
- * @param controller
- * @override
- */
-vs.directives.LoadingDecorator.prototype.link = function($scope, $element, $attrs, controller) {};
-
-
-/**
- * @constructor
- * @extends vs.ui.VisHandler
- */
-vs.ui.svg.SvgVis = function () {};
-
-vs.ui.svg.SvgVis.prototype.beginDraw = function () {};
 
 
 /**
@@ -1586,12 +1619,9 @@ vs.ui.decorators.Grid.prototype.format;
  * @constructor
  * @extends vs.ui.decorators.Grid
  */
-vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {};
+vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {};
 
-/**
- * @returns {Promise}
- */
-vs.ui.svg.SvgGrid.prototype.endDraw = function() {};
+vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {};
 
 
 /**
@@ -1602,9 +1632,12 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {};
  * @constructor
  * @extends vs.ui.decorators.Grid
  */
-vs.ui.canvas.CanvasGrid = function($ng, $targetElement, target, options) {};
+vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {};
 
-vs.ui.canvas.CanvasGrid.prototype.endDraw = function() {};
+/**
+ * @returns {Promise}
+ */
+vs.ui.svg.SvgGrid.prototype.endDraw = function() {};
 
 
 /**

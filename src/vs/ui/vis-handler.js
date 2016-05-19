@@ -366,6 +366,16 @@ vs.ui.VisHandler.prototype.optionValue = function(optionKey) {
 };
 
 /**
+ * @param {string} optionKey
+ * @returns {*}
+ */
+vs.ui.VisHandler.prototype.optionFunctionValue = function(optionKey) {
+  if (!(optionKey in this['settings'])) { return null; }
+  var fWrapper = this['settings'][optionKey].getValue(this['options'], this['$attrs'], this['data'], this['settings']);
+  return fWrapper['func'](this['settings'][optionKey], this['options'], this['$attrs'], this['data'], this['settings']);
+};
+
+/**
  * @returns {Promise}
  */
 vs.ui.VisHandler.prototype.beginDraw = function() { u.log.info('beginDraw'); return Promise.resolve(); };

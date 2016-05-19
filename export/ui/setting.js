@@ -12,6 +12,7 @@ goog.exportProperty(vs.ui.Setting.prototype, 'possibleValues', vs.ui.Setting.pro
 goog.exportProperty(vs.ui.Setting.prototype, 'copy', vs.ui.Setting.prototype.copy);
 
 goog.exportSymbol('vs.ui.Setting.Type', vs.ui.Setting.Type);
+goog.exportSymbol('vs.ui.Setting.FunctionWrapper', vs.ui.Setting.FunctionWrapper);
 
 goog.exportProperty(vs.ui.Setting, 'boundaries', vs.ui.Setting.boundaries);
 goog.exportProperty(vs.ui.Setting, 'xBoundaries', vs.ui.Setting.xBoundaries);

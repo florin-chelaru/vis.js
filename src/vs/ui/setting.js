@@ -18,11 +18,11 @@ goog.require('vs.models.Margins');
  * @param {{
  *  key: string,
  *  type: (vs.ui.Setting.Type|string),
- *  defaultValue: (function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*),
+ *  defaultValue: (function(vs.ui.Setting, Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*),
  *  label: (string|undefined),
  *  template: (string|undefined),
  *  hidden: (boolean|undefined),
- *  possibleValues: (*|function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|undefined),
+ *  possibleValues: (*|function(vs.ui.Setting, Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|undefined),
  *  dependencies: (Object.<string, string>|undefined)
  * }} args
  * @constructor
@@ -39,7 +39,7 @@ vs.ui.Setting = function(args) {
   this['type'] = args['type'];
 
   /**
-   * @type {function(Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*}
+   * @type {function(vs.ui.Setting, Object.<string, *>, *, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>)|*}
    */
   this['defaultValue'] = args['defaultValue'];
 
@@ -49,7 +49,7 @@ vs.ui.Setting = function(args) {
   this['label'] = args['label'] || this['key'];
 
   /**
-   * @type {*|function(Object.<string, *>, *, (Array.<vs.models.DataSource>|undefined), (Object.<string, vs.ui.Setting>|undefined))|null}
+   * @type {*|function(vs.ui.Setting, Object.<string, *>, *, (Array.<vs.models.DataSource>|undefined), (Object.<string, vs.ui.Setting>|undefined))|null}
    * @private
    */
   this._possibleValues = args['possibleValues'] || null;
@@ -156,7 +156,7 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
     case vs.ui.Setting.Type['CATEGORICAL']:
       if (this._possibleValues === null) { return val; }
       possibleVals = (typeof this._possibleValues == 'function') ?
-        this._possibleValues.call(null, options, $attrs, data, settings) : this._possibleValues;
+        this._possibleValues.call(null, this, options, $attrs, data, settings) : this._possibleValues;
       return possibleVals.indexOf(val) < 0 ? defaultValue() : val;
 
     case vs.ui.Setting.Type['OBJECT']:
@@ -203,7 +203,7 @@ vs.ui.Setting.prototype.getValue = function(options, $attrs, data, settings) {
 vs.ui.Setting.prototype.possibleValues = function(options, $attrs, data, settings) {
   if (this._possibleValues) {
     return (typeof this._possibleValues != 'function') ?
-      this._possibleValues : this._possibleValues.call(null, options, $attrs, data, settings);
+      this._possibleValues : this._possibleValues.call(null, this, options, $attrs, data, settings);
   }
   if (!data) { return null; }
 
@@ -491,15 +491,23 @@ vs.ui.Setting.yScale = function (setting, options, $attrs, data, settings) {
   var yBoundaries = /** @type {vs.models.Boundaries} */ (settings[dependencies['yBoundaries']].getValue(options, $attrs, data, settings));
   var height = /** @type {number} */ (settings[dependencies['height']].getValue(options, $attrs, data, settings));
   var margins = /** @type {vs.models.Margins} */ (settings[dependencies['margins']].getValue(options, $attrs, data, settings));
+
   return d3.scale.linear()
     .domain([yBoundaries['min'], yBoundaries['max']])
     .range([height - margins['top'] - margins['bottom'], 0]);
 };
 
 /**
- * @const {function(*):string}
+ * @param {vs.ui.Setting} setting
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
  */
-vs.ui.Setting.defaultPalette = d3.scale.category20();
+vs.ui.Setting.defaultPalette = function (setting, options, $attrs, data, settings) {
+  return new vs.ui.Setting.FunctionWrapper('linear', d3.scale.category20());
+};
 
 /**
  * @param {vs.ui.Setting} setting
@@ -565,6 +573,38 @@ vs.ui.Setting.mergeCols = function(xField, ds) {
 };
 //endregion
 
+//region Nested types
+
+/*
+ /**
+ * @param {vs.ui.Setting} setting
+ * @param {Object.<string, *>} options
+ * @param $attrs Angular attrs
+ * @param {Array.<vs.models.DataSource>} [data]
+ * @param {Object.<string, vs.ui.Setting>} [settings]
+ * @returns {*}
+ *
+ */
+
+/**
+ * @param {string} label
+ * @param {Function} func
+ * @constructor
+ */
+vs.ui.Setting.FunctionWrapper = function(label, func) {
+  /**
+   * @type {string}
+   */
+  this['label'] = label;
+
+  /**
+   * @type {function(vs.ui.Setting, Object.<string, *>, angular.Attributes, Array.<vs.models.DataSource>, Object.<string, vs.ui.Setting>): *}
+   */
+  this['func'] = func;
+};
+
+//endregion
+
 //region Constants
 /**
  * @const {Object.<string, vs.ui.Setting>}
@@ -585,7 +625,7 @@ vs.ui.Setting.PredefinedSettings = {
   'height': new vs.ui.Setting({'key':'height', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':300}),
 
   'cols': new vs.ui.Setting({'key':'cols', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(setting, options, $attrs, data) { return u.fast.map(data, function(d) { return d['id']; }); }, 'label':'columns', 'template':'_multiselect-tbl.html',
-    'possibleValues': function(options, $attrs, data, settings) { return u.fast.map(data, function(d) { return d['id']; }); }}),
+    'possibleValues': function(setting, options, $attrs, data, settings) { return u.fast.map(data, function(d) { return d['id']; }); }}),
   'xVals': new vs.ui.Setting({'key':'xVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(setting, options, $attrs, data) { return vs.models.DataSource.combinedArrayMetadata(data); }, 'label':'xs', 'template':'_multiselect-tbl.html'}),
   'yVals': new vs.ui.Setting({'key':'yVals', 'type':vs.ui.Setting.Type['ARRAY'], 'defaultValue':function(setting, options, $attrs, data) { return vs.models.DataSource.combinedArrayMetadata(data); }, 'label':'ys', 'template':'_multiselect-tbl.html'}),
 
@@ -594,14 +634,25 @@ vs.ui.Setting.PredefinedSettings = {
 
   'doubleBuffer': new vs.ui.Setting({'key':'doubleBuffer', 'type':vs.ui.Setting.Type['BOOLEAN'], 'defaultValue':true, 'label':'double buffer', 'template':'_switch.html'}),
 
-  'xScale': new vs.ui.Setting({'key':'xScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.xScale, 'dependencies': {'xBoundaries':'xBoundaries', 'width':'width', 'margins':'margins'}, 'hidden': true}),
-  'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'dependencies': {'yBoundaries':'yBoundaries', 'height':'height', 'margins':'margins'}, 'hidden': true}),
+  // 'xScale': new vs.ui.Setting({'key':'xScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.xScale, 'dependencies': {'xBoundaries':'xBoundaries', 'width':'width', 'margins':'margins'}, 'hidden': true}),
+  // 'yScale': new vs.ui.Setting({'key':'yScale', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':vs.ui.Setting.yScale, 'dependencies': {'yBoundaries':'yBoundaries', 'height':'height', 'margins':'margins'}, 'hidden': true}),
+
+  'xScale': new vs.ui.Setting({'key':'xScale', 'type':'vs.ui.Setting.FunctionWrapper', 'defaultValue': new vs.ui.Setting.FunctionWrapper('linear', vs.ui.Setting.xScale), 'dependencies': {'xBoundaries':'xBoundaries', 'width':'width', 'margins':'margins'}, 'template': '_function.html',
+    'possibleValues':[new vs.ui.Setting.FunctionWrapper('linear', vs.ui.Setting.xScale)]}),
+  'yScale': new vs.ui.Setting({'key':'yScale', 'type':'vs.ui.Setting.FunctionWrapper', 'defaultValue': new vs.ui.Setting.FunctionWrapper('linear', vs.ui.Setting.yScale), 'dependencies': {'yBoundaries':'yBoundaries', 'height':'height', 'margins':'margins'}, 'template': '_function.html',
+    'possibleValues':[new vs.ui.Setting.FunctionWrapper('linear', vs.ui.Setting.yScale)]}),
 
   'fill': new vs.ui.Setting({'key':'fill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,0.3)', 'label':'object fill', 'template': '_color.html'}),
-  'fills': new vs.ui.Setting({'key':'fills', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue': function() { return vs.ui.Setting.defaultPalette; }, 'label':'object fill'}),
+  //'fills': new vs.ui.Setting({'key':'fills', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue': function() { return vs.ui.Setting.defaultPalette; }, 'label':'object fill', 'template': '_color-palette.html'}),
+  /*'fills': new vs.ui.Setting({'key':'fills', 'type':vs.ui.Setting.Type['CATEGORICAL'], 'defaultValue': function() { return vs.ui.Setting.defaultPalette; }, 'label':'object fill', 'template': '_color-palette.html',
+    'possibleValues': [vs.ui.Setting.defaultPalette]}),*/
+  'fills': new vs.ui.Setting({'key':'fills', 'type':'vs.ui.Setting.FunctionWrapper', 'defaultValue': new vs.ui.Setting.FunctionWrapper('category20', function() { return d3.scale.category20(); }), 'label':'object fill', 'template': '_function.html',
+    'possibleValues':[new vs.ui.Setting.FunctionWrapper('category20', function() { return d3.scale.category20(); }), new vs.ui.Setting.FunctionWrapper('category10', function() { return d3.scale.category10(); })] }),
   'fillOpacity': new vs.ui.Setting({'key':'fillOpacity', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':.3, 'label':'fill opacity'}),
   'stroke': new vs.ui.Setting({'key':'stroke', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'rgba(30,96,212,1)', 'label':'object stroke', 'template': '_color.html'}),
-  'strokes': new vs.ui.Setting({'key':'strokes', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':function() { return vs.ui.Setting.defaultPalette; }, 'label':'object stroke'}),
+  //'strokes': new vs.ui.Setting({'key':'strokes', 'type':vs.ui.Setting.Type['FUNCTION'], 'defaultValue':function() { return vs.ui.Setting.defaultPalette; }, 'label':'object stroke', 'template': '_color-palette.html'}),
+  'strokes': new vs.ui.Setting({'key':'strokes', 'type':'vs.ui.Setting.FunctionWrapper', 'defaultValue':new vs.ui.Setting.FunctionWrapper('category20', function() { return d3.scale.category20(); }), 'label':'object stroke', 'template': '_function.html',
+    'possibleValues':[new vs.ui.Setting.FunctionWrapper('category20', function() { return d3.scale.category20(); }), new vs.ui.Setting.FunctionWrapper('category10', function() { return d3.scale.category10(); })] }),
   'strokeThickness': new vs.ui.Setting({'key':'strokeThickness', 'type':vs.ui.Setting.Type['NUMBER'], 'defaultValue':1, 'label':'stroke thickness', 'template': '_number.html'}),
 
   'selectFill': new vs.ui.Setting({'key':'selectFill', 'type':vs.ui.Setting.Type['STRING'], 'defaultValue':'#ff6520', 'label':'selected object fill', 'template': '_color.html'}),

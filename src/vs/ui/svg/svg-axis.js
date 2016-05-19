@@ -23,6 +23,15 @@ vs.ui.svg.SvgAxis = function($ng, $targetElement, target, options) {
 goog.inherits(vs.ui.svg.SvgAxis, vs.ui.decorators.Axis);
 
 /**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.svg.SvgAxis.Settings = u.extend({}, vs.ui.decorators.Axis.Settings);
+
+Object.defineProperties(vs.ui.svg.SvgAxis.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.svg.SvgAxis)} */ (function() { return vs.ui.svg.SvgAxis.Settings; })}
+});
+
+/**
  * @returns {Promise}
  */
 vs.ui.svg.SvgAxis.prototype.endDraw = function() {
@@ -46,7 +55,7 @@ vs.ui.svg.SvgAxis.prototype.endDraw = function() {
     var margins = target['margins'];
     var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
-    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    var scale = (type == 'x') ? target.optionFunctionValue('xScale') : target.optionFunctionValue('yScale');
     if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Axis decorator'); }
 
     var axisFn = d3.svg.axis()

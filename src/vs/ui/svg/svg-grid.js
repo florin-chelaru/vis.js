@@ -23,6 +23,15 @@ vs.ui.svg.SvgGrid = function($ng, $targetElement, target, options) {
 goog.inherits(vs.ui.svg.SvgGrid, vs.ui.decorators.Grid);
 
 /**
+ * @type {Object.<string, vs.ui.Setting>}
+ */
+vs.ui.svg.SvgGrid.Settings = u.extend({}, vs.ui.decorators.Grid.Settings);
+
+Object.defineProperties(vs.ui.svg.SvgGrid.prototype, {
+  'settings': { get: /** @type {function (this:vs.ui.svg.SvgGrid)} */ (function() { return vs.ui.svg.SvgGrid.Settings; })}
+});
+
+/**
  * @returns {Promise}
  */
 vs.ui.svg.SvgGrid.prototype.endDraw = function() {
@@ -47,7 +56,7 @@ vs.ui.svg.SvgGrid.prototype.endDraw = function() {
     var margins = target['margins'];
     var origins = {'x': margins['left'], 'y': height - margins['bottom']};
 
-    var scale = (type == 'x') ? target.optionValue('xScale') : target.optionValue('yScale');
+    var scale = (type == 'x') ? target.optionFunctionValue('xScale') : target.optionFunctionValue('yScale');
     if (!scale) { throw new vs.ui.UiException('Visualization must have "xScale"/"yScale" settings defined in order to use the Grid decorator'); }
 
     var gridLines = grid

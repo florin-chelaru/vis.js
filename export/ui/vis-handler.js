@@ -9,6 +9,7 @@ goog.require('vs.ui.VisHandler');
 goog.exportSymbol('vs.ui.VisHandler', vs.ui.VisHandler);
 goog.exportProperty(vs.ui.VisHandler, 'Settings', vs.ui.VisHandler.Settings);
 goog.exportProperty(vs.ui.VisHandler.prototype, 'optionValue', vs.ui.VisHandler.prototype.optionValue);
+goog.exportProperty(vs.ui.VisHandler.prototype, 'optionFunctionValue', vs.ui.VisHandler.prototype.optionFunctionValue);
 goog.exportProperty(vs.ui.VisHandler.prototype, 'scheduleRedraw', vs.ui.VisHandler.prototype.scheduleRedraw);
 goog.exportProperty(vs.ui.VisHandler.prototype, 'schedulePreProcessData', vs.ui.VisHandler.prototype.schedulePreProcessData);
 
